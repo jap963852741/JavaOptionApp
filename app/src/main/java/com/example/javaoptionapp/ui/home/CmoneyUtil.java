@@ -2,22 +2,10 @@ package com.example.javaoptionapp.ui.home;
 
 import android.util.Log;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -33,59 +21,21 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-//Model层只用来产生数据
-public class HomeViewModel extends ViewModel implements CmoneyUtil.MarkeyInformation {
-    private RedirectInterceptor mRedirectInterceptor = new RedirectInterceptor();
-    public final static long timeoutTime = 1000 * 15;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
-
-
-    public static class SSLSocketClient {
-        //获取这个SSLSocketFactory
-        public static SSLSocketFactory getSSLSocketFactory() {
-            try {
-                SSLContext sslContext = SSLContext.getInstance("SSL");
-                sslContext.init(null, getTrustManager(), new SecureRandom());
-                return sslContext.getSocketFactory();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        //获取TrustManager
-        private static TrustManager[] getTrustManager() {
-            TrustManager[] trustAllCerts = new TrustManager[]{
-                    new X509TrustManager() {
-                        @Override
-                        public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                        }
-
-                        @Override
-                        public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                        }
-
-                        @Override
-                        public X509Certificate[] getAcceptedIssuers() {
-                            return new X509Certificate[]{};
-                        }
-                    }
-            };
-            return trustAllCerts;
-        }
-
-        //获取HostnameVerifier
-        public static HostnameVerifier getHostnameVerifier() {
-            HostnameVerifier hostnameVerifier = new HostnameVerifier() {
-                @Override
-                public boolean verify(String s, SSLSession sslSession) {
-                    return true;
-                }
-            };
-            return hostnameVerifier;
-        }
-    }
+public class CmoneyUtil {
+    MarkeyInformation markeyInformation;
     private OkHttpClient okHttpClient;
-    private MutableLiveData<String> mText;
-    public static final MediaType JSONType = MediaType.parse("application/json; charset=utf-8");
+    public final static long timeoutTime = 1000 * 15;
+    private RedirectInterceptor mRedirectInterceptor = new RedirectInterceptor();
+
     private static JSONObject Market_information ;
     private static JSONObject token_json ;
     private static String token_string ;
@@ -93,7 +43,32 @@ public class HomeViewModel extends ViewModel implements CmoneyUtil.MarkeyInforma
     private static ArrayList Market_information_NewestArray ;
     private static ArrayList Market_information_DataArray;
 
+    public interface MarkeyInformation {
+        void answer(String info);
+    }
 
+    public void response(MarkeyInformation markeyInformation) {
+        this.markeyInformation = markeyInformation;
+        post_tolken();
+    }
+
+    public CmoneyUtil() {
+
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    Thread.sleep(100);
+//                    if (null != markeyInformation) {
+//                        markeyInformation.answer(Market_information_DataArray.toString());
+//                    }
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }).start();
+
+    }
 
 
 
@@ -101,8 +76,8 @@ public class HomeViewModel extends ViewModel implements CmoneyUtil.MarkeyInforma
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.connectTimeout(timeoutTime, TimeUnit.MILLISECONDS)
                 .readTimeout(timeoutTime, TimeUnit.MILLISECONDS)
-                .sslSocketFactory(SSLSocketClient.getSSLSocketFactory())
-                .hostnameVerifier(SSLSocketClient.getHostnameVerifier())
+                .sslSocketFactory(HomeViewModel.SSLSocketClient.getSSLSocketFactory())
+                .hostnameVerifier(HomeViewModel.SSLSocketClient.getHostnameVerifier())
                 .addInterceptor(mRedirectInterceptor);
         okHttpClient = builder.build();
 
@@ -153,8 +128,8 @@ public class HomeViewModel extends ViewModel implements CmoneyUtil.MarkeyInforma
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.connectTimeout(timeoutTime, TimeUnit.MILLISECONDS)
                 .readTimeout(timeoutTime, TimeUnit.MILLISECONDS)
-                .sslSocketFactory(SSLSocketClient.getSSLSocketFactory())
-                .hostnameVerifier(SSLSocketClient.getHostnameVerifier())
+                .sslSocketFactory(HomeViewModel.SSLSocketClient.getSSLSocketFactory())
+                .hostnameVerifier(HomeViewModel.SSLSocketClient.getHostnameVerifier())
                 .addInterceptor(mRedirectInterceptor);
         okHttpClient = builder.build();
 
@@ -194,39 +169,17 @@ public class HomeViewModel extends ViewModel implements CmoneyUtil.MarkeyInforma
                 Log.i("Market_information_Newest_String", Market_information_Newest_String);
                 Market_information_NewestArray = new ArrayList<String>(Arrays.asList(Market_information_Newest_String.split(",")));
 
-
+                if (null != markeyInformation) {
+                        markeyInformation.answer(Market_information_Newest_String);
+                }
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-            Log.i("sb",sb.toString());
-            Log.i("Market_information",Market_information.toString());
-            Log.i("Market_information_Title",Market_information_Title.toString());
-            Log.i("Market_information_DataArray",Market_information_DataArray.get(0).toString());
-            Log.i("Market_information_NewestArray",Market_information_NewestArray.toString());
-
         }
     };
 
-    public HomeViewModel() {
-        mText = new MutableLiveData<>();
-//        post_tolken();
-        CmoneyUtil cmoneyUtil = new CmoneyUtil();
-        cmoneyUtil.response(this);
-        Log.i("Now","HomeViewModel()");
 
 
-    }
 
-    public LiveData<String> getText() {
-        return mText;
-    }
-
-
-    @Override
-    public void answer(String info) {
-        Log.i("Now","answer");
-        mText.postValue("目前大盤"+ info);
-    }
 }
