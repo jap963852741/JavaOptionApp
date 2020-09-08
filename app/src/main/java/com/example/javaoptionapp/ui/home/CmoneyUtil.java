@@ -40,8 +40,10 @@ public class CmoneyUtil {
     private static JSONObject token_json ;
     private static String token_string ;
     private static String Market_information_Title ;
+    private static ArrayList Market_information_Title_Array ;
     private static ArrayList Market_information_NewestArray ;
     private static ArrayList Market_information_DataArray;
+    private static ArrayList Title_information_Array;
 
     public interface MarkeyInformation {
         void answer(String info);
@@ -53,20 +55,6 @@ public class CmoneyUtil {
     }
 
     public CmoneyUtil() {
-
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    Thread.sleep(100);
-//                    if (null != markeyInformation) {
-//                        markeyInformation.answer(Market_information_DataArray.toString());
-//                    }
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
 
     }
 
@@ -163,14 +151,27 @@ public class CmoneyUtil {
             try {
                 Market_information =new JSONObject(String.valueOf(sb));
                 Market_information_Title = Market_information.getString("Title");
+                Market_information_Title_Array = new ArrayList<String>(Arrays.asList(Market_information_Title.replaceAll("\\[" , "").replaceAll("]" , "").split(",")));
                 String Market_information_DataArrayString = Market_information.getString("Data");
                 Market_information_DataArray = new ArrayList<String>(Arrays.asList(Market_information_DataArrayString.replaceAll("\\[" , "").split("]")));
                 String Market_information_Newest_String = Market_information_DataArray.get(0).toString();
                 Log.i("Market_information_Newest_String", Market_information_Newest_String);
                 Market_information_NewestArray = new ArrayList<String>(Arrays.asList(Market_information_Newest_String.split(",")));
 
+
+//
+                Title_information_Array = new ArrayList<String>();
+                for(int i = 0; i <= Market_information_Title_Array.size()-1; i++){
+//                    Log.i("i=",String.valueOf(i));
+//                    Log.i("Market_information_Title_Array.get(i).toString()",Market_information_Title_Array.get(i).toString());
+//                    Log.i("Market_information_NewestArray.get(i).toString()",Market_information_NewestArray.get(i).toString());
+                    String temp_word = Market_information_Title_Array.get(i).toString() + " : " + Market_information_NewestArray.get(i).toString();
+                    Title_information_Array.add(temp_word);
+                }
+
+
                 if (null != markeyInformation) {
-                        markeyInformation.answer(Market_information_Newest_String);
+                        markeyInformation.answer(Title_information_Array.toString());
                 }
 
             } catch (JSONException e) {
