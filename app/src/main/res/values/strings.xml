@@ -3,4 +3,6 @@
     <string name="CMoney_API">CMoney_API</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="date">日期</string>
+
 </resources>

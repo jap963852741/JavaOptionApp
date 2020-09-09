@@ -44,20 +44,21 @@ public class CmoneyUtil {
     private static ArrayList Market_information_NewestArray ;
     private static ArrayList Market_information_DataArray;
     private static ArrayList Title_information_Array;
+    static ArrayList Market_Date;//全域
+    private static int date_index;
 
+    private static String choose_date;
     public interface MarkeyInformation {
         void answer(String info);
     }
 
     public void response(MarkeyInformation markeyInformation) {
         this.markeyInformation = markeyInformation;
-        post_tolken();
     }
 
     public CmoneyUtil() {
 
     }
-
 
 
     public void post_tolken() {
@@ -126,7 +127,7 @@ public class CmoneyUtil {
             public void run() {
                 Log.i("Authorization","Bearer "+token_string);
                 Request request = new Request.Builder()
-                        .url("https://owl.cmoney.com.tw/OwlApi/api/v2/json/BA1-23689a")
+                        .url("https://owl.cmoney.com.tw/OwlApi/api/v2/json/BA1-23689a")//BA1-23690a大盤籌碼日報  //BA1-23689a 大盤
                         .header("Authorization", "Bearer "+token_string)
                         .get()
                         .build();
@@ -153,7 +154,7 @@ public class CmoneyUtil {
                 Market_information_Title = Market_information.getString("Title");
                 Market_information_Title_Array = new ArrayList<String>(Arrays.asList(Market_information_Title.replaceAll("\\[" , "").replaceAll("]" , "").split(",")));
                 String Market_information_DataArrayString = Market_information.getString("Data");
-                Market_information_DataArray = new ArrayList<String>(Arrays.asList(Market_information_DataArrayString.replaceAll("\\[" , "").split("]")));
+                Market_information_DataArray = new ArrayList<String>(Arrays.asList(Market_information_DataArrayString.replaceAll("\\[" , "").split("],")));
                 String Market_information_Newest_String = Market_information_DataArray.get(0).toString();
                 Log.i("Market_information_Newest_String", Market_information_Newest_String);
                 Market_information_NewestArray = new ArrayList<String>(Arrays.asList(Market_information_Newest_String.split(",")));
@@ -161,14 +162,21 @@ public class CmoneyUtil {
 
 //
                 Title_information_Array = new ArrayList<String>();
+                //取得第一筆資料的Array
                 for(int i = 0; i <= Market_information_Title_Array.size()-1; i++){
-//                    Log.i("i=",String.valueOf(i));
-//                    Log.i("Market_information_Title_Array.get(i).toString()",Market_information_Title_Array.get(i).toString());
-//                    Log.i("Market_information_NewestArray.get(i).toString()",Market_information_NewestArray.get(i).toString());
+                    if (Market_information_Title_Array.get(i).toString() == "日期"){
+                        date_index = i;
+                    }
                     String temp_word = Market_information_Title_Array.get(i).toString() + " : " + Market_information_NewestArray.get(i).toString();
                     Title_information_Array.add(temp_word);
                 }
 
+                Market_Date = new ArrayList<String>();
+                for(int i = 0; i <= Market_information_DataArray.size()-1;i++){
+                    String Market_information_String = Market_information_DataArray.get(i).toString();
+                    ArrayList Market_information_TempArray = new ArrayList<String>(Arrays.asList(Market_information_String.split(",")));
+                    Market_Date.add(Market_information_TempArray.get(date_index));
+                }
 
                 if (null != markeyInformation) {
                         markeyInformation.answer(Title_information_Array.toString());
@@ -179,6 +187,128 @@ public class CmoneyUtil {
             }
         }
     };
+
+
+
+    public void post_tolken(String date) {
+        choose_date = date;
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.connectTimeout(timeoutTime, TimeUnit.MILLISECONDS)
+                .readTimeout(timeoutTime, TimeUnit.MILLISECONDS)
+                .sslSocketFactory(HomeViewModel.SSLSocketClient.getSSLSocketFactory())
+                .hostnameVerifier(HomeViewModel.SSLSocketClient.getHostnameVerifier())
+                .addInterceptor(mRedirectInterceptor);
+        okHttpClient = builder.build();
+
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("appId", "20200904152146367")
+                .addFormDataPart("appSecret", "4a56a0f0ee7f11ea93fb000c2932e359")
+                .build();
+        Request request = new Request.Builder()
+                .url("https://owl.cmoney.com.tw/OwlApi/auth?appId=20200904152146367&appSecret=4a56a0f0ee7f11ea93fb000c2932e359")
+                .post(requestBody)
+                .build();
+
+        okHttpClient.newCall(request).enqueue(callback_token_date);
+    }
+    //请求后的回调方法
+    private Callback callback_token_date = new Callback() {
+        @Override
+        public void onFailure(Call call, IOException e) {
+            Log.i("get_tolken", "onFailure");
+            Log.i("get_tolken", e.toString());
+        }
+
+        @Override
+        public void onResponse(Call call, Response response) throws IOException {
+            Log.i("get_tolken", "onResponse");
+            final StringBuffer sb = new StringBuffer(response.body().string());
+
+            try {
+                token_json = new JSONObject(String.valueOf(sb));
+                token_string = token_json.getString("token");
+                Log.i("token_string", token_string);
+                get(choose_date);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+    };
+
+    public void get(String date){
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.connectTimeout(timeoutTime, TimeUnit.MILLISECONDS)
+                .readTimeout(timeoutTime, TimeUnit.MILLISECONDS)
+                .sslSocketFactory(HomeViewModel.SSLSocketClient.getSSLSocketFactory())
+                .hostnameVerifier(HomeViewModel.SSLSocketClient.getHostnameVerifier())
+                .addInterceptor(mRedirectInterceptor);
+        okHttpClient = builder.build();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i("Authorization","Bearer "+token_string);
+                Request request = new Request.Builder()
+                        .url("https://owl.cmoney.com.tw/OwlApi/api/v2/json/BA1-23689a")//BA1-23690a大盤籌碼日報  //BA1-23689a 大盤
+                        .header("Authorization", "Bearer "+token_string)
+                        .get()
+                        .build();
+                okHttpClient.newCall(request).enqueue(callback_date);
+            }
+        }).start();
+    }
+    //请求后的回调方法
+    private Callback callback_date = new Callback() {
+        @Override
+        public void onFailure(Call call, IOException e) {
+            Log.i("get", e.toString());
+        }
+
+        @Override
+        public void onResponse(Call call, Response response) throws IOException {
+            Log.i("get", "onResponse");
+            final StringBuffer sb = new StringBuffer(response.body().string());
+
+            for(int i = 0; i <= Market_information_Title_Array.size()-1; i++){
+                if (Market_information_Title_Array.get(i).toString() == "日期"){
+                    date_index = i;
+                }
+            }
+            Log.i("choose_date",choose_date);
+            for(int i = 0; i <= Market_information_DataArray.size()-1;i++){
+                String temp_String = Market_information_DataArray.get(i).toString();
+                ArrayList temp_array = new ArrayList<String>(Arrays.asList(temp_String.split(",")));
+                if (temp_array.get(date_index).toString().replace("\"","").equals(choose_date)){
+                    Market_information_NewestArray = temp_array;
+                    break;
+                }
+            }
+
+
+            Title_information_Array = new ArrayList<String>();
+            //取得第一筆資料的Array
+            for(int i = 0; i <= Market_information_Title_Array.size()-1; i++){
+                String temp_word = Market_information_Title_Array.get(i).toString() + " : " + Market_information_NewestArray.get(i).toString();
+                Title_information_Array.add(temp_word);
+            }
+
+            Market_Date = new ArrayList<String>();
+            for(int i = 0; i <= Market_information_DataArray.size()-1;i++){
+                String Market_information_String = Market_information_DataArray.get(i).toString();
+                ArrayList Market_information_TempArray = new ArrayList<String>(Arrays.asList(Market_information_String.split(",")));
+                Market_Date.add(Market_information_TempArray.get(date_index));
+            }
+
+            Log.i("Title_information_Array",Title_information_Array.toString());
+            HomeViewModel.mText.postValue(Title_information_Array.toString());
+
+        }
+    };
+
+
+
 
 
 

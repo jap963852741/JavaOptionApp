@@ -42,6 +42,8 @@ import javax.net.ssl.X509TrustManager;
 //ViewModel：将前面两者联系在一起的对象
 public class HomeViewModel extends ViewModel implements CmoneyUtil.MarkeyInformation {
 
+    public static MutableLiveData<String>  mText;
+
     public static class SSLSocketClient {
         //获取这个SSLSocketFactory
         public static SSLSocketFactory getSSLSocketFactory() {
@@ -85,14 +87,18 @@ public class HomeViewModel extends ViewModel implements CmoneyUtil.MarkeyInforma
             return hostnameVerifier;
         }
     }
-    public MutableLiveData<String> mText;
+//    public MutableLiveData<String> mText;
 
     public HomeViewModel() {
         mText = new MutableLiveData<>();
         CmoneyUtil cmoneyUtil = new CmoneyUtil();
         cmoneyUtil.response(this);
+        cmoneyUtil.post_tolken();
         Log.i("Now","HomeViewModel()");
     }
+
+
+
     public LiveData<String> getText() {
         return mText;
     }

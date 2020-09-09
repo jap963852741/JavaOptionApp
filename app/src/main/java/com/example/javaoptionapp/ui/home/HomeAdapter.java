@@ -42,7 +42,7 @@ public class HomeAdapter extends RecyclerView.Adapter<VH> {
 
 class VH extends RecyclerView.ViewHolder {
     TextView tv1;
-    //        TextView tv2;
+    //TextView tv2;
     public VH(@NonNull View itemView,View parent) {
         super(itemView);
         tv1 = itemView.findViewById(R.id.tv1);
