@@ -4,4 +4,11 @@
 
     <item android:id="@+id/date" android:title="@string/date"/>
 
+    <item android:id="@+id/BA123690a"
+        android:title="@string/BA123690a"/>
+    <item android:id="@+id/BA123695a"
+        android:title="@string/BA123695a"/>
+    <item android:id="@+id/BA123691a"
+        android:title="@string/BA123691a"/>
+
 </menu>

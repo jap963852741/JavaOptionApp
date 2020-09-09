@@ -35,6 +35,13 @@ public class CmoneyUtil {
     private OkHttpClient okHttpClient;
     public final static long timeoutTime = 1000 * 15;
     private RedirectInterceptor mRedirectInterceptor = new RedirectInterceptor();
+    public String get_url = "https://owl.cmoney.com.tw/OwlApi/api/v2/json/";
+    public String item_schma = "BA1-23689a";
+    //BA1-23690a 大盤籌碼日報
+    // BA1-23689a 大盤K線
+//    BA1-23695a 大盤漲跌家數
+//BA1-23691a 大盤外資
+
 
     private static JSONObject Market_information ;
     private static JSONObject token_json ;
@@ -127,7 +134,7 @@ public class CmoneyUtil {
             public void run() {
                 Log.i("Authorization","Bearer "+token_string);
                 Request request = new Request.Builder()
-                        .url("https://owl.cmoney.com.tw/OwlApi/api/v2/json/BA1-23689a")//BA1-23690a大盤籌碼日報  //BA1-23689a 大盤
+                        .url(get_url+item_schma)
                         .header("Authorization", "Bearer "+token_string)
                         .get()
                         .build();
@@ -170,7 +177,7 @@ public class CmoneyUtil {
                     String temp_word = Market_information_Title_Array.get(i).toString() + " : " + Market_information_NewestArray.get(i).toString();
                     Title_information_Array.add(temp_word);
                 }
-
+                Log.i("Market_information_DataArray",Market_information_DataArray.toString());
                 Market_Date = new ArrayList<String>();
                 for(int i = 0; i <= Market_information_DataArray.size()-1;i++){
                     String Market_information_String = Market_information_DataArray.get(i).toString();
@@ -179,7 +186,12 @@ public class CmoneyUtil {
                 }
 
                 if (null != markeyInformation) {
-                        markeyInformation.answer(Title_information_Array.toString());
+                    markeyInformation.answer(Title_information_Array.toString());
+                    Log.i("Market_Date",Market_Date.toString());
+
+                }else{
+                    HomeViewModel.mText.postValue(Title_information_Array.toString());
+                    Log.i("Market_Date",Market_Date.toString());
                 }
 
             } catch (JSONException e) {
@@ -251,7 +263,7 @@ public class CmoneyUtil {
             public void run() {
                 Log.i("Authorization","Bearer "+token_string);
                 Request request = new Request.Builder()
-                        .url("https://owl.cmoney.com.tw/OwlApi/api/v2/json/BA1-23689a")//BA1-23690a大盤籌碼日報  //BA1-23689a 大盤
+                        .url(get_url+item_schma)
                         .header("Authorization", "Bearer "+token_string)
                         .get()
                         .build();
