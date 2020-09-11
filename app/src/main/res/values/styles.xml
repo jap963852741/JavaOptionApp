@@ -1,10 +1,31 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/colorWhite</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:navigationBarColor">@color/colorWhite</item>
+        <item name="android:windowBackground" tools:ignore="DuplicateDefinition">@color/colorWhite</item>
+        <item name="android:text">@color/textColorPrimary</item>
+        <item name="windowActionBar">false</item> <!-- 解決在 宣告 toolbar時的錯誤 -->
+        <item name="windowNoTitle">true</item> <!-- 解決在 宣告 toolbar時的錯誤 -->
+<!--        <item name="fontFamily">@font/normal</item>-->
+<!--        <item name="titleTextAppearance">@style/fontstyle</item>-->
+
     </style>
+<!--    <style name="fontstyle"  parent="Theme.AppCompat">-->
+<!--        <item name="fontFamily">@font/ozcaramel</item>-->
+<!--    </style>-->
+
+
+    <style name="toolbarstyle" parent="Theme.MaterialComponents.Light">
+<!--        <item name="showTitle">false</item>-->
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
+
 
 </resources>

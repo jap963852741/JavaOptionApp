@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -57,7 +59,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
         final RecyclerView recyclerView =  root.findViewById(R.id.re_view);
         choose_button = (Button) root.findViewById(R.id.choose_button);
         choose_button.setOnClickListener(this);
-
+        Toolbar toolbar = getActivity().findViewById(R.id.toolBar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
@@ -69,6 +72,59 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
 
             }
         });
+
+        //设置日曆
+        toolbar.setNavigationIcon(R.drawable.calendar);
+        //设置日曆点击事件
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<Long>  markDays = new ArrayList<>();
+                ArrayList market_date_array = CmoneyUtil.Market_Date;
+                final SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+                for (int i = 0; i < market_date_array.size()-1; i++) {
+                    try {
+                        Date d = sf.parse(String.valueOf(market_date_array.get(i)).replace("\"",""));
+                        long milliseconds = d.getTime();
+                        markDays.add(milliseconds);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+                CalendarViewDialog.getInstance()
+                        .init(getContext())
+                        .addMarks(markDays)
+                        .setLimitMonth(true)
+                        .show(new CalendarView.OnCalendarClickListener() {
+                            @Override
+                            public void onDayClick(java.util.Calendar calendar) {
+                                CalendarViewDialog.getInstance().close();
+                                String temp_date = sf.format(calendar.getTime());
+                                Log.i("temp_date",temp_date);
+                                CmoneyUtil cu = new CmoneyUtil();
+                                cu.post_tolken(temp_date);
+
+                            }
+
+                            @Override
+                            public void onDayNotMarkClick(java.util.Calendar daySelectedCalendar) {
+                                super.onDayNotMarkClick(daySelectedCalendar);
+                                Toast.makeText(getContext(), "此日無開盤/或是無資料" , Toast.LENGTH_SHORT).show();
+
+                            }
+
+                        });
+
+
+
+
+
+            }
+        });
+
+
+
         return root;
     }
 
