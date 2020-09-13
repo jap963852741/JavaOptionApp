@@ -1,2 +1,3 @@
+include ':franktest'
 include ':app'
 rootProject.name = "JavaOptionApp"

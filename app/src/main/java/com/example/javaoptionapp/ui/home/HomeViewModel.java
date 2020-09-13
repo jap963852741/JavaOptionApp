@@ -91,7 +91,7 @@ public class HomeViewModel extends ViewModel implements CmoneyUtil.MarkeyInforma
 
     public HomeViewModel() {
         mText = new MutableLiveData<>();
-        CmoneyUtil cmoneyUtil = new CmoneyUtil();
+        CmoneyUtil cmoneyUtil = new CmoneyUtil();//初始化
         cmoneyUtil.response(this);
         cmoneyUtil.post_tolken();
         Log.i("Now","HomeViewModel()");

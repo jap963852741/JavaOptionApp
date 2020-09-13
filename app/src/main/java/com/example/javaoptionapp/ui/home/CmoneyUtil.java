@@ -41,8 +41,6 @@ public class CmoneyUtil {
     // BA1-23689a 大盤K線
 //    BA1-23695a 大盤漲跌家數
 //BA1-23691a 大盤外資
-
-
     private static JSONObject Market_information ;
     private static JSONObject token_json ;
     private static String token_string ;
