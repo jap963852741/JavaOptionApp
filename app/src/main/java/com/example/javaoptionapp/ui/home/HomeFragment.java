@@ -59,7 +59,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
         final RecyclerView recyclerView =  root.findViewById(R.id.re_view);
         choose_button = (Button) root.findViewById(R.id.choose_button);
         choose_button.setOnClickListener(this);
-        Toolbar toolbar = getActivity().findViewById(R.id.toolBar);
+        Toolbar toolbar = root.findViewById(R.id.toolBar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
