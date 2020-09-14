@@ -22,6 +22,19 @@ android {
     }
 }
 
+
+//解決 REJECTING RE-INIT ON PREVIOUSLY-FAILED CLASS <ANDROIDX.CORE.VIEW.VIEWCOMPAT$2> 警告
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def requested = details.requested
+        if (requested.group == "androidx.appcompat") {
+            if (!requested.name.startsWith("multidex")) {
+                details.useVersion "1.+"
+            }
+        }
+    }
+}
+
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.1.0'

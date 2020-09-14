@@ -49,17 +49,20 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
+        Log.i("NOW","HomeFragment onCreate");
 
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
+
         final View root = inflater.inflate(R.layout.fragment_home, container, false);
         final RecyclerView recyclerView =  root.findViewById(R.id.re_view);
         choose_button = (Button) root.findViewById(R.id.choose_button);
         choose_button.setOnClickListener(this);
         Toolbar toolbar = root.findViewById(R.id.toolBar);
+        toolbar.setTitle("");
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
@@ -80,7 +83,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
             @Override
             public void onClick(View v) {
                 List<Long>  markDays = new ArrayList<>();
-                ArrayList market_date_array = CmoneyUtil.Market_Date;
+                ArrayList market_date_array = HomeViewModel.Market_Date;
                 final SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
                 for (int i = 0; i < market_date_array.size()-1; i++) {
                     try {
@@ -102,8 +105,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
                                 CalendarViewDialog.getInstance().close();
                                 String temp_date = sf.format(calendar.getTime());
                                 Log.i("temp_date",temp_date);
-                                CmoneyUtil cu = new CmoneyUtil();
-                                cu.post_tolken(temp_date);
+
+                                homeViewModel.post_tolken(temp_date);
 
                             }
 
@@ -123,7 +126,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
             }
         });
 
-
+        init();
 
         return root;
     }
@@ -141,7 +144,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
             case 1:
 //                final Calendar calendar = Calendar.getInstance();
                 List<Long>  markDays = new ArrayList<>();
-                ArrayList market_date_array = CmoneyUtil.Market_Date;
+                ArrayList market_date_array = homeViewModel.Market_Date;
                 final SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
                 for (int i = 0; i < market_date_array.size()-1; i++) {
                     try {
@@ -163,8 +166,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
                                 CalendarViewDialog.getInstance().close();
                                 String temp_date = sf.format(calendar.getTime());
                                 Log.i("temp_date",temp_date);
-                                CmoneyUtil cu = new CmoneyUtil();
-                                cu.post_tolken(temp_date);
+                                homeViewModel.post_tolken(temp_date);
 
                             }
 
@@ -213,19 +215,18 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        CmoneyUtil cm = new CmoneyUtil();
         switch (item.getItemId()) {
             case R.id.BA123690a://大盤籌碼日報
-                cm.item_schma = "BA1-23690a";
-                cm.post_tolken();
+                homeViewModel.item_schma = "BA1-23690a";
+                homeViewModel.post_tolken();
                 break;
             case R.id.BA123695a://大盤漲跌家數
-                cm.item_schma = "BA1-23695a";
-                cm.post_tolken();
+                homeViewModel.item_schma = "BA1-23695a";
+                homeViewModel.post_tolken();
                 break;
             case R.id.BA123691a://大盤外資
-                cm.item_schma = "BA1-23691a";
-                cm.post_tolken();
+                homeViewModel.item_schma = "BA1-23691a";
+                homeViewModel.post_tolken();
                 break;
             default:
                 break;
@@ -237,7 +238,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
 
 
 
-
+    private void init(){
+        homeViewModel.post_tolken();
+    }
 
 
 

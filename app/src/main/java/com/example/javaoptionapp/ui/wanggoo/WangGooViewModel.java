@@ -1,16 +1,16 @@
-package com.example.javaoptionapp.ui.notifications;
+package com.example.javaoptionapp.ui.wanggoo;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class NotificationsViewModel extends ViewModel {
+public class WangGooViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public NotificationsViewModel() {
+    public WangGooViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is notifications fragment");
+        mText.setValue("This is wanggoo fragment");
     }
 
     public LiveData<String> getText() {

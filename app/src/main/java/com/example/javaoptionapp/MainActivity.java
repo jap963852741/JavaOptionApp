@@ -25,28 +25,15 @@ public class MainActivity extends AppCompatActivity {
 //        但只有两种选择： 白色 （0）和 灰色（View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR）
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);//Statusbar 轉為深色
         setContentView(R.layout.activity_main);
-
         BottomNavigationView navView = findViewById(R.id.nav_view);
-//        Toolbar toolbar = findViewById(R.id.toolBar);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-//        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-//        setSupportActionBar(toolbar);
         NavigationUI.setupWithNavController(navView, navController);
 
-//        //设置日曆
-//        toolbar.setNavigationIcon(R.drawable.calendar);
-//        //设置日曆点击事件
-//        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                finish();
-//            }
-//        });
 
     }
 

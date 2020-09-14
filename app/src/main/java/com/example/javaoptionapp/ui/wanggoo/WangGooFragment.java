@@ -1,4 +1,4 @@
-package com.example.javaoptionapp.ui.notifications;
+package com.example.javaoptionapp.ui.wanggoo;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,17 +14,17 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.javaoptionapp.R;
 
-public class NotificationsFragment extends Fragment {
+public class WangGooFragment extends Fragment {
 
-    private NotificationsViewModel notificationsViewModel;
+    private WangGooViewModel wangGooViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        notificationsViewModel =
-                ViewModelProviders.of(this).get(NotificationsViewModel.class);
+        wangGooViewModel =
+                ViewModelProviders.of(this).get(WangGooViewModel.class);
         View root = inflater.inflate(R.layout.fragment_notifications, container, false);
         final TextView textView = root.findViewById(R.id.text_notifications);
-        notificationsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        wangGooViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
