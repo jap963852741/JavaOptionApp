@@ -11,9 +11,9 @@ allprojects {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation group: 'edu.uci.ics', name: 'crawler4j', version: '4.4.0'
-    implementation group: 'org.xerial', name: 'sqlite-jdbc', version: '3.7.2'
+    implementation group: 'org.xerial', name: 'sqlite-jdbc', version: '3.32.3.2'
     implementation 'com.squareup.okhttp3:okhttp:3.11.0'
-
+    implementation 'org.json:org.json:2.0'
 }
 tasks.withType(JavaCompile){
     options.encoding("UTF-8")

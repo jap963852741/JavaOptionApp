@@ -2,29 +2,22 @@ package wanggoo;
 
 
 import java.io.IOException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 public abstract class StockUtil {
-    private String url;
+    private  String url;
     private OkHttpClient okHttpClient;
-
+    private static JSONObject json_response_option;
+    private Lock lock = new ReentrantLock();
     public void seturl(String url) {
         this.url = url;
     }
@@ -32,48 +25,12 @@ public abstract class StockUtil {
         return url;
     }
 
-    public static class SSLSocketClient {
-        //获取这个SSLSocketFactory
-        public static SSLSocketFactory getSSLSocketFactory() {
-            try {
-                SSLContext sslContext = SSLContext.getInstance("SSL");
-                sslContext.init(null, getTrustManager(), new SecureRandom());
-                return sslContext.getSocketFactory();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        //获取TrustManager
-        private static TrustManager[] getTrustManager() {
-            TrustManager[] trustAllCerts = new TrustManager[]{
-                    new X509TrustManager() {
-                        @Override
-                        public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                        }
 
-                        @Override
-                        public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                        }
-
-                        @Override
-                        public X509Certificate[] getAcceptedIssuers() {
-                            return new X509Certificate[]{};
-                        }
-                    }
-            };
-            return trustAllCerts;
+    public static JSONObject get_json_response_option(){
+        if (json_response_option == null){
+            throw new ArithmeticException("try to get post() void first");
         }
-
-        //获取HostnameVerifier
-        public static HostnameVerifier getHostnameVerifier() {
-            HostnameVerifier hostnameVerifier = new HostnameVerifier() {
-                @Override
-                public boolean verify(String s, SSLSession sslSession) {
-                    return true;
-                }
-            };
-            return hostnameVerifier;
-        }
+        return json_response_option;
     }
 
     public void post(){
@@ -85,21 +42,36 @@ public abstract class StockUtil {
                 .url(url)
                 .get()
                 .build();
-        okHttpClient.newCall(request).enqueue(callback_token);
+
+        Response response = null;
+        try {
+            //将请求添加到请求队列等待执行，并返回执行后的Response对象
+            response = okHttpClient.newCall(request).execute();
+            //获取Http Status Code.其中200表示成功
+            if (response.code() == 200) {
+                //这里需要注意，response.body().string()是获取返回的结果，此句话只能调用一次，再次调用获得不到结果。
+                //所以先将结果使用result变量接收
+                String result = response.body().string();
+                result = result.replace("{","").replace("}","").replace("\"","");
+                ArrayList  temp_list = new ArrayList();
+                JSONObject json_result = new JSONObject();
+                String[] list_result = result.split(",");
+                for (String list : list_result){
+                    String[] temp_list_result = list.split(":");
+                    json_result.append(temp_list_result[0],temp_list_result[1]);
+                }
+//                System.out.println(result);
+//                System.out.println(json_result);
+                json_response_option = json_result;
+
+            }
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        } finally {
+            if (response != null) {
+                response.body().close();
+            }
+        }
     }
-
-    private Callback callback_token = new Callback() {
-        @Override
-        public void onFailure(Call call, IOException e) {
-            System.out.println("onfailure");
-        }
-
-        @Override
-        public void onResponse(Call call, Response response) throws IOException {
-            final StringBuffer sb = new StringBuffer(response.body().string());
-            System.out.println(response.body());
-            System.out.println(sb);
-        }
-    };
 
 }
