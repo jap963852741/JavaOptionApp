@@ -67,8 +67,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
-                List<String> Market_data = new ArrayList<>();
-                Market_data = new ArrayList<String>(Arrays.asList(s.replaceAll("\\[" , "").replaceAll("]","").replaceAll("\""," ").split(",")));
+                List<String> Market_data = new ArrayList<String>(Arrays.asList(s
+                        .replaceAll("\\[" , "")
+                        .replaceAll("]","")
+                        .replaceAll("\""," ")
+                        .split(",")));
                 homeAdapter = new HomeAdapter(Market_data,container);
                 recyclerView.setAdapter(homeAdapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));

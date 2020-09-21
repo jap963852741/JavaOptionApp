@@ -53,7 +53,7 @@ public abstract class StockUtil {
                 //所以先将结果使用result变量接收
                 String result = response.body().string();
                 result = result.replace("{","").replace("}","").replace("\"","");
-                ArrayList  temp_list = new ArrayList();
+//                ArrayList  temp_list = new ArrayList();
                 JSONObject json_result = new JSONObject();
                 String[] list_result = result.split(",");
                 for (String list : list_result){
