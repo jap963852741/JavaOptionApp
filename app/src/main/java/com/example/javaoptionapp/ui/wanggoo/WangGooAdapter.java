@@ -26,6 +26,7 @@ public class WangGooAdapter extends RecyclerView.Adapter<VH> {
 
     private List<String> dataList;
     private ViewGroup parentview;
+
     public WangGooAdapter(List<String> dataList,ViewGroup container) {
         Log.i("WangGooAdapter",dataList.toString());
         for (int i = 0 ; i < dataList.size() ; i++ ){
@@ -59,7 +60,6 @@ public class WangGooAdapter extends RecyclerView.Adapter<VH> {
                 dataList.set(i,"");
             }
 
-
         }
 
         Log.i("WangGooAdapter",dataList.toString());
@@ -84,17 +84,11 @@ public class WangGooAdapter extends RecyclerView.Adapter<VH> {
             holder.tv1.setTextColor(Color.parseColor("#FF0000"));
             holder.tv1.setTextSize(35);
             holder.tv1.getLayoutParams().height = 1000;
+        }else {
+            DisplayMetrics displaymetrics = new DisplayMetrics();
+            int deviceheight = displaymetrics.heightPixels / 10;
+            holder.tv1.getLayoutParams().height = deviceheight;
         }
-
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        Context.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        //if you need three fix imageview in width
-        int devicewidth = displaymetrics.widthPixels / 3;
-
-        //if you need 4-5-6 anything fix imageview in height
-        int deviceheight = displaymetrics.heightPixels / 4;
-
-
 
     }
 

@@ -21,7 +21,13 @@ import okhttp3.Response;
 public class WangGooUtil {
     private  String url;
     private OkHttpClient okHttpClient;
-    private static JSONObject json_response_option;
+    public WangGooUtil(MutableLiveData  mld){
+        this.seturl();
+        post(mld);
+    }
+    public WangGooUtil() {
+
+    }
     public void seturl() {
         int IntTime = 0;  //幾點幾分
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -39,7 +45,6 @@ public class WangGooUtil {
             url = "https://www.wantgoo.com/investrue/wtxp&/daily-candlestick"; //晚盤
         }
     }
-
     public void post(MutableLiveData mld){
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.connectTimeout(15000, TimeUnit.MILLISECONDS)
@@ -69,20 +74,6 @@ public class WangGooUtil {
                         e.printStackTrace();
                     }
                     result = result.replace("{","").replace("}","").replace("\"","");
-//                    JSONObject json_result = new JSONObject();
-//                    String[] list_result = result.split(",");
-//                    for (String list : list_result){
-//                        String[] temp_list_result = list.split(":");
-//                        try {
-//                            Log.i("temp_list_result[0]=",temp_list_result[0]);
-//                            Log.i("temp_list_result[1]=",temp_list_result[1]);
-//
-//                            json_result.put(temp_list_result[0],temp_list_result[1]);
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                    json_response_option = json_result;
                     mld.postValue(result);
                 }
             }
@@ -92,10 +83,4 @@ public class WangGooUtil {
 
 
     }
-
-    public WangGooUtil(MutableLiveData  mld){
-        this.seturl();
-        post(mld);
-    }
-
 }

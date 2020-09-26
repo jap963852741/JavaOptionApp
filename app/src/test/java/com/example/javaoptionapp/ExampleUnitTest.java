@@ -1,5 +1,8 @@
 package com.example.javaoptionapp;
 
+import com.example.javaoptionapp.database.FeedReaderDbHelper;
+import com.example.javaoptionapp.ui.wanggoo.WangGooHistoryUtil;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -10,8 +13,20 @@ import static org.junit.Assert.*;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 public class ExampleUnitTest {
+//    @Test
+//    public void addition_isCorrect() {
+//        assertEquals(4, 2 + 2);
+//    }
+
     @Test
-    public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
+    public void wghu_test(){
+        WangGooHistoryUtil wghu = new WangGooHistoryUtil();
     }
+
+
+
+
+
+
+
 }
