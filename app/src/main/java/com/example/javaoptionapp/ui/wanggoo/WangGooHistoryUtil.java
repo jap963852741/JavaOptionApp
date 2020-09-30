@@ -31,12 +31,23 @@ public class WangGooHistoryUtil extends WangGooUtil{
         this.seturl();
         post();
     }
+
+    public WangGooHistoryUtil(String time){
+        super();
+        this.seturl(time);
+        post();
+    }
     @Override
     public void seturl() {
 //        System.out.println(System.currentTimeMillis());
         url = "https://www.wantgoo.com/investrue/wmt&/historical-daily-candlesticks?before="+System.currentTimeMillis()+"&top=490";
         System.out.println(url);
+    }
 
+    public void seturl(String time) {
+//        System.out.println(System.currentTimeMillis());
+        url = "https://www.wantgoo.com/investrue/wmt&/historical-daily-candlesticks?before="+time+"&top=490";
+        System.out.println(url);
     }
     public void post(){
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -92,4 +103,6 @@ public class WangGooHistoryUtil extends WangGooUtil{
             }
         }
     }
+
+
 }

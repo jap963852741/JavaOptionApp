@@ -5,5 +5,7 @@
             <certificates src="system" />
             <certificates src="user" />
         </trust-anchors>
+        <base-config cleartextTrafficPermitted="true" />
+
     </base-config>
 </network-security-config>
