@@ -54,7 +54,8 @@ public class WangGooHistoryUtil extends WangGooUtil{
         builder.connectTimeout(15000, TimeUnit.MILLISECONDS)
                 .readTimeout(15000, TimeUnit.MILLISECONDS);
         okHttpClient = builder.build();
-        Request request = new Request.Builder()
+        Request request = new Request.Builder().addHeader("User-Agent",
+                "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
                 .url(url)
                 .get()
                 .build();
