@@ -234,56 +234,56 @@ public class ExampleInstrumentedTest {
 //        * 寫入及更新 DateIndexTable 的方法
 //        * [time:1600963200000, tradeDate:1600963200000, open:12168.00000, high:12234.00000, low:12157.00000, close:12206.00000, volume:9865, millionAmount:0.00]
 //        * */
-        long year_time = TimeUnit.SECONDS.toMillis((long) (365.25*24*60*60));
-        String time = String.valueOf(System.currentTimeMillis());//- 2*year_time
-        WangGooHistoryUtil wghu = new WangGooHistoryUtil(time);
-        HashMap<String, HashMap<String,String>> hashmap_time_data = wghu.hashmap_time_data;
-        for (String key : hashmap_time_data.keySet()) {
-            HashMap<String,String> temp_data = hashmap_time_data.get(key);
-            String date = key;
-            Date_Small_Taiwan_Feature dstf = new Date_Small_Taiwan_Feature(date,
-                    Float.parseFloat(temp_data.get("open")),
-                    Float.parseFloat(temp_data.get("high")),
-                    Float.parseFloat(temp_data.get("low")),
-                    Float.parseFloat(temp_data.get("close")),
-                    Float.parseFloat(temp_data.get("volume")));
-            Date_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
-//           沒有的才 insert
-            if (the_date_information != null){
-                fdDao.update(dstf);
-            }else {
-                fdDao.insertAll(dstf);
-            }
-        }
-
-
-
-
-
-        /**
-         * MA 5 日線計算 單元測試
-         * MA 10 日線計算 單元測試
-         * MA 15 日線計算 單元測試
-         *當天收盤價也會計算在內
-         * */
-        String ma5_begin_date = fdDao.get_ma5_begin_date();
-        String ma10_begin_date = fdDao.get_ma10_begin_date();
-        String ma15_begin_date = fdDao.get_ma15_begin_date();
-        List<Date_Small_Taiwan_Feature> LD = fdDao.getAll();
-        for (Date_Small_Taiwan_Feature d : LD){
-            String date = d.date;
-            if (Integer.parseInt(date) >= Integer.parseInt(ma5_begin_date)) { //從  ma5_begin_date 日開始更新
-                fdDao.update_ma5(date);
-            }
-            if (Integer.parseInt(date) >= Integer.parseInt(ma10_begin_date)) {
-                fdDao.update_ma10(date);
-            }
-            if (Integer.parseInt(date) >= Integer.parseInt(ma15_begin_date)) {
-                fdDao.update_ma15(date);
-            }
-        }
-
-
+//        long year_time = TimeUnit.SECONDS.toMillis((long) (365.25*24*60*60));
+//        String time = String.valueOf(System.currentTimeMillis());//- 2*year_time
+//        WangGooHistoryUtil wghu = new WangGooHistoryUtil(time);
+//        HashMap<String, HashMap<String,String>> hashmap_time_data = wghu.hashmap_time_data;
+//        for (String key : hashmap_time_data.keySet()) {
+//            HashMap<String,String> temp_data = hashmap_time_data.get(key);
+//            String date = key;
+//            Date_Small_Taiwan_Feature dstf = new Date_Small_Taiwan_Feature(date,
+//                    Float.parseFloat(temp_data.get("open")),
+//                    Float.parseFloat(temp_data.get("high")),
+//                    Float.parseFloat(temp_data.get("low")),
+//                    Float.parseFloat(temp_data.get("close")),
+//                    Float.parseFloat(temp_data.get("volume")));
+//            Date_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
+////           沒有的才 insert
+//            if (the_date_information != null){
+//                fdDao.update(dstf);
+//            }else {
+//                fdDao.insertAll(dstf);
+//            }
+//        }
+//
+//
+//
+//
+//
+//        /**
+//         * MA 5 日線計算 單元測試
+//         * MA 10 日線計算 單元測試
+//         * MA 15 日線計算 單元測試
+//         *當天收盤價也會計算在內
+//         * */
+//        String ma5_begin_date = fdDao.get_ma5_begin_date();
+//        String ma10_begin_date = fdDao.get_ma10_begin_date();
+//        String ma15_begin_date = fdDao.get_ma15_begin_date();
+//        List<Date_Small_Taiwan_Feature> LD = fdDao.getAll();
+//        for (Date_Small_Taiwan_Feature d : LD){
+//            String date = d.date;
+//            if (Integer.parseInt(date) >= Integer.parseInt(ma5_begin_date)) { //從  ma5_begin_date 日開始更新
+//                fdDao.update_ma5(date);
+//            }
+//            if (Integer.parseInt(date) >= Integer.parseInt(ma10_begin_date)) {
+//                fdDao.update_ma10(date);
+//            }
+//            if (Integer.parseInt(date) >= Integer.parseInt(ma15_begin_date)) {
+//                fdDao.update_ma15(date);
+//            }
+//        }
+//
+//
 
         /**
         * 績效回測單元測試
@@ -303,68 +303,56 @@ public class ExampleInstrumentedTest {
         List<Date_Small_Taiwan_Feature> All_Data = fdDao.getAll();
         boolean Approach = false;
         String Long_Short = "";
-        Float Entry_Point = null,Exit_Point = null;
+        Float Entry_Point = null , Exit_Point = null, Exit_Benifit_Point = null ,Exit_Damage_Point = null;
         Map<String, Float> Total_Performance = new LinkedHashMap();
+        int Day = 0;
         for (Date_Small_Taiwan_Feature Day_Data : All_Data){
             System.out.println(Day_Data.date + " 開盤: " + Day_Data.open + " 最高: "+Day_Data.high + " 最低 : "+Day_Data.low + " 收盤 : " +Day_Data.close);
             if(!Approach) {
                 if(Day_Data.MA_5!=null &&Day_Data.MA_10!=null &&Day_Data.MA_15!=null   &&
                         Day_Data.MA_5 > Day_Data.MA_10 && Day_Data.close > Day_Data.MA_15 ){ //&&  Day_Data.close < Day_Data.MA_5
                     Entry_Point = Day_Data.close; //進場點數
-                    System.out.println("進場做多點數 : "+Day_Data.close +"停利點位:" + Entry_Point * 1.03 + "停損點數 :" + Entry_Point * 0.99);
+                    Exit_Benifit_Point = Day_Data.close * 1.05f;
+                    Exit_Damage_Point = Day_Data.close * 0.98f;
+                    System.out.println("進場做多點數 : "+Day_Data.close +"停利點位:" + Exit_Benifit_Point + "停損點數 :" + Exit_Damage_Point);
                     Approach = true;//進場
                     Long_Short = "Long"; //做多
+                    Day = 0;
                 }
-//                else if(Day_Data.MA_5!=null &&Day_Data.MA_10!=null &&Day_Data.MA_15!=null   &&
-//                        Day_Data.MA_5 < Day_Data.MA_10 && Day_Data.close < Day_Data.MA_15 ){
-//                    Entry_Point = Day_Data.close; //進場點數
-//                    System.out.println("進場做多點數 : "+Day_Data.close +"停利點位:" + Entry_Point * 1.025 + "停損點數 :" + Entry_Point * 0.99);
-//                    Approach = true;//進場
-//                    Long_Short = "Long"; //做多
-//                }
+
             }
             else if(Approach && Long_Short.equals("Long")){//已進場做多 判斷停利停損
-                if(Day_Data.close > Entry_Point * 1.045){  //Day_Data.close > Day_Data.MA_5 * 1.05 ||
-                    System.out.println("停利點數 : "+Day_Data.close);
-                    Exit_Point = Day_Data.close; //停利點數
+               if(Day_Data.high > Exit_Benifit_Point){  //Day_Data.close > Day_Data.MA_5 * 1.05 ||
+                    System.out.println("停利點數 : "+ Exit_Benifit_Point);
+                    Exit_Point = Exit_Benifit_Point; //停利點數
                     Approach = false;
                 }
-                if(Day_Data.close < Entry_Point * 0.98){
+                else if(Day_Data.close < Exit_Damage_Point){  //盤中如果有低於停損價位 關盤前要停損
                     System.out.println("停損點數 : "+Day_Data.close);
                     Exit_Point = Day_Data.close; //停損點數
                     Approach = false;
                 }
+
                 if(!Approach){//出場
                     String year = Day_Data.date.substring(0,4);
                     Float init_vale = 0f;
                     if (Total_Performance.containsKey(year)){
                         init_vale = Total_Performance.get(year);
                     }
-                    Total_Performance.put(year , init_vale + Exit_Point - Entry_Point - 2);
-                    System.out.println("單次績效 : "+ String.valueOf(Exit_Point - Entry_Point -2));
+                    //買必put避險
+                    Float change_value = Exit_Point - Entry_Point - 2;
+                    if (change_value < 0) {
+                        change_value = -200f;
+                    }else {
+                        change_value -= 50;
+                    }
+
+                    Total_Performance.put(year , init_vale + change_value);
+                    System.out.println("單次績效 : "+ String.valueOf(change_value) +"歷時天數 : " +String.valueOf(Day) );
+                }else {
+                    Day += 1;
                 }
             }
-//            else if(Approach && Long_Short.equals("Short")) {//已進場做空 判斷停利停損
-//                if(Day_Data.close > Entry_Point * 1.01){  //Day_Data.close > Day_Data.MA_5 * 1.05 ||
-//                    System.out.println("停損點數 : "+Day_Data.close);
-//                    Exit_Point = Day_Data.close; //停損點數
-//                    Approach = false;
-//                }
-//                if(Day_Data.close < Entry_Point * 0.8){
-//                    System.out.println("停利點數 : "+Day_Data.close);
-//                    Exit_Point = Day_Data.close; //停利點數
-//                    Approach = false;
-//                }
-//                if(!Approach){//出場
-//                    String year = Day_Data.date.substring(0,4);
-//                    Float init_vale = 0f;
-//                    if (Total_Performance.containsKey(year)){
-//                        init_vale = Total_Performance.get(year);
-//                    }
-//                    Total_Performance.put(year , init_vale + Entry_Point - Exit_Point - 2);
-//                    System.out.println("單次績效 : "+ String.valueOf( Entry_Point - Exit_Point - 2));
-//                }
-//            }
         }
         AtomicReference<Float> total_v = new AtomicReference<>(0f);
         Total_Performance.forEach((k, v) -> {
