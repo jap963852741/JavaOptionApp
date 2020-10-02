@@ -24,11 +24,13 @@ import java.util.List;
 
 public class WangGooAdapter extends RecyclerView.Adapter<VH> {
 
-    private List<String> dataList;
+    public List<String> dataList;
     private ViewGroup parentview;
 
     public WangGooAdapter(List<String> dataList,ViewGroup container) {
         Log.i("WangGooAdapter",dataList.toString());
+
+        StrategyUtil stu = new StrategyUtil(container,this);
         for (int i = 0 ; i < dataList.size() ; i++ ){
             String temp_string = dataList.get(i);
             String[] temp_array = temp_string.split(":");
@@ -53,14 +55,15 @@ public class WangGooAdapter extends RecyclerView.Adapter<VH> {
                 dataList.set(i,temp_string.replace("low","最低價 "));
             }else if(temp_array[0].equals("close")){
                 dataList.set(0,temp_string.replace("close","目前 "));  //放第一筆
-                dataList.set(i,"");
+//                dataList.set(i,"");
             }else if(temp_array[0].equals("volume")){
                 dataList.set(i,temp_string.replace("volume","交易量 "));
             }else if(temp_array[0].equals("millionAmount")){
-                dataList.set(i,"");
+//                dataList.set(i,"");
+                dataList.remove(i);
             }
-
         }
+
 
         Log.i("WangGooAdapter",dataList.toString());
 
@@ -83,7 +86,7 @@ public class WangGooAdapter extends RecyclerView.Adapter<VH> {
         if(position == 0) {
             holder.tv1.setTextColor(Color.parseColor("#FF0000"));
             holder.tv1.setTextSize(35);
-            holder.tv1.getLayoutParams().height = 1000;
+            holder.tv1.getLayoutParams().height = 100;
         }else {
             DisplayMetrics displaymetrics = new DisplayMetrics();
             int deviceheight = displaymetrics.heightPixels / 10;

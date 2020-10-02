@@ -1,6 +1,7 @@
 package com.example.javaoptionapp;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.room.Room;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -156,7 +157,7 @@ public class ExampleInstrumentedTest {
                     if(final_list[0].equals("time")){
                         long millisecond = Long.parseLong(final_list[1]);
                         Date date = new Date(millisecond);
-                        SimpleDateFormat format = new SimpleDateFormat("YYYYMMdd");
+                        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
                         temp_time = format.format(date);
                     }else{
                         temp_map.put(final_list[0],final_list[1]);
@@ -173,7 +174,7 @@ public class ExampleInstrumentedTest {
         for (String key : hashmap_time_data.keySet()) {
             HashMap<String,String> temp_data = hashmap_time_data.get(key);
             String date = key;
-            System.out.println(temp_data.toString());
+            System.out.println(date +" " +temp_data.toString());
             Date_Small_Taiwan_Feature dstf = new Date_Small_Taiwan_Feature(date,
                     Float.parseFloat(temp_data.get("open")),
                     Float.parseFloat(temp_data.get("high")),
@@ -268,17 +269,22 @@ public class ExampleInstrumentedTest {
         String ma5_begin_date = fdDao.get_ma5_begin_date();
         String ma10_begin_date = fdDao.get_ma10_begin_date();
         String ma15_begin_date = fdDao.get_ma15_begin_date();
+        String ma30_begin_date = fdDao.get_ma30_begin_date();
         List<Date_Small_Taiwan_Feature> LD = fdDao.getAll();
         for (Date_Small_Taiwan_Feature d : LD){
             String date = d.date;
             if (Integer.parseInt(date) >= Integer.parseInt(ma5_begin_date)) { //從  ma5_begin_date 日開始更新
                 fdDao.update_ma5(date);
+                fdDao.update_bias5(date);
             }
             if (Integer.parseInt(date) >= Integer.parseInt(ma10_begin_date)) {
                 fdDao.update_ma10(date);
             }
             if (Integer.parseInt(date) >= Integer.parseInt(ma15_begin_date)) {
                 fdDao.update_ma15(date);
+            }
+            if (Integer.parseInt(date) >= Integer.parseInt(ma30_begin_date)) {
+                fdDao.update_ma30(date);
             }
         }
 
@@ -398,33 +404,37 @@ public class ExampleInstrumentedTest {
         Map<String, Float> Total_Session = new LinkedHashMap();
         int Day = 0;
         for (Date_Small_Taiwan_Feature Day_Data : All_Data){
-            System.out.println(Day_Data.date + " 開盤: " + Day_Data.open + " 最高: "+Day_Data.high + " 最低 : "+Day_Data.low + " 收盤 : " +Day_Data.close);
+            System.out.println(Day_Data.date + " 開盤: " + Day_Data.open + " 最高: "+Day_Data.high + " 最低 : "+Day_Data.low + " 收盤 : " +Day_Data.close + " "+ Day_Data.MA_5+ " "+ Day_Data.BIAS_5);
             if(!Approach) {
-                if(Day_Data.MA_5!=null &&Day_Data.MA_10!=null &&Day_Data.MA_15!=null   &&
-                        Day_Data.MA_5 > Day_Data.MA_10 && Day_Data.MA_10 > Day_Data.MA_15 ){ //&&  Day_Data.close < Day_Data.MA_5
+                if(Day_Data.MA_5!=null&&Day_Data.MA_10!=null&&Day_Data.MA_15!=null&&Day_Data.MA_30!=null&&
+                         Day_Data.close < Day_Data.MA_5
+                        && Day_Data.high > Day_Data.MA_5
+                ){ //收上引線不進場
                     Entry_Point = Day_Data.close; //進場點數
-                    Exit_Benifit_Point =  Entry_Point + 100; //停利點數
+                    Exit_Benifit_Point =  Entry_Point * 1.01f; //停利點數
                     Approach = true;//進場
                     Long_Short = "Long"; //做多
-                    Day = 0;//第0天
-                }
+                    Day = 1;//第0天
+                    System.out.println(Day_Data.date + " 進場做多點數 : "+ Entry_Point +"停利點位:" + Exit_Benifit_Point);
 
+                }
             }
             else if(Approach && Long_Short.equals("Long")){//已進場做多 判斷停利停損
                 boolean Win = false;
                 if(Day_Data.high > Exit_Benifit_Point){  //Day_Data.close > Day_Data.MA_5 * 1.05 ||
-                    System.out.println("停利點數 : "+ Exit_Benifit_Point);
-                    Exit_Point =  Exit_Benifit_Point; //停利點數
+                    Exit_Point =  Day_Data.close; //停利點數
                     Approach = false;
                     Win = true;
+                    System.out.println("停利點數 : "+ Exit_Point);
                 }
                 else if(Day == 2){  //第三天沒漲超過100就算輸
-                    System.out.println("停損點數 : "+Day_Data.close);
                     Exit_Point = Day_Data.close; //停損點數
                     Approach = false;
+                    System.out.println("停損點數 : "+Exit_Point);
                 }
 
                 if(!Approach){//出場
+
                     String year = Day_Data.date.substring(0,4);
                     Float init_vale = 0f;
                     Float Denominator = 0f;
@@ -447,7 +457,11 @@ public class ExampleInstrumentedTest {
                     if (Win){
                         Win_Session.put(year , Numerator+1);
                     }
-                    System.out.println("單次績效 : "+ String.valueOf(change_value) +"歷時天數 : " +String.valueOf(Day) );
+                    if (Math.abs(change_value) > 200){
+                        System.out.println("-----------單次績效 : "+ String.valueOf(change_value) +"歷時天數 : " +String.valueOf(Day) );
+                    }else {
+                        System.out.println("單次績效 : "+ String.valueOf(change_value) +"歷時天數 : " +String.valueOf(Day) );
+                    }
                 }else {
                     Day += 1;
                 }
@@ -476,17 +490,37 @@ public class ExampleInstrumentedTest {
             if(Win_Session.containsKey(k_1)){
                 temp_win = Win_Session.get(k_1);
             }
-            System.out.println("年份: " + k_1 + " 勝率:" + temp_win/v_1);
+            System.out.println("年份: " + k_1 + " 勝率:" + temp_win/v_1  +" " +temp_win +"/" + v_1);
             total_session.updateAndGet(v1_1 -> v1_1 + v_1);
         });
-        System.out.println("總勝率 : "+ Integer.parseInt(win_session.toString())/Integer.parseInt(total_session.toString()));
+        System.out.println("總勝率 : "+ Float.valueOf(win_session.toString())/Float.valueOf(total_session.toString()) +" " +win_session.toString().replace(".0","") +"/" + total_session.toString().replace(".0","") );
+    }
 
+    @Test
+    public void delete_data_test(){
+
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        FeatureDatabaseDao fdDao;
+        FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
+        fdDao = fdb.FeatureDatabaseDao();
+        fdDao.Delete_after_day("20200831");
 
 
     }
 
 
 
+    @Test
+    public void Strategy_test(){
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        FeatureDatabaseDao fdDao;
+        FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
+        fdDao = fdb.FeatureDatabaseDao();
+        List<Date_Small_Taiwan_Feature> Hundred_Data = fdDao.get_100_data_fromnow();
+        for (Date_Small_Taiwan_Feature i :Hundred_Data) {
+            Log.i("Hundred_Data", i.toString());
+        }
 
+    }
 
 }
