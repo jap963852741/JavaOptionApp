@@ -24,7 +24,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -516,11 +519,31 @@ public class ExampleInstrumentedTest {
         FeatureDatabaseDao fdDao;
         FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
         fdDao = fdb.FeatureDatabaseDao();
-        List<Date_Small_Taiwan_Feature> Hundred_Data = fdDao.get_100_data_fromnow();
+        List<Date_Small_Taiwan_Feature> Hundred_Data = fdDao.get_30_data_fromnow();
         for (Date_Small_Taiwan_Feature i :Hundred_Data) {
             Log.i("Hundred_Data", i.toString());
         }
 
+    }
+
+
+    @Test
+    public void get_day_unixtime(){
+
+        DateFormat format = new SimpleDateFormat("yyyyMMddHHmm"); //定义日期格式化的格式
+        String classDateString = "20201003"+"1400";//需要加减的字符串型日期
+        Date classDate = null;//把字符串转化成指定格式的日期
+        try {
+            classDate = format.parse(classDateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Calendar calendar = Calendar.getInstance(); //使用Calendar日历类对日期进行加减
+        calendar.setTime(classDate);
+        calendar.add(Calendar.DATE, +2);
+        classDate = calendar.getTime();//获取加减以后的Date类型日期
+        SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+        String formatted = format1.format(classDate.getTime());
     }
 
 }

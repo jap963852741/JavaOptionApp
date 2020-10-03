@@ -30,7 +30,7 @@ public class WangGooAdapter extends RecyclerView.Adapter<VH> {
     public WangGooAdapter(List<String> dataList,ViewGroup container) {
         Log.i("WangGooAdapter",dataList.toString());
 
-        StrategyUtil stu = new StrategyUtil(container,this);
+
         for (int i = 0 ; i < dataList.size() ; i++ ){
             String temp_string = dataList.get(i);
             String[] temp_array = temp_string.split(":");
@@ -64,9 +64,6 @@ public class WangGooAdapter extends RecyclerView.Adapter<VH> {
             }
         }
 
-
-        Log.i("WangGooAdapter",dataList.toString());
-
         this.dataList = dataList;
         this.parentview = container;
     }
@@ -94,13 +91,10 @@ public class WangGooAdapter extends RecyclerView.Adapter<VH> {
         }
 
     }
-
-
     @Override
     public int getItemCount() {
         return dataList.size();
     }
-
 }
 
 

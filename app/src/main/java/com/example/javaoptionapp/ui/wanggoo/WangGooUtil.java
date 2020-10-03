@@ -75,7 +75,7 @@ public class WangGooUtil {
                         e.printStackTrace();
                     }
                     result = result.replace("{","").replace("}","").replace("\"","");
-                    mld.postValue(result);
+                    mld.postValue(mld.getValue()+result);
                 }
             }
         }).start();

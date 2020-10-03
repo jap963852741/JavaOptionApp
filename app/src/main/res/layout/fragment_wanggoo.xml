@@ -30,19 +30,7 @@
             android:fontFamily="@font/ozcaramel"/>
 
     </androidx.appcompat.widget.Toolbar>
-<!--    <TextView-->
-<!--        android:id="@+id/text_wanggoo"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="8dp"-->
-<!--        android:layout_marginTop="8dp"-->
-<!--        android:layout_marginEnd="8dp"-->
-<!--        android:textAlignment="center"-->
-<!--        android:textSize="20sp"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/re_view_wanggoo"
         android:layout_width="match_parent"
@@ -54,5 +42,14 @@
         android:layout_below="@id/toolBar_wanggoo"
         />
 
+    <com.wang.avi.AVLoadingIndicatorView
+        app:layout_constraintTop_toBottomOf="@id/re_view_wanggoo"
+        android:id="@+id/avi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:indicatorName="BallPulseIndicator"
+        app:indicatorColor="@color/roboto_calendar_month_arrow"
+        tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,8 +14,8 @@ public interface FeatureDatabaseDao {
     List<Date_Small_Taiwan_Feature> getAll();
 
 
-    @Query("SELECT * FROM (SELECT * FROM DateIndexTable ORDER BY date DESC limit 100) aa ORDER BY date ASC")
-    List<Date_Small_Taiwan_Feature> get_100_data_fromnow();
+    @Query("SELECT * FROM (SELECT * FROM DateIndexTable ORDER BY date DESC limit 30) aa ORDER BY date ASC")
+    List<Date_Small_Taiwan_Feature> get_30_data_fromnow();
 
     @Query("SELECT * FROM DateIndexTable WHERE date = :one_date"  )
     Date_Small_Taiwan_Feature get_Date_data(String one_date);
