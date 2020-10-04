@@ -3,6 +3,7 @@ package com.example.javaoptionapp.ui.wanggoo;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -75,19 +77,20 @@ public class WangGooAdapter extends RecyclerView.Adapter<VH> {
         return new VH(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_home, parent, false),parentview);
     }
 
-    @SuppressLint("ResourceAsColor")
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
         String c = dataList.get(position);
         holder.tv1.setText(c);
-        if(position == 0) {
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        int deviceheight = displaymetrics.heightPixels;
+        if(position == 0 || position > 7 ) {
             holder.tv1.setTextColor(Color.parseColor("#FF0000"));
-            holder.tv1.setTextSize(35);
-            holder.tv1.getLayoutParams().height = 100;
+            holder.tv1.getTextSize();
+            holder.tv1.setTextSize(26);
+
+            holder.tv1.getLayoutParams().height = deviceheight/5;
         }else {
-            DisplayMetrics displaymetrics = new DisplayMetrics();
-            int deviceheight = displaymetrics.heightPixels / 10;
-            holder.tv1.getLayoutParams().height = deviceheight;
+            holder.tv1.getLayoutParams().height = deviceheight/10;
         }
 
     }

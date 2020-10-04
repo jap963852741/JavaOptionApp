@@ -3,10 +3,7 @@ package com.example.javaoptionapp.ui.wanggoo;
 import android.content.Context;
 import android.util.Log;
 
-import android.view.ViewGroup;
-
-import com.example.javaoptionapp.R;
-import com.example.javaoptionapp.room.Date_Small_Taiwan_Feature;
+import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
 import com.example.javaoptionapp.room.FeatureDatabase;
 import com.example.javaoptionapp.room.FeatureDatabaseDao;
 
@@ -19,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import androidx.lifecycle.MutableLiveData;
 import androidx.room.Room;
+
 import com.wang.avi.AVLoadingIndicatorView;
 
 public class StrategyUtil {
@@ -44,13 +42,13 @@ public class StrategyUtil {
         for (String key : hashmap_time_data.keySet()) {
             HashMap<String,String> temp_data = hashmap_time_data.get(key);
             String date = key;
-            Date_Small_Taiwan_Feature dstf = new Date_Small_Taiwan_Feature(date,
+            Table_Small_Taiwan_Feature dstf = new Table_Small_Taiwan_Feature(date,
                     Float.parseFloat(temp_data.get("open")),
                     Float.parseFloat(temp_data.get("high")),
                     Float.parseFloat(temp_data.get("low")),
                     Float.parseFloat(temp_data.get("close")),
                     Float.parseFloat(temp_data.get("volume")));
-            Date_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
+            Table_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
 //           沒有的才 insert
             if (the_date_information != null){
                 fdDao.update(dstf);
@@ -63,8 +61,8 @@ public class StrategyUtil {
         String ma10_begin_date = fdDao.get_ma10_begin_date();
         String ma15_begin_date = fdDao.get_ma15_begin_date();
         String ma30_begin_date = fdDao.get_ma30_begin_date();
-        List<Date_Small_Taiwan_Feature> LD = fdDao.getAll();
-        for (Date_Small_Taiwan_Feature d : LD){
+        List<Table_Small_Taiwan_Feature> LD = fdDao.getAll();
+        for (Table_Small_Taiwan_Feature d : LD){
             String date = d.date;
             if (Integer.parseInt(date) >= Integer.parseInt(ma5_begin_date)) { //從  ma5_begin_date 日開始更新
                 fdDao.update_ma5(date);
@@ -95,9 +93,9 @@ public class StrategyUtil {
                 update_db(fdDao);
                 WangGooFragment.mUI_Handler.sendEmptyMessage(WangGooFragment.MSG_UPLOAD_Finish);
 
-                List<Date_Small_Taiwan_Feature> Hundred_Data = fdDao.get_30_data_fromnow();
+                List<Table_Small_Taiwan_Feature> Hundred_Data = fdDao.get_30_data_fromnow();
                 Approach = false;
-                for(Date_Small_Taiwan_Feature Day_Data : Hundred_Data){
+                for(Table_Small_Taiwan_Feature Day_Data : Hundred_Data){
                     Day_to_Stop = false;
                     Log.i("Hundred_Data", Day_Data.date + " 開盤: " + Day_Data.open + " 最高: "+Day_Data.high + " 最低 : "+Day_Data.low + " 收盤 : " +Day_Data.close + " "+ Day_Data.MA_5+ " "+ Day_Data.BIAS_5);
                     if(!Approach) {

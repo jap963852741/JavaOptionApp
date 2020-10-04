@@ -6,13 +6,13 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "DateIndexTable")
-public class Date_Small_Taiwan_Feature {
-    public Date_Small_Taiwan_Feature() {
+public class Table_Small_Taiwan_Feature {
+    public Table_Small_Taiwan_Feature() {
     }
 
 //[time:1600963200000, tradeDate:1600963200000, open:12168.00000, high:12234.00000, low:12157.00000, close:12206.00000, volume:9865, millionAmount:0.00]
 
-    public Date_Small_Taiwan_Feature(String date,Float open,Float high,Float low,Float close,Float volume) {
+    public Table_Small_Taiwan_Feature(String date, Float open, Float high, Float low, Float close, Float volume) {
         this.date = date;
         this.open = open;
         this.high = high;
@@ -21,7 +21,7 @@ public class Date_Small_Taiwan_Feature {
         this.volume = volume;
     }
 
-    public Date_Small_Taiwan_Feature(String date,Float open,Float high,Float low,Float close,Float volume,Float MA_5,Float MA_10,Float MA_15,Float BIAS_5) {
+    public Table_Small_Taiwan_Feature(String date, Float open, Float high, Float low, Float close, Float volume, Float MA_5, Float MA_10, Float MA_15, Float BIAS_5) {
         this.date = date;
         this.open = open;
         this.high = high;

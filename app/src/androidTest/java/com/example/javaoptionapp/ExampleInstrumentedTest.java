@@ -7,23 +7,17 @@ import androidx.room.Room;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.example.javaoptionapp.room.Date_Small_Taiwan_Feature;
+import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
 import com.example.javaoptionapp.room.FeatureDatabase;
 import com.example.javaoptionapp.room.FeatureDatabaseDao;
 import com.example.javaoptionapp.ui.wanggoo.WangGooHistoryUtil;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Pattern;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -178,13 +171,13 @@ public class ExampleInstrumentedTest {
             HashMap<String,String> temp_data = hashmap_time_data.get(key);
             String date = key;
             System.out.println(date +" " +temp_data.toString());
-            Date_Small_Taiwan_Feature dstf = new Date_Small_Taiwan_Feature(date,
+            Table_Small_Taiwan_Feature dstf = new Table_Small_Taiwan_Feature(date,
                     Float.parseFloat(temp_data.get("open")),
                     Float.parseFloat(temp_data.get("high")),
                     Float.parseFloat(temp_data.get("low")),
                     Float.parseFloat(temp_data.get("close")),
                     Float.parseFloat(temp_data.get("volume")));
-            Date_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
+            Table_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
 //           沒有的才 insert
             if (the_date_information != null){
                 fdDao.update(dstf);
@@ -203,8 +196,8 @@ public class ExampleInstrumentedTest {
             String ma5_begin_date = fdDao.get_ma5_begin_date();
             String ma10_begin_date = fdDao.get_ma10_begin_date();
             String ma15_begin_date = fdDao.get_ma15_begin_date();
-            List<Date_Small_Taiwan_Feature> LD = fdDao.getAll();
-            for (Date_Small_Taiwan_Feature d : LD) {
+            List<Table_Small_Taiwan_Feature> LD = fdDao.getAll();
+            for (Table_Small_Taiwan_Feature d : LD) {
                 String date = d.date;
                 if (Integer.parseInt(date) >= Integer.parseInt(ma5_begin_date)) { //從  ma5_begin_date 日開始更新
                     fdDao.update_ma5(date);
@@ -244,13 +237,13 @@ public class ExampleInstrumentedTest {
         for (String key : hashmap_time_data.keySet()) {
             HashMap<String,String> temp_data = hashmap_time_data.get(key);
             String date = key;
-            Date_Small_Taiwan_Feature dstf = new Date_Small_Taiwan_Feature(date,
+            Table_Small_Taiwan_Feature dstf = new Table_Small_Taiwan_Feature(date,
                     Float.parseFloat(temp_data.get("open")),
                     Float.parseFloat(temp_data.get("high")),
                     Float.parseFloat(temp_data.get("low")),
                     Float.parseFloat(temp_data.get("close")),
                     Float.parseFloat(temp_data.get("volume")));
-            Date_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
+            Table_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
 //           沒有的才 insert
             if (the_date_information != null){
                 fdDao.update(dstf);
@@ -273,8 +266,8 @@ public class ExampleInstrumentedTest {
         String ma10_begin_date = fdDao.get_ma10_begin_date();
         String ma15_begin_date = fdDao.get_ma15_begin_date();
         String ma30_begin_date = fdDao.get_ma30_begin_date();
-        List<Date_Small_Taiwan_Feature> LD = fdDao.getAll();
-        for (Date_Small_Taiwan_Feature d : LD){
+        List<Table_Small_Taiwan_Feature> LD = fdDao.getAll();
+        for (Table_Small_Taiwan_Feature d : LD){
             String date = d.date;
             if (Integer.parseInt(date) >= Integer.parseInt(ma5_begin_date)) { //從  ma5_begin_date 日開始更新
                 fdDao.update_ma5(date);
@@ -308,13 +301,13 @@ public class ExampleInstrumentedTest {
          *
          * 做空進場點
         * */
-        List<Date_Small_Taiwan_Feature> All_Data = fdDao.getAll();
+        List<Table_Small_Taiwan_Feature> All_Data = fdDao.getAll();
         boolean Approach = false;
         String Long_Short = "";
         Float Entry_Point = null , Exit_Point = null, Exit_Benifit_Point = null ,Exit_Damage_Point = null;
         Map<String, Float> Total_Performance = new LinkedHashMap();
         int Day = 0;
-        for (Date_Small_Taiwan_Feature Day_Data : All_Data){
+        for (Table_Small_Taiwan_Feature Day_Data : All_Data){
             System.out.println(Day_Data.date + " 開盤: " + Day_Data.open + " 最高: "+Day_Data.high + " 最低 : "+Day_Data.low + " 收盤 : " +Day_Data.close);
             if(!Approach) {
                 if(Day_Data.MA_5!=null &&Day_Data.MA_10!=null &&Day_Data.MA_15!=null   &&
@@ -398,7 +391,7 @@ public class ExampleInstrumentedTest {
         FeatureDatabaseDao fdDao;
         FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
         fdDao = fdb.FeatureDatabaseDao();
-        List<Date_Small_Taiwan_Feature> All_Data = fdDao.getAll();
+        List<Table_Small_Taiwan_Feature> All_Data = fdDao.getAll();
         boolean Approach = false;
         String Long_Short = "";
         Float Entry_Point = null , Exit_Point = null, Exit_Benifit_Point = null ,Exit_Damage_Point = null;
@@ -406,7 +399,7 @@ public class ExampleInstrumentedTest {
         Map<String, Float> Win_Session = new LinkedHashMap();
         Map<String, Float> Total_Session = new LinkedHashMap();
         int Day = 0;
-        for (Date_Small_Taiwan_Feature Day_Data : All_Data){
+        for (Table_Small_Taiwan_Feature Day_Data : All_Data){
             System.out.println(Day_Data.date + " 開盤: " + Day_Data.open + " 最高: "+Day_Data.high + " 最低 : "+Day_Data.low + " 收盤 : " +Day_Data.close + " "+ Day_Data.MA_5+ " "+ Day_Data.BIAS_5);
             if(!Approach) {
                 if(Day_Data.MA_5!=null&&Day_Data.MA_10!=null&&Day_Data.MA_15!=null&&Day_Data.MA_30!=null&&
@@ -519,8 +512,8 @@ public class ExampleInstrumentedTest {
         FeatureDatabaseDao fdDao;
         FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
         fdDao = fdb.FeatureDatabaseDao();
-        List<Date_Small_Taiwan_Feature> Hundred_Data = fdDao.get_30_data_fromnow();
-        for (Date_Small_Taiwan_Feature i :Hundred_Data) {
+        List<Table_Small_Taiwan_Feature> Hundred_Data = fdDao.get_30_data_fromnow();
+        for (Table_Small_Taiwan_Feature i :Hundred_Data) {
             Log.i("Hundred_Data", i.toString());
         }
 
