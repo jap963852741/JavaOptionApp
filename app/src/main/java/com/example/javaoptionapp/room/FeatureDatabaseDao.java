@@ -13,12 +13,14 @@ public interface FeatureDatabaseDao {
     @Query("SELECT * FROM DateIndexTable ORDER BY date ASC")
     List<Table_Small_Taiwan_Feature> getAll();
 
-
     @Query("SELECT * FROM (SELECT * FROM DateIndexTable ORDER BY date DESC limit 30) aa ORDER BY date ASC")
     List<Table_Small_Taiwan_Feature> get_30_data_fromnow();
 
     @Query("SELECT * FROM DateIndexTable WHERE date = :one_date"  )
     Table_Small_Taiwan_Feature get_Date_data(String one_date);
+
+    @Query("SELECT * FROM OptionTable WHERE Date = :one_date AND Maturity = :m AND Strike_price = :SP AND CallPut = :CP"  )
+    Table_Option get_option_data(String one_date,String m,String SP ,String CP);
 
     @Query("SELECT date FROM DateIndexTable  ORDER BY date ASC limit 1 offset 4")//忽略4筆從第五筆開始拿
     String get_ma5_begin_date();
@@ -51,14 +53,16 @@ public interface FeatureDatabaseDao {
     List<Table_Small_Taiwan_Feature> loadAllByIds(int[] tradedates);
 
 
-    @Query("DELETE FROM DateIndexTable WHERE date >= :one_date")
+    @Query("DELETE FROM DateIndexTable WHERE date > :one_date")
     public void Delete_after_day(String one_date);
-//    @Query("SELECT * FROM DateIndexTable WHERE first_name LIKE :first AND " +
-//            "last_name LIKE :last LIMIT 1")
-//    User findByName(String first, String last);
+
+
 
     @Insert
     void insertAll(Table_Small_Taiwan_Feature... data);
+
+    @Insert
+    void insert_option(Table_Option... data);
 
     @Delete
     void delete(Table_Small_Taiwan_Feature data);
@@ -66,4 +70,6 @@ public interface FeatureDatabaseDao {
     @Update
     void update(Table_Small_Taiwan_Feature data);
 
+    @Update
+    void update_option(Table_Option data);
 }

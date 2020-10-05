@@ -7,6 +7,7 @@ import androidx.room.Room;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.example.javaoptionapp.room.Table_Option;
 import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
 import com.example.javaoptionapp.room.FeatureDatabase;
 import com.example.javaoptionapp.room.FeatureDatabaseDao;
@@ -125,7 +126,7 @@ public class ExampleInstrumentedTest {
 //    }
 
     @Test
-    public void update_before_2014_db() {
+    public void update_before_2014_feature() {
 
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         FeatureDatabaseDao fdDao;
@@ -213,19 +214,78 @@ public class ExampleInstrumentedTest {
 
         }
 
+    @Test
+    public void update_2000_2019_option() {
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        FeatureDatabaseDao fdDao;
+        FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
+        fdDao = fdb.FeatureDatabaseDao();
+        InputStream inputStream = appContext.getResources().openRawResource(R.raw.option_data);
+        HashMap<Integer, HashMap<String,String>> hashmap_time_data = new HashMap<Integer, HashMap<String,String>>();
 
+        try {
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "gbk");
+            BufferedReader reader = new BufferedReader(inputStreamReader);
+            StringBuffer sb = new StringBuffer("");
+            String result = null;
+            int i = 0;
+
+            while ((result = reader.readLine()) != null) {
+//              資料轉換
+                if (i>10000 && i % 10000 == 0){
+                    System.out.println(result);
+                }
+                result = result.replace("[","").replace("]","").replace(" ","");
+                result = result.replace("'","");
+                String[] temp_list = result.split(",");
+
+                HashMap<String, String> temp_map = new HashMap<String, String>();
+                String temp_time = "";
+                for (String bb : temp_list){
+                    String[] final_list = bb.split(":");
+                    if(final_list[0].equals("Date")){
+                        temp_time = final_list[1];
+                    }
+                    temp_map.put(final_list[0],final_list[1]);
+                }
+                hashmap_time_data.put(i,temp_map);
+                i+=1;
+            }
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+
+        List<Table_Option> update_list = null;
+        for (Integer key : hashmap_time_data.keySet()) {
+            HashMap<String,String> temp_data = hashmap_time_data.get(key);
+
+//            System.out.println(key +" " +temp_data.toString());
+            Table_Option table_option = new Table_Option(
+                    temp_data.get("Date"),
+                    temp_data.get("Maturity"),
+                    temp_data.get("Strike_price"),
+                    temp_data.get("CallPut"),
+                    Float.parseFloat(temp_data.get("close")),
+                    Integer.parseInt(temp_data.get("Day_To_Finish")));
+            Table_Option the_date_information = fdDao.get_option_data(temp_data.get("Date"),temp_data.get("Maturity"),temp_data.get("Strike_price"),temp_data.get("CallPut"));
+//           沒有的才 insert
+            if (the_date_information != null){
+                fdDao.update_option(table_option);
+            }else {
+                fdDao.insert_option(table_option);
+            }
+        }
+        fdb.close();
+    }
 
 
     @Test
     public void room_test(){
-
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         FeatureDatabaseDao fdDao;
         FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
         fdDao = fdb.FeatureDatabaseDao();
 //        //[time:1600963200000, tradeDate:1600963200000, open:12168.00000, high:12234.00000, low:12157.00000, close:12206.00000, volume:9865, millionAmount:0.00]
-
-
         /**
         * 寫入及更新 DateIndexTable 的方法
         * [time:1600963200000, tradeDate:1600963200000, open:12168.00000, high:12234.00000, low:12157.00000, close:12206.00000, volume:9865, millionAmount:0.00]
@@ -251,10 +311,6 @@ public class ExampleInstrumentedTest {
                 fdDao.insertAll(dstf);
             }
         }
-
-
-
-
 
         /**
          * MA 5 日線計算 單元測試
@@ -283,89 +339,6 @@ public class ExampleInstrumentedTest {
                 fdDao.update_ma30(date);
             }
         }
-
-
-
-        /**
-        * 績效回測單元測試
-         * 做多進場點
-         * 1.close > MA15
-         * 2.MA5 > MA10 X
-         * 3.close < MA5
-         *
-         * 停利點
-         * 1.高於 入場點 4%
-         *
-         * 停損點
-         * 1.低於入場點 2%
-         *
-         * 做空進場點
-        * */
-        List<Table_Small_Taiwan_Feature> All_Data = fdDao.getAll();
-        boolean Approach = false;
-        String Long_Short = "";
-        Float Entry_Point = null , Exit_Point = null, Exit_Benifit_Point = null ,Exit_Damage_Point = null;
-        Map<String, Float> Total_Performance = new LinkedHashMap();
-        int Day = 0;
-        for (Table_Small_Taiwan_Feature Day_Data : All_Data){
-            System.out.println(Day_Data.date + " 開盤: " + Day_Data.open + " 最高: "+Day_Data.high + " 最低 : "+Day_Data.low + " 收盤 : " +Day_Data.close);
-            if(!Approach) {
-                if(Day_Data.MA_5!=null &&Day_Data.MA_10!=null &&Day_Data.MA_15!=null   &&
-                        Day_Data.MA_5 > Day_Data.MA_10 && Day_Data.close > Day_Data.MA_15 ){ //&&  Day_Data.close < Day_Data.MA_5
-                    Entry_Point = Day_Data.close; //進場點數
-                    Exit_Benifit_Point = Day_Data.close * 1.05f;
-                    Exit_Damage_Point = Day_Data.close * 0.98f;
-                    System.out.println("進場做多點數 : "+Day_Data.close +"停利點位:" + Exit_Benifit_Point + "停損點數 :" + Exit_Damage_Point);
-                    Approach = true;//進場
-                    Long_Short = "Long"; //做多
-                    Day = 0;
-                }
-
-            }
-            else if(Approach && Long_Short.equals("Long")){//已進場做多 判斷停利停損
-               if(Day_Data.high > Exit_Benifit_Point){  //Day_Data.close > Day_Data.MA_5 * 1.05 ||
-                    System.out.println("停利點數 : "+ Exit_Benifit_Point);
-                    Exit_Point = Exit_Benifit_Point; //停利點數
-                    Approach = false;
-                }
-                else if(Day_Data.close < Exit_Damage_Point){  //盤中如果有低於停損價位 關盤前要停損
-                    System.out.println("停損點數 : "+Day_Data.close);
-                    Exit_Point = Day_Data.close; //停損點數
-                    Approach = false;
-                }
-
-                if(!Approach){//出場
-                    String year = Day_Data.date.substring(0,4);
-                    Float init_vale = 0f;
-                    if (Total_Performance.containsKey(year)){
-                        init_vale = Total_Performance.get(year);
-                    }
-                    //買必put避險
-                    Float change_value = Exit_Point - Entry_Point - 2;
-                    if (change_value < 0) {
-                        change_value = -200f;
-                    }else {
-                        change_value -= 50;
-                    }
-
-                    Total_Performance.put(year , init_vale + change_value);
-                    System.out.println("單次績效 : "+ String.valueOf(change_value) +"歷時天數 : " +String.valueOf(Day) );
-                }else {
-                    Day += 1;
-                }
-            }
-        }
-        AtomicReference<Float> total_v = new AtomicReference<>(0f);
-        Total_Performance.forEach((k, v) -> {
-            System.out.println("年份: " + k + " 績效:" + v);
-            total_v.updateAndGet(v1 -> v1 + v);
-        });
-        System.out.println("總績效 : "+ total_v);
-
-
-
-
-
     }
 
 
@@ -407,7 +380,7 @@ public class ExampleInstrumentedTest {
                         && Day_Data.high > Day_Data.MA_5
                 ){ //收上引線不進場
                     Entry_Point = Day_Data.close; //進場點數
-                    Exit_Benifit_Point =  Entry_Point * 1.01f; //停利點數
+                    Exit_Benifit_Point =  Entry_Point * 1.007f; //停利點數
                     Approach = true;//進場
                     Long_Short = "Long"; //做多
                     Day = 1;//第0天
@@ -494,17 +467,18 @@ public class ExampleInstrumentedTest {
 
     @Test
     public void delete_data_test(){
-
+        java.util.Date time = new java.util.Date(System.currentTimeMillis());
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        String day = format.format(time);
+        System.out.println(day);
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         FeatureDatabaseDao fdDao;
         FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
         fdDao = fdb.FeatureDatabaseDao();
-        fdDao.Delete_after_day("20200831");
+        fdDao.Delete_after_day(day);
 
 
     }
-
-
 
     @Test
     public void Strategy_test(){
@@ -518,7 +492,6 @@ public class ExampleInstrumentedTest {
         }
 
     }
-
 
     @Test
     public void get_day_unixtime(){

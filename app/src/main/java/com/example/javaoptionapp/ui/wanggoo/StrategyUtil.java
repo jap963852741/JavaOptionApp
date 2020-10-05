@@ -78,6 +78,13 @@ public class StrategyUtil {
                 fdDao.update_ma30(date);
             }
         }
+
+        java.util.Date today = new java.util.Date(System.currentTimeMillis());
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        String day = format.format(today);
+        fdDao.Delete_after_day(day);
+
+
     }
 
 
