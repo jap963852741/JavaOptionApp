@@ -19,6 +19,10 @@ public interface FeatureDatabaseDao {
     @Query("SELECT * FROM DateIndexTable WHERE date = :one_date"  )
     Table_Small_Taiwan_Feature get_Date_data(String one_date);
 
+    @Query("SELECT * FROM OptionTable WHERE date = :one_date AND close > :small AND close < :big AND Day_To_Finish >= :D" +
+            " ORDER BY close ASC LIMIT 1"  )
+    Table_Option get_Option_Date_Close_Settlement_data(String one_date,Integer small,Integer big,Integer D);
+
     @Query("SELECT * FROM OptionTable WHERE Date = :one_date AND Maturity = :m AND Strike_price = :SP AND CallPut = :CP"  )
     Table_Option get_option_data(String one_date,String m,String SP ,String CP);
 
