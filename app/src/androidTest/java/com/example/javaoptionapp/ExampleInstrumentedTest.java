@@ -250,7 +250,8 @@ public class ExampleInstrumentedTest {
             Table_Option the_date_information = fdDao.get_option_data(temp_data.get("Date"),temp_data.get("Maturity"),temp_data.get("Strike_price"),temp_data.get("CallPut"));
 //           沒有的才 insert
             if (the_date_information != null){
-                fdDao.update_option(table_option);
+//                fdDao.update_option(table_option);
+                continue;
             }else {
                 fdDao.insert_option(table_option);
             }
