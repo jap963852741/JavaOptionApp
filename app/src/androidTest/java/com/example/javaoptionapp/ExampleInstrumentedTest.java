@@ -22,12 +22,14 @@ import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -167,7 +169,8 @@ public class ExampleInstrumentedTest {
             e1.printStackTrace();
         }
 
-
+        ArrayList need_to_update_list = new ArrayList();
+        ArrayList need_to_insert_list = new ArrayList();
         for (String key : hashmap_time_data.keySet()) {
             HashMap<String,String> temp_data = hashmap_time_data.get(key);
             String date = key;
@@ -181,19 +184,26 @@ public class ExampleInstrumentedTest {
             Table_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
 //           沒有的才 insert
             if (the_date_information != null){
-                fdDao.update(dstf);
+                need_to_update_list.add(dstf);
             }else {
-                fdDao.insertAll(dstf);
+                need_to_insert_list.add(dstf);
             }
         }
 
+        if (need_to_update_list != null) {
+            fdDao.updateAllTable_Small_Taiwan_Feature(need_to_update_list);
+        }
+        if (need_to_insert_list != null) {
+            fdDao.insertAllTable_Small_Taiwan_Feature(need_to_insert_list);
+        }
 
-            /**
-             * MA 5 日線計算 單元測試
-             * MA 10 日線計算 單元測試
-             * MA 15 日線計算 單元測試
-             *當天收盤價也會計算在內
-             * */
+
+        /**
+         * MA 5 日線計算 單元測試
+         * MA 10 日線計算 單元測試
+         * MA 15 日線計算 單元測試
+         *當天收盤價也會計算在內
+         * */
         String ma5_begin_date = fdDao.get_ma5_begin_date();
         String ma10_begin_date = fdDao.get_ma10_begin_date();
         String ma15_begin_date = fdDao.get_ma15_begin_date();
@@ -201,6 +211,7 @@ public class ExampleInstrumentedTest {
         List<Table_Small_Taiwan_Feature> LD = fdDao.getAll();
         for (Table_Small_Taiwan_Feature d : LD){
             String date = d.date;
+            System.out.println(date+"update_ma + ");
             if (Integer.parseInt(date) >= Integer.parseInt(ma5_begin_date)) { //從  ma5_begin_date 日開始更新
                 fdDao.update_ma5(date);
                 fdDao.update_bias5(date);
@@ -216,11 +227,12 @@ public class ExampleInstrumentedTest {
             }
         }
 
-
-        }
+        System.out.println("finish");
+}
 
     @Test
     public void update_2000_2019_option() {
+
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         FeatureDatabaseDao fdDao;
         FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
@@ -259,12 +271,8 @@ public class ExampleInstrumentedTest {
         } catch (Exception e1) {
             e1.printStackTrace();
         }
-
-        List<Table_Option> update_list = null;
         for (Integer key : hashmap_time_data.keySet()) {
             HashMap<String,String> temp_data = hashmap_time_data.get(key);
-
-//            System.out.println(key +" " +temp_data.toString());
             Table_Option table_option = new Table_Option(
                     temp_data.get("Date"),
                     temp_data.get("Maturity"),
@@ -280,6 +288,7 @@ public class ExampleInstrumentedTest {
                 fdDao.insert_option(table_option);
             }
         }
+        System.out.println("離開迴圈");
         fdb.close();
     }
 
@@ -298,9 +307,12 @@ public class ExampleInstrumentedTest {
         String time = String.valueOf(System.currentTimeMillis());//- 2*year_time
         WangGooHistoryUtil wghu = new WangGooHistoryUtil(time);
         HashMap<String, HashMap<String,String>> hashmap_time_data = wghu.hashmap_time_data;
+        ArrayList need_to_update_list = new ArrayList();
+        ArrayList need_to_insert_list = new ArrayList();
         for (String key : hashmap_time_data.keySet()) {
             HashMap<String,String> temp_data = hashmap_time_data.get(key);
             String date = key;
+            System.out.println(date +" " +temp_data.toString());
             Table_Small_Taiwan_Feature dstf = new Table_Small_Taiwan_Feature(date,
                     Float.parseFloat(temp_data.get("open")),
                     Float.parseFloat(temp_data.get("high")),
@@ -310,10 +322,17 @@ public class ExampleInstrumentedTest {
             Table_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
 //           沒有的才 insert
             if (the_date_information != null){
-                fdDao.update(dstf);
+                need_to_update_list.add(dstf);
             }else {
-                fdDao.insertAll(dstf);
+                need_to_insert_list.add(dstf);
             }
+        }
+
+        if (need_to_update_list != null) {
+            fdDao.updateAllTable_Small_Taiwan_Feature(need_to_update_list);
+        }
+        if (need_to_insert_list != null) {
+            fdDao.insertAllTable_Small_Taiwan_Feature(need_to_insert_list);
         }
 
         /**
@@ -396,13 +415,13 @@ public class ExampleInstrumentedTest {
                         && Day_Data.high > Day_Data.MA_5
                 ){ //收上引線不進場
                     Entry_Point = Day_Data.close; //進場點數
-                    Exit_Benifit_Point =  Entry_Point * 1.05f; //停利點數
+                    Exit_Benifit_Point =  Entry_Point * 1.2f; //停利點數
                     Approach = true;//進場
                     Long_Short = "Long"; //做多
                     Day = 1;//第0天
                     System.out.println(Day_Data.date + " 進場做多點數 : "+ Entry_Point +"停利點位:" + Exit_Benifit_Point);
 
-                    Table_Option Approch_option = fdDao.get_Option_Date_Close_Settlement_data(Day_Data.date,50,1000,4);
+                    Table_Option Approch_option = fdDao.get_Option_Date_Close_Settlement_data(Day_Data.date,30,1000,10);
                     if (Approch_option == null){
                         have_option_information = false;
                     }else {
@@ -428,15 +447,11 @@ public class ExampleInstrumentedTest {
                     Approach = false;
 
                     if(have_option_information) {
-
                         Table_Option Exit_option = fdDao.get_option_data(Day_Data.date, Approach_Maturity, Approach_Strike_price, "call");
                         Exit_Option_Point = Exit_option.close;
                         System.out.println("選擇權停利點數 : "+ Exit_Option_Point);
-
                     }
-
                     System.out.println("停利點數 : "+ Exit_Point);
-
                 }
                 else if(Day == 4){  //第三天沒漲超過100就算輸
                     Exit_Point = Day_Data.close; //停損點數

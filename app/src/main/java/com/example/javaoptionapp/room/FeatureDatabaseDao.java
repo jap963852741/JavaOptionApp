@@ -3,6 +3,7 @@ package com.example.javaoptionapp.room;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -13,8 +14,8 @@ public interface FeatureDatabaseDao {
     @Query("SELECT * FROM DateIndexTable ORDER BY date ASC")
     List<Table_Small_Taiwan_Feature> getAll();
 
-    @Query("SELECT * FROM (SELECT * FROM DateIndexTable ORDER BY date DESC limit 30) aa ORDER BY date ASC")
-    List<Table_Small_Taiwan_Feature> get_30_data_fromnow();
+    @Query("SELECT * FROM (SELECT * FROM DateIndexTable ORDER BY date DESC limit 10) aa ORDER BY date ASC")
+    List<Table_Small_Taiwan_Feature> get_10_data_fromnow();
 
     @Query("SELECT * FROM DateIndexTable WHERE date = :one_date"  )
     Table_Small_Taiwan_Feature get_Date_data(String one_date);
@@ -53,6 +54,17 @@ public interface FeatureDatabaseDao {
     @Query("UPDATE DateIndexTable SET BIAS_5 = (SELECT (temp_table.close-temp_table.MA_5)/temp_table.MA_5 FROM (SELECT * FROM DateIndexTable WHERE date = :one_date) temp_table) Where date = :one_date")
     public void update_bias5(String one_date);
 
+    @Query("UPDATE DateIndexTable  SET MA_5 = (SELECT SUM(temp_table.close)/5 FROM (SELECT * FROM DateIndexTable WHERE date <= DateIndexTable.date  ORDER BY date DESC limit 5) temp_table) Where date > :begin_day")
+    public void update_ALL_ma5(String one_date,String begin_day);
+
+
+
+
+
+
+
+
+
     @Query("SELECT * FROM DateIndexTable WHERE date IN (:tradedates)")
     List<Table_Small_Taiwan_Feature> loadAllByIds(int[] tradedates);
 
@@ -66,7 +78,12 @@ public interface FeatureDatabaseDao {
     void insertAll(Table_Small_Taiwan_Feature... data);
 
     @Insert
+    void insertAllTable_Small_Taiwan_Feature(List<Table_Small_Taiwan_Feature> List_Table_Small_Taiwan_Feature);
+
+    @Insert
     void insert_option(Table_Option... data);
+    @Insert
+    void insert_ALL_option(List<Table_Option> data);
 
     @Delete
     void delete(Table_Small_Taiwan_Feature data);
@@ -75,5 +92,10 @@ public interface FeatureDatabaseDao {
     void update(Table_Small_Taiwan_Feature data);
 
     @Update
+    void updateAllTable_Small_Taiwan_Feature(List<Table_Small_Taiwan_Feature> data);
+
+    @Update
     void update_option(Table_Option data);
+    @Update
+    void update_ALL_option(List<Table_Option> data);
 }

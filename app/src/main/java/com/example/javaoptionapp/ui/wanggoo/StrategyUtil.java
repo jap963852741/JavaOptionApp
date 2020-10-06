@@ -10,6 +10,7 @@ import com.example.javaoptionapp.room.FeatureDatabaseDao;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,9 +40,12 @@ public class StrategyUtil {
         String time = String.valueOf(System.currentTimeMillis());//- 2*year_time
         WangGooHistoryUtil wghu = new WangGooHistoryUtil(time);
         HashMap<String, HashMap<String,String>> hashmap_time_data = wghu.hashmap_time_data;
+        ArrayList need_to_update_list = new ArrayList();
+        ArrayList need_to_insert_list = new ArrayList();
         for (String key : hashmap_time_data.keySet()) {
             HashMap<String,String> temp_data = hashmap_time_data.get(key);
             String date = key;
+            System.out.println(date +" " +temp_data.toString());
             Table_Small_Taiwan_Feature dstf = new Table_Small_Taiwan_Feature(date,
                     Float.parseFloat(temp_data.get("open")),
                     Float.parseFloat(temp_data.get("high")),
@@ -51,10 +55,17 @@ public class StrategyUtil {
             Table_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
 //           沒有的才 insert
             if (the_date_information != null){
-                fdDao.update(dstf);
+                need_to_update_list.add(dstf);
             }else {
-                fdDao.insertAll(dstf);
+                need_to_insert_list.add(dstf);
             }
+        }
+
+        if (need_to_update_list != null) {
+            fdDao.updateAllTable_Small_Taiwan_Feature(need_to_update_list);
+        }
+        if (need_to_insert_list != null) {
+            fdDao.insertAllTable_Small_Taiwan_Feature(need_to_insert_list);
         }
 
         String ma5_begin_date = fdDao.get_ma5_begin_date();
@@ -93,14 +104,14 @@ public class StrategyUtil {
             @Override
             public void run() {
                 String need_to_add = "";
-                Context appContext = WangGooFragment.container.getContext();
+                Context appContext = WangGooFragment.strategyutil_context;
                 FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
                 FeatureDatabaseDao fdDao =fdb.FeatureDatabaseDao();
                 WangGooFragment.mUI_Handler.sendEmptyMessage(WangGooFragment.MSG_UPLOAD_Begin);
                 update_db(fdDao);
                 WangGooFragment.mUI_Handler.sendEmptyMessage(WangGooFragment.MSG_UPLOAD_Finish);
 
-                List<Table_Small_Taiwan_Feature> Hundred_Data = fdDao.get_30_data_fromnow();
+                List<Table_Small_Taiwan_Feature> Hundred_Data = fdDao.get_10_data_fromnow();
                 Approach = false;
                 for(Table_Small_Taiwan_Feature Day_Data : Hundred_Data){
                     Day_to_Stop = false;

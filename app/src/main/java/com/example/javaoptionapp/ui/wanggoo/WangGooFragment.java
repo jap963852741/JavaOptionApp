@@ -1,5 +1,6 @@
 package com.example.javaoptionapp.ui.wanggoo;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -29,23 +30,20 @@ public class WangGooFragment extends Fragment {
 
     private WangGooViewModel wangGooViewModel;
     private WangGooAdapter wanggooAdapter;
-    public static ViewGroup container;
-    public static View root;
     public static final int MSG_UPLOAD_Begin =  1;
     public static final int MSG_UPLOAD_Finish = 2;
     private static AVLoadingIndicatorView avi;
+    public static Context strategyutil_context;
 //    private Handler mUI_Handler = new Handler();
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup fcontainer, Bundle savedInstanceState) {
+                             ViewGroup container, Bundle savedInstanceState) {
+        strategyutil_context = getActivity().getApplicationContext();
         wangGooViewModel = new ViewModelProvider(this).get(WangGooViewModel.class);
-        container = fcontainer;
-        root = inflater.inflate(R.layout.fragment_wanggoo, container, false);
+        View root = inflater.inflate(R.layout.fragment_wanggoo, container, false);
         final RecyclerView recyclerView =  root.findViewById(R.id.re_view_wanggoo);
-        avi = WangGooFragment.root.findViewById(R.id.avi);
-
-
+        avi = root.findViewById(R.id.avi);
 
         wangGooViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
