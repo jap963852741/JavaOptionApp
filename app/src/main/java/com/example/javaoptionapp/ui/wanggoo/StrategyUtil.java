@@ -60,7 +60,7 @@ public class StrategyUtil {
                 need_to_insert_list.add(dstf);
             }
         }
-
+            //如果資料太多 array 內存會爆  >>就要一筆一筆update
         if (need_to_update_list != null) {
             fdDao.updateAllTable_Small_Taiwan_Feature(need_to_update_list);
         }
@@ -68,27 +68,11 @@ public class StrategyUtil {
             fdDao.insertAllTable_Small_Taiwan_Feature(need_to_insert_list);
         }
 
-        String ma5_begin_date = fdDao.get_ma5_begin_date();
-        String ma10_begin_date = fdDao.get_ma10_begin_date();
-        String ma15_begin_date = fdDao.get_ma15_begin_date();
-        String ma30_begin_date = fdDao.get_ma30_begin_date();
-        List<Table_Small_Taiwan_Feature> LD = fdDao.getAll();
-        for (Table_Small_Taiwan_Feature d : LD){
-            String date = d.date;
-            if (Integer.parseInt(date) >= Integer.parseInt(ma5_begin_date)) { //從  ma5_begin_date 日開始更新
-                fdDao.update_ma5(date);
-                fdDao.update_bias5(date);
-            }
-            if (Integer.parseInt(date) >= Integer.parseInt(ma10_begin_date)) {
-                fdDao.update_ma10(date);
-            }
-            if (Integer.parseInt(date) >= Integer.parseInt(ma15_begin_date)) {
-                fdDao.update_ma15(date);
-            }
-            if (Integer.parseInt(date) >= Integer.parseInt(ma30_begin_date)) {
-                fdDao.update_ma30(date);
-            }
-        }
+        fdDao.update_ALL_ma5(fdDao.get_ma5_begin_date());
+        fdDao.update_ALL_ma10(fdDao.get_ma10_begin_date());
+        fdDao.update_ALL_ma15(fdDao.get_ma15_begin_date());
+        fdDao.update_ALL_ma30(fdDao.get_ma30_begin_date());
+        fdDao.update_ALL_bias5(fdDao.get_ma5_begin_date());
 
         java.util.Date today = new java.util.Date(System.currentTimeMillis());
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");

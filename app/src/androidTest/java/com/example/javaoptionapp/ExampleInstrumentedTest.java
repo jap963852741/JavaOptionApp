@@ -196,40 +196,7 @@ public class ExampleInstrumentedTest {
         if (need_to_insert_list != null) {
             fdDao.insertAllTable_Small_Taiwan_Feature(need_to_insert_list);
         }
-
-
-        /**
-         * MA 5 日線計算 單元測試
-         * MA 10 日線計算 單元測試
-         * MA 15 日線計算 單元測試
-         *當天收盤價也會計算在內
-         * */
-        String ma5_begin_date = fdDao.get_ma5_begin_date();
-        String ma10_begin_date = fdDao.get_ma10_begin_date();
-        String ma15_begin_date = fdDao.get_ma15_begin_date();
-        String ma30_begin_date = fdDao.get_ma30_begin_date();
-        List<Table_Small_Taiwan_Feature> LD = fdDao.getAll();
-        for (Table_Small_Taiwan_Feature d : LD){
-            String date = d.date;
-            System.out.println(date+"update_ma + ");
-            if (Integer.parseInt(date) >= Integer.parseInt(ma5_begin_date)) { //從  ma5_begin_date 日開始更新
-                fdDao.update_ma5(date);
-                fdDao.update_bias5(date);
-            }
-            if (Integer.parseInt(date) >= Integer.parseInt(ma10_begin_date)) {
-                fdDao.update_ma10(date);
-            }
-            if (Integer.parseInt(date) >= Integer.parseInt(ma15_begin_date)) {
-                fdDao.update_ma15(date);
-            }
-            if (Integer.parseInt(date) >= Integer.parseInt(ma30_begin_date)) {
-                fdDao.update_ma30(date);
-            }
-        }
-
-        System.out.println("finish");
 }
-
     @Test
     public void update_2000_2019_option() {
 
@@ -249,7 +216,7 @@ public class ExampleInstrumentedTest {
 
             while ((result = reader.readLine()) != null) {
 //              資料轉換
-                if (i>10000 && i % 10000 == 0){
+                if (i>10000 && i % 1000 == 0){
                     System.out.println(result);
                 }
                 result = result.replace("[","").replace("]","").replace(" ","");
@@ -291,7 +258,6 @@ public class ExampleInstrumentedTest {
         System.out.println("離開迴圈");
         fdb.close();
     }
-
     @Test
     public void room_test(){
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
@@ -341,27 +307,12 @@ public class ExampleInstrumentedTest {
          * MA 15 日線計算 單元測試
          *當天收盤價也會計算在內
          * */
-        String ma5_begin_date = fdDao.get_ma5_begin_date();
-        String ma10_begin_date = fdDao.get_ma10_begin_date();
-        String ma15_begin_date = fdDao.get_ma15_begin_date();
-        String ma30_begin_date = fdDao.get_ma30_begin_date();
-        List<Table_Small_Taiwan_Feature> LD = fdDao.getAll();
-        for (Table_Small_Taiwan_Feature d : LD){
-            String date = d.date;
-            if (Integer.parseInt(date) >= Integer.parseInt(ma5_begin_date)) { //從  ma5_begin_date 日開始更新
-                fdDao.update_ma5(date);
-                fdDao.update_bias5(date);
-            }
-            if (Integer.parseInt(date) >= Integer.parseInt(ma10_begin_date)) {
-                fdDao.update_ma10(date);
-            }
-            if (Integer.parseInt(date) >= Integer.parseInt(ma15_begin_date)) {
-                fdDao.update_ma15(date);
-            }
-            if (Integer.parseInt(date) >= Integer.parseInt(ma30_begin_date)) {
-                fdDao.update_ma30(date);
-            }
-        }
+        fdDao.update_ALL_ma5(fdDao.get_ma5_begin_date());
+        fdDao.update_ALL_ma10(fdDao.get_ma10_begin_date());
+        fdDao.update_ALL_ma15(fdDao.get_ma15_begin_date());
+        fdDao.update_ALL_ma30(fdDao.get_ma30_begin_date());
+        fdDao.update_ALL_bias5(fdDao.get_ma5_begin_date());
+
     }
 
 

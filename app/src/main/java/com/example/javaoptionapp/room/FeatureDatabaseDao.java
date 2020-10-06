@@ -54,16 +54,36 @@ public interface FeatureDatabaseDao {
     @Query("UPDATE DateIndexTable SET BIAS_5 = (SELECT (temp_table.close-temp_table.MA_5)/temp_table.MA_5 FROM (SELECT * FROM DateIndexTable WHERE date = :one_date) temp_table) Where date = :one_date")
     public void update_bias5(String one_date);
 
-    @Query("UPDATE DateIndexTable  SET MA_5 = (SELECT SUM(temp_table.close)/5 FROM (SELECT * FROM DateIndexTable WHERE date <= DateIndexTable.date  ORDER BY date DESC limit 5) temp_table) Where date > :begin_day")
-    public void update_ALL_ma5(String one_date,String begin_day);
+    @Query("UPDATE DateIndexTable  SET MA_5 = " +
+            "(SELECT SUM(temp_table.close)/5 FROM " +
+            "(SELECT * FROM DateIndexTable a WHERE a.date <= DateIndexTable.date  ORDER BY date DESC limit 5) " +
+            "temp_table) Where date > :begin_day")
+    public void update_ALL_ma5(String begin_day);
+
+    @Query("UPDATE DateIndexTable  SET MA_10 = " +
+            "(SELECT SUM(temp_table.close)/10 FROM " +
+            "(SELECT * FROM DateIndexTable a WHERE a.date <= DateIndexTable.date  ORDER BY date DESC limit 10) " +
+            "temp_table) Where date > :begin_day")
+    public void update_ALL_ma10(String begin_day);
+
+    @Query("UPDATE DateIndexTable  SET MA_15 = " +
+            "(SELECT SUM(temp_table.close)/15 FROM " +
+            "(SELECT * FROM DateIndexTable a WHERE a.date <= DateIndexTable.date  ORDER BY date DESC limit 15) " +
+            "temp_table) Where date > :begin_day")
+    public void update_ALL_ma15(String begin_day);
+
+    @Query("UPDATE DateIndexTable  SET MA_30 = " +
+            "(SELECT SUM(temp_table.close)/30 FROM " +
+            "(SELECT * FROM DateIndexTable a WHERE a.date <= DateIndexTable.date  ORDER BY date DESC limit 30) " +
+            "temp_table) Where date > :begin_day")
+    public void update_ALL_ma30(String begin_day);
 
 
-
-
-
-
-
-
+    @Query("UPDATE DateIndexTable SET BIAS_5 = " +
+            "(SELECT (temp_table.close-temp_table.MA_5)/temp_table.MA_5 " +
+            "FROM (SELECT * FROM DateIndexTable A WHERE A.date = DateIndexTable.date) temp_table) " +
+            "Where date > :begin_day")
+    public void update_ALL_bias5(String begin_day);
 
     @Query("SELECT * FROM DateIndexTable WHERE date IN (:tradedates)")
     List<Table_Small_Taiwan_Feature> loadAllByIds(int[] tradedates);
