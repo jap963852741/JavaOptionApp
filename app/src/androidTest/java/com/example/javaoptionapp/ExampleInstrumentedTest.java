@@ -313,6 +313,7 @@ public class ExampleInstrumentedTest {
         fdDao.update_ALL_ma15(fdDao.get_ma15_begin_date());
         fdDao.update_ALL_ma30(fdDao.get_ma30_begin_date());
         fdDao.update_ALL_bias5(fdDao.get_ma5_begin_date());
+        fdDao.update_ALL_before_5_days_average(fdDao.get_ma5_begin_date());
 
     }
 
@@ -333,7 +334,7 @@ public class ExampleInstrumentedTest {
      * 做空進場點
      * */
     @Test
-    public void option_test(){
+    public void option_long_test(){
 
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         FeatureDatabaseDao fdDao;
@@ -353,6 +354,8 @@ public class ExampleInstrumentedTest {
                 Exit_Benifit_Point = null ,
                 Exit_Damage_Point = null;
 
+        int Day_To_Stop_Loss = 4;
+
 
         Map<String, Float> Total_Performance = new LinkedHashMap();
         Map<String, Float> Total_Option_Performance = new LinkedHashMap();
@@ -360,11 +363,12 @@ public class ExampleInstrumentedTest {
         Map<String, Float> Total_Session = new LinkedHashMap();
         int Day = 0;
         for (Table_Small_Taiwan_Feature Day_Data : All_Data){
-            System.out.println(Day_Data.date + " 開盤: " + Day_Data.open + " 最高: "+Day_Data.high + " 最低 : "+Day_Data.low + " 收盤 : " +Day_Data.close + " "+ Day_Data.MA_5+ " "+ Day_Data.BIAS_5);
+            System.out.printf("%s  開盤: %.0f  最高: %.0f  最低 : %.0f   收盤 : %.0f  %n", Day_Data.date,Day_Data.open,Day_Data.high,Day_Data.low,Day_Data.close);
             if(!Approach) {
                 if(Day_Data.MA_5!=null&&Day_Data.MA_10!=null&&Day_Data.MA_15!=null&&Day_Data.MA_30!=null&&
                         Day_Data.close < Day_Data.MA_5
                         && Day_Data.high > Day_Data.MA_5
+                        && Day_Data.volume > Day_Data.before_5_days_average*.865
                 ){ //收上引線不進場
                     Entry_Point = Day_Data.close; //進場點數
                     Exit_Benifit_Point =  Entry_Point * 1.2f; //停利點數
@@ -373,7 +377,7 @@ public class ExampleInstrumentedTest {
                     Day = 1;//第0天
                     System.out.println(Day_Data.date + " 進場做多點數 : "+ Entry_Point +"停利點位:" + Exit_Benifit_Point);
 
-                    Table_Option Approch_option = fdDao.get_Option_Date_Close_Settlement_data(Day_Data.date,30,1000,10);
+                    Table_Option Approch_option = fdDao.get_Option_Date_Close_Settlement_data(Day_Data.date,30,1000,4);
                     if (Approch_option == null){
                         have_option_information = false;
                     }else {
@@ -405,7 +409,7 @@ public class ExampleInstrumentedTest {
                     }
                     System.out.println("停利點數 : "+ Exit_Point);
                 }
-                else if(Day == 4){  //第三天沒漲超過100就算輸
+                else if(Day == Day_To_Stop_Loss){  //第三天沒漲超過100就算輸
                     Exit_Point = Day_Data.close; //停損點數
                     Approach = false;
 
@@ -504,7 +508,9 @@ public class ExampleInstrumentedTest {
             System.out.println("年份: " + k_1 + " 勝率:" + temp_win/v_1  +" " +temp_win +"/" + v_1);
             total_session.updateAndGet(v1_1 -> v1_1 + v_1);
         });
-        System.out.println("總勝率 : "+ Float.valueOf(win_session.toString())/Float.valueOf(total_session.toString()) +" " +win_session.toString().replace(".0","") +"/" + total_session.toString().replace(".0","") );
+        System.out.println("總勝率 : "+ Float.valueOf(win_session.toString())/Float.valueOf(total_session.toString())
+                +" " +win_session.toString().replace(".0","")
+                +"/" + total_session.toString().replace(".0","") );
     }
 
     @Test

@@ -1,9 +1,15 @@
 package com.example.javaoptionapp.ui.wanggoo;
 
+import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
+import androidx.room.Room;
+
+import com.example.javaoptionapp.room.FeatureDatabase;
+import com.example.javaoptionapp.room.FeatureDatabaseDao;
+import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -31,7 +37,6 @@ public class WangGooHistoryUtil extends WangGooUtil{
         this.seturl();
         post();
     }
-
     public WangGooHistoryUtil(String time){
         super();
         this.seturl(time);
@@ -50,6 +55,9 @@ public class WangGooHistoryUtil extends WangGooUtil{
         System.out.println(url);
     }
     public void post(){
+        Context appContext = WangGooFragment.strategyutil_context;
+        FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
+        FeatureDatabaseDao fdDao =fdb.FeatureDatabaseDao();
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.connectTimeout(15000, TimeUnit.MILLISECONDS)
                 .readTimeout(15000, TimeUnit.MILLISECONDS);
@@ -102,8 +110,53 @@ public class WangGooHistoryUtil extends WangGooUtil{
                 }
 //                System.out.println("temp_map"+temp_map.toString());
             }
+            update_db(fdDao);
         }
     }
 
+    public void update_db(FeatureDatabaseDao fdDao){
+        String time = String.valueOf(System.currentTimeMillis());//- 2*year_time
+        WangGooHistoryUtil wghu = new WangGooHistoryUtil(time);
+        HashMap<String, HashMap<String,String>> hashmap_time_data = wghu.hashmap_time_data;
+        ArrayList need_to_update_list = new ArrayList();
+        ArrayList need_to_insert_list = new ArrayList();
+        for (String key : hashmap_time_data.keySet()) {
+            HashMap<String,String> temp_data = hashmap_time_data.get(key);
+            String date = key;
+            System.out.println(date +" " +temp_data.toString());
+            Table_Small_Taiwan_Feature dstf = new Table_Small_Taiwan_Feature(date,
+                    Float.parseFloat(temp_data.get("open")),
+                    Float.parseFloat(temp_data.get("high")),
+                    Float.parseFloat(temp_data.get("low")),
+                    Float.parseFloat(temp_data.get("close")),
+                    Float.parseFloat(temp_data.get("volume")));
+            Table_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
+//           沒有的才 insert
+            if (the_date_information != null){
+                need_to_update_list.add(dstf);
+            }else {
+                need_to_insert_list.add(dstf);
+            }
+        }
+        //如果資料太多 array 內存會爆  >>就要一筆一筆update
+        if (need_to_update_list != null) {
+            fdDao.updateAllTable_Small_Taiwan_Feature(need_to_update_list);
+        }
+        if (need_to_insert_list != null) {
+            fdDao.insertAllTable_Small_Taiwan_Feature(need_to_insert_list);
+        }
+        fdDao.update_ALL_ma5(fdDao.get_ma5_begin_date());
+        fdDao.update_ALL_ma10(fdDao.get_ma10_begin_date());
+        fdDao.update_ALL_ma15(fdDao.get_ma15_begin_date());
+        fdDao.update_ALL_ma30(fdDao.get_ma30_begin_date());
+        fdDao.update_ALL_bias5(fdDao.get_ma5_begin_date());
+        fdDao.update_ALL_before_5_days_average(fdDao.get_ma5_begin_date());
+
+
+        java.util.Date today = new java.util.Date(System.currentTimeMillis());
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        String day = format.format(today);
+        fdDao.Delete_after_day(day);
+    }
 
 }

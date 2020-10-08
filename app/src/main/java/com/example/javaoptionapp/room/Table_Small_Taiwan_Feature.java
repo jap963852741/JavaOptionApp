@@ -21,7 +21,7 @@ public class Table_Small_Taiwan_Feature {
         this.volume = volume;
     }
 
-    public Table_Small_Taiwan_Feature(String date, Float open, Float high, Float low, Float close, Float volume, Float MA_5, Float MA_10, Float MA_15, Float BIAS_5) {
+    public Table_Small_Taiwan_Feature(String date, Float open, Float high, Float low, Float close, Float volume, Float MA_5, Float MA_10, Float MA_15, Float MA_30) {
         this.date = date;
         this.open = open;
         this.high = high;
@@ -33,6 +33,7 @@ public class Table_Small_Taiwan_Feature {
         this.MA_15 = MA_15;
         this.MA_30 = MA_30;
         this.BIAS_5 = BIAS_5;
+        this.before_5_days_average = before_5_days_average;
 
     }
 
@@ -56,6 +57,7 @@ public class Table_Small_Taiwan_Feature {
     @ColumnInfo(name = "volume")
     public Float volume;
 
+
     @ColumnInfo(name = "MA_5")
     public Float MA_5;
 
@@ -70,5 +72,8 @@ public class Table_Small_Taiwan_Feature {
 
     @ColumnInfo(name = "BIAS_5")
     public Float BIAS_5;
+
+    @ColumnInfo(name = "before_5_days_average")
+    public Float before_5_days_average;
 
 }

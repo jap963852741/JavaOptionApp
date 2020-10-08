@@ -54,6 +54,12 @@ public interface FeatureDatabaseDao {
     @Query("UPDATE DateIndexTable SET BIAS_5 = (SELECT (temp_table.close-temp_table.MA_5)/temp_table.MA_5 FROM (SELECT * FROM DateIndexTable WHERE date = :one_date) temp_table) Where date = :one_date")
     public void update_bias5(String one_date);
 
+    @Query("UPDATE DateIndexTable  SET before_5_days_average = " +
+            "(SELECT SUM(temp_table.volume)/5 FROM " +
+            "(SELECT * FROM DateIndexTable a WHERE a.date < :one_date  ORDER BY date DESC limit 5) " +
+            "temp_table) Where date = :one_date")
+    public void update_days_average(String one_date);
+
     @Query("UPDATE DateIndexTable  SET MA_5 = " +
             "(SELECT SUM(temp_table.close)/5 FROM " +
             "(SELECT * FROM DateIndexTable a WHERE a.date <= DateIndexTable.date  ORDER BY date DESC limit 5) " +
@@ -84,6 +90,12 @@ public interface FeatureDatabaseDao {
             "FROM (SELECT * FROM DateIndexTable A WHERE A.date = DateIndexTable.date) temp_table) " +
             "Where date > :begin_day")
     public void update_ALL_bias5(String begin_day);
+
+    @Query("UPDATE DateIndexTable  SET before_5_days_average = " +
+            "(SELECT SUM(temp_table.volume)/5 FROM " +
+            "(SELECT * FROM DateIndexTable a WHERE a.date < DateIndexTable.date  ORDER BY date DESC limit 5) " +
+            "temp_table) Where date > :begin_day")
+    public void update_ALL_before_5_days_average(String begin_day);
 
     @Query("SELECT * FROM DateIndexTable WHERE date IN (:tradedates)")
     List<Table_Small_Taiwan_Feature> loadAllByIds(int[] tradedates);

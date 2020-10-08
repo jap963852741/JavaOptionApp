@@ -25,65 +25,19 @@ public class StrategyUtil {
     public boolean Approach;
     public Float Entry_Point = null , Exit_Point = null, Exit_Benifit_Point = null ,Exit_Damage_Point = null;
     public int Day;
+    public int Day_To_Stop_Loss;
     public String ApproachDate = "";
     public boolean Day_to_Stop;
-    public AVLoadingIndicatorView avi;
+
 
     public StrategyUtil(MutableLiveData<String> mText){
-        get_strategy(mText);
+        get_strategy();
         this.mText = mText;
-
     }
 
 
-    public void update_db(FeatureDatabaseDao fdDao){
-        String time = String.valueOf(System.currentTimeMillis());//- 2*year_time
-        WangGooHistoryUtil wghu = new WangGooHistoryUtil(time);
-        HashMap<String, HashMap<String,String>> hashmap_time_data = wghu.hashmap_time_data;
-        ArrayList need_to_update_list = new ArrayList();
-        ArrayList need_to_insert_list = new ArrayList();
-        for (String key : hashmap_time_data.keySet()) {
-            HashMap<String,String> temp_data = hashmap_time_data.get(key);
-            String date = key;
-            System.out.println(date +" " +temp_data.toString());
-            Table_Small_Taiwan_Feature dstf = new Table_Small_Taiwan_Feature(date,
-                    Float.parseFloat(temp_data.get("open")),
-                    Float.parseFloat(temp_data.get("high")),
-                    Float.parseFloat(temp_data.get("low")),
-                    Float.parseFloat(temp_data.get("close")),
-                    Float.parseFloat(temp_data.get("volume")));
-            Table_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
-//           沒有的才 insert
-            if (the_date_information != null){
-                need_to_update_list.add(dstf);
-            }else {
-                need_to_insert_list.add(dstf);
-            }
-        }
-            //如果資料太多 array 內存會爆  >>就要一筆一筆update
-        if (need_to_update_list != null) {
-            fdDao.updateAllTable_Small_Taiwan_Feature(need_to_update_list);
-        }
-        if (need_to_insert_list != null) {
-            fdDao.insertAllTable_Small_Taiwan_Feature(need_to_insert_list);
-        }
 
-        fdDao.update_ALL_ma5(fdDao.get_ma5_begin_date());
-        fdDao.update_ALL_ma10(fdDao.get_ma10_begin_date());
-        fdDao.update_ALL_ma15(fdDao.get_ma15_begin_date());
-        fdDao.update_ALL_ma30(fdDao.get_ma30_begin_date());
-        fdDao.update_ALL_bias5(fdDao.get_ma5_begin_date());
-
-        java.util.Date today = new java.util.Date(System.currentTimeMillis());
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-        String day = format.format(today);
-        fdDao.Delete_after_day(day);
-
-
-    }
-
-
-    void get_strategy(MutableLiveData<String> mText){
+    void get_strategy(){
         Thread thread = new Thread(new Runnable(){
             @Override
             public void run() {
@@ -92,9 +46,10 @@ public class StrategyUtil {
                 FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
                 FeatureDatabaseDao fdDao =fdb.FeatureDatabaseDao();
                 WangGooFragment.mUI_Handler.sendEmptyMessage(WangGooFragment.MSG_UPLOAD_Begin);
-                update_db(fdDao);
+//                update_db(fdDao);
                 WangGooFragment.mUI_Handler.sendEmptyMessage(WangGooFragment.MSG_UPLOAD_Finish);
 
+                Day_To_Stop_Loss = 4;//幾天內沒到停利點 就平倉
                 List<Table_Small_Taiwan_Feature> Hundred_Data = fdDao.get_10_data_fromnow();
                 Approach = false;
                 for(Table_Small_Taiwan_Feature Day_Data : Hundred_Data){
@@ -103,27 +58,27 @@ public class StrategyUtil {
                     if(!Approach) {
                         if(Day_Data.MA_5!=null&&Day_Data.MA_10!=null&&Day_Data.MA_15!=null&&Day_Data.MA_30!=null&&
                                 Day_Data.close < Day_Data.MA_5
-                                && Day_Data.high > Day_Data.MA_5){
+                                && Day_Data.high > Day_Data.MA_5
+                                && Day_Data.volume > Day_Data.before_5_days_average*.86){
                             ApproachDate = Day_Data.date;
                             Entry_Point = Day_Data.close; //進場點數
-                            Exit_Benifit_Point =  Entry_Point * 1.01f; //停利點數
+                            Exit_Benifit_Point =  Entry_Point * 1.2f; //停利點數
                             Approach = true;//進場
                             Day = 1;//第0天
-                            Log.i("Hundred_Data", Day_Data.date + " 進場做多點數 : "+ Entry_Point +"停利點位:" + Exit_Benifit_Point);
-
+//                            Log.i("Hundred_Data", Day_Data.date + " 進場做多點數 : "+ Entry_Point +"停利點位:" + Exit_Benifit_Point);
                         }
-                    }else if(Approach ){//已進場做多 判斷停利停損
+                    }else if(Approach){//已進場做多 判斷停利停損
                         if(Day_Data.high > Exit_Benifit_Point){  //Day_Data.close > Day_Data.MA_5 * 1.05 ||
                             Day_to_Stop = true;
                             Exit_Point =  Day_Data.close; //停利點數
                             Approach = false;
-                            System.out.println("停利點數 : "+ Exit_Point);
+//                            System.out.println("停利點數 : "+ Exit_Point);
                         }
-                        else if(Day == 2){  //第三天沒漲超過100就算輸
+                        else if(Day == Day_To_Stop_Loss){  //第四天沒漲超過100就算輸
                             Day_to_Stop = true;
                             Exit_Point = Day_Data.close; //停損點數
                             Approach = false;
-                            System.out.println("停損點數 : "+Exit_Point);
+//                            System.out.println("停損點數 : "+Exit_Point);
                         }
                         Day += 1;
                     }

@@ -20,17 +20,12 @@ import static java.lang.Thread.sleep;
 
 
 public class WangGooViewModel extends ViewModel {
-//implements WangGooUtil.get_resource
     private MutableLiveData<String> mText;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public WangGooViewModel() throws InterruptedException {
         mText = new MutableLiveData<>();
         WangGooUtil wgt = new WangGooUtil(mText);
-        StrategyUtil stu = new StrategyUtil(mText);
-
-        mText.setValue("This is wanggoo fragment");
-
 
     }
 
