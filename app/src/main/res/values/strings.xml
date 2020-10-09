@@ -2,8 +2,9 @@
     <string name="app_name">JavaOptionApp</string>
     <string name="CMoney_API">CMoney_API</string>
     <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_mystrategy">My_Strategy</string>
     <string name="date">日期</string>
+    <string name="update_two_year_data">更新兩年資料</string>
     <string name="maket_data">市場資料</string>
     <string name="BA123690a">大盤籌碼日報</string>
     <string name="BA123695a">大盤漲跌家數</string>

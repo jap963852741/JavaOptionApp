@@ -62,7 +62,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
         choose_button = (Button) root.findViewById(R.id.choose_button);
         choose_button.setOnClickListener(this);
         Toolbar toolbar = root.findViewById(R.id.toolBar);
-        toolbar.setTitle("");
+//        toolbar.setTitle("");
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override

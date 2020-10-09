@@ -18,8 +18,8 @@
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_mystrategy"
         android:name="com.example.javaoptionapp.ui.wanggoo.WangGooFragment"
-        android:label="@string/title_notifications"
+        android:label="@string/title_mystrategy"
         tools:layout="@layout/fragment_wanggoo" />
 </navigation>

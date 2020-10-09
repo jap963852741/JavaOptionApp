@@ -32,6 +32,7 @@ public class WangGooHistoryUtil extends WangGooUtil{
     private OkHttpClient okHttpClient;
     private String[] value;
     public HashMap<String, HashMap<String,String>> hashmap_time_data = new HashMap<String, HashMap<String,String>>();
+    private FeatureDatabaseDao fdDao;
     public WangGooHistoryUtil(){
         super();
         this.seturl();
@@ -55,66 +56,73 @@ public class WangGooHistoryUtil extends WangGooUtil{
         System.out.println(url);
     }
     public void post(){
-        Context appContext = WangGooFragment.strategyutil_context;
-        FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
-        FeatureDatabaseDao fdDao =fdb.FeatureDatabaseDao();
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.connectTimeout(15000, TimeUnit.MILLISECONDS)
-                .readTimeout(15000, TimeUnit.MILLISECONDS);
-        okHttpClient = builder.build();
-        Request request = new Request.Builder().addHeader("User-Agent",
-                "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
-                .url(url)
-                .get()
-                .build();
-        System.out.println("post");
-            //将请求添加到请求队列等待执行，并返回执行后的Response对象
-        Response response = null;
-        try {
-            response = okHttpClient.newCall(request).execute();
-        } catch (IOException e) {
-            System.out.println(e);
+        Thread thread = new Thread(new Runnable(){
+            @Override
+            public void run() {
+                System.out.println("post run");
+                Context appContext = WangGooFragment.strategyutil_context;
+                FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
+                fdDao =fdb.FeatureDatabaseDao();
+                OkHttpClient.Builder builder = new OkHttpClient.Builder();
+                builder.connectTimeout(15000, TimeUnit.MILLISECONDS)
+                        .readTimeout(15000, TimeUnit.MILLISECONDS);
+                okHttpClient = builder.build();
+                Request request = new Request.Builder().addHeader("User-Agent",
+                        "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+                        .url(url)
+                        .get()
+                        .build();
+                System.out.println("post");
+                //将请求添加到请求队列等待执行，并返回执行后的Response对象
+                Response response = null;
+                try {
+                    response = okHttpClient.newCall(request).execute();
+                } catch (IOException e) {
+                    System.out.println(e);
 
-            e.printStackTrace();
-        }
-//                Log.i("responce",String.valueOf(response.code()));
-        System.out.println(response.code());
-        if (response.code() == 200) {
-            String result = null;
-            try {
-                result = response.body().string();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            result = result.replace("{","").replace("[","").replace("]","");
-            System.out.println(result);
-            value = result.split(Pattern.quote("},"));
-            System.out.println(result);
-            for (String aa : value){
-                aa = aa.replace("\"","");
-                String[] temp_list = aa.split(",");
-                HashMap<String, String> temp_map = new HashMap<String, String>();
-                String temp_time = "";
-                for (String bb : temp_list){
-                    String[] final_list = bb.split(":");
-                    if(final_list[0].equals("time")){
-                        long millisecond = Long.parseLong(final_list[1]);
-                        Date date = new Date(millisecond);
-                        SimpleDateFormat format = new SimpleDateFormat("YYYYMMdd");
-                        temp_time = format.format(date);
-                    }else if(final_list[0].equals("millionAmount")){
-                        hashmap_time_data.put(temp_time,temp_map);
-                    }else{
-                        temp_map.put(final_list[0],final_list[1]);
-                    }
+                    e.printStackTrace();
                 }
+//                Log.i("responce",String.valueOf(response.code()));
+                System.out.println(response.code());
+                if (response.code() == 200) {
+                    String result = null;
+                    try {
+                        result = response.body().string();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    result = result.replace("{", "").replace("[", "").replace("]", "");
+                    System.out.println(result);
+                    value = result.split(Pattern.quote("},"));
+                    System.out.println(result);
+                    for (String aa : value) {
+                        aa = aa.replace("\"", "");
+                        String[] temp_list = aa.split(",");
+                        HashMap<String, String> temp_map = new HashMap<String, String>();
+                        String temp_time = "";
+                        for (String bb : temp_list) {
+                            String[] final_list = bb.split(":");
+                            if (final_list[0].equals("time")) {
+                                long millisecond = Long.parseLong(final_list[1]);
+                                Date date = new Date(millisecond);
+                                SimpleDateFormat format = new SimpleDateFormat("YYYYMMdd");
+                                temp_time = format.format(date);
+                            } else if (final_list[0].equals("millionAmount")) {
+                                hashmap_time_data.put(temp_time, temp_map);
+                            } else {
+                                temp_map.put(final_list[0], final_list[1]);
+                            }
+                        }
 //                System.out.println("temp_map"+temp_map.toString());
+                    }
+                    update_db();
+                }
             }
-            update_db(fdDao);
-        }
+        });
+
     }
 
-    public void update_db(FeatureDatabaseDao fdDao){
+    public void update_db(){
         String time = String.valueOf(System.currentTimeMillis());//- 2*year_time
         WangGooHistoryUtil wghu = new WangGooHistoryUtil(time);
         HashMap<String, HashMap<String,String>> hashmap_time_data = wghu.hashmap_time_data;
