@@ -25,6 +25,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.javaoptionapp.R;
+import com.example.javaoptionapp.dialog.LoadingDialog;
+import com.example.javaoptionapp.dialog.LoadingDialogFragment;
 import com.example.javaoptionapp.ui.home.HomeAdapter;
 import com.example.javaoptionapp.ui.home.HomeFragment;
 import com.hdl.calendardialog.CalendarView;
@@ -44,17 +46,14 @@ public class WangGooFragment extends Fragment {
     private WangGooAdapter wanggooAdapter;
     public static final int MSG_UPLOAD_Begin =  1;
     public static final int MSG_UPLOAD_Finish = 2;
-    public static final int UPDATE_DB =3;
     private static AVLoadingIndicatorView avi;
     public static Context strategyutil_context;
-//    private Handler mUI_Handler = new Handler();
-
+    public static LoadingDialog loadingdialog;
+    public WangGooHistoryUtil wghu;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        Log.i("NOW","WangGooFragment onCreate");
-
     }
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -67,6 +66,12 @@ public class WangGooFragment extends Fragment {
 //        toolbar.setNavigationIcon(R.drawable.ic_history);
         toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_history));//把三個小點換掉
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        loadingdialog = new LoadingDialog(getContext());
+        //仅点击外部不可取消
+        loadingdialog.setCanceledOnTouchOutside(false);
+        //点击返回键和外部都不可取消
+        loadingdialog.setCancelable(false);
+        wghu = new WangGooHistoryUtil();
         wangGooViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
@@ -90,10 +95,12 @@ public class WangGooFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
 
         menu.add(Menu.NONE, WangGooFragment.ActionBar_Menu_Num.update_two_year_data, Menu.NONE, R.string.update_two_year_data);
+        menu.add(Menu.NONE, WangGooFragment.ActionBar_Menu_Num.update_all_year_data, Menu.NONE, R.string.update_all_year_data);
     }
 
     public interface ActionBar_Menu_Num{
         final Integer update_two_year_data = 1;
+        final Integer update_all_year_data = 2;
     }
 
 
@@ -101,7 +108,12 @@ public class WangGooFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case 1:
-                new WangGooHistoryUtil();
+                wghu.post();
+                loadingdialog.show();
+                break;
+            case 2:
+                wghu.update_all_history();
+                loadingdialog.show();
                 break;
         }
         return super.onOptionsItemSelected(item);

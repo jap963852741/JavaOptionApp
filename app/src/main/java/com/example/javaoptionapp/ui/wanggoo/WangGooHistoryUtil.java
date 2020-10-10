@@ -7,11 +7,15 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 import androidx.room.Room;
 
+import com.example.javaoptionapp.R;
 import com.example.javaoptionapp.room.FeatureDatabase;
 import com.example.javaoptionapp.room.FeatureDatabaseDao;
 import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -36,10 +40,10 @@ public class WangGooHistoryUtil extends WangGooUtil{
     public WangGooHistoryUtil(){
         super();
         this.seturl();
-        post();
     }
     public WangGooHistoryUtil(String time){
         super();
+//        WangGooFragment.mUI_Handler.sendEmptyMessage(WangGooFragment.MSG_LoadingDialog_Begin);
         this.seturl(time);
         post();
     }
@@ -72,7 +76,7 @@ public class WangGooHistoryUtil extends WangGooUtil{
                         .url(url)
                         .get()
                         .build();
-                System.out.println("post");
+
                 //将请求添加到请求队列等待执行，并返回执行后的Response对象
                 Response response = null;
                 try {
@@ -93,6 +97,7 @@ public class WangGooHistoryUtil extends WangGooUtil{
                     }
                     result = result.replace("{", "").replace("[", "").replace("]", "");
                     System.out.println(result);
+                    Log.i("WangGooHistoryUtil","result"+result);
                     value = result.split(Pattern.quote("},"));
                     System.out.println(result);
                     for (String aa : value) {
@@ -115,17 +120,16 @@ public class WangGooHistoryUtil extends WangGooUtil{
                         }
 //                System.out.println("temp_map"+temp_map.toString());
                     }
-                    update_db();
+                    update_db(hashmap_time_data);
+                    fdb.close();
                 }
             }
         });
 
+        thread.start();
     }
-
-    public void update_db(){
-        String time = String.valueOf(System.currentTimeMillis());//- 2*year_time
-        WangGooHistoryUtil wghu = new WangGooHistoryUtil(time);
-        HashMap<String, HashMap<String,String>> hashmap_time_data = wghu.hashmap_time_data;
+    public void update_db(HashMap<String, HashMap<String,String>> hashmap_time_data){
+        System.out.println("update_db");
         ArrayList need_to_update_list = new ArrayList();
         ArrayList need_to_insert_list = new ArrayList();
         for (String key : hashmap_time_data.keySet()) {
@@ -153,6 +157,7 @@ public class WangGooHistoryUtil extends WangGooUtil{
         if (need_to_insert_list != null) {
             fdDao.insertAllTable_Small_Taiwan_Feature(need_to_insert_list);
         }
+
         fdDao.update_ALL_ma5(fdDao.get_ma5_begin_date());
         fdDao.update_ALL_ma10(fdDao.get_ma10_begin_date());
         fdDao.update_ALL_ma15(fdDao.get_ma15_begin_date());
@@ -160,11 +165,60 @@ public class WangGooHistoryUtil extends WangGooUtil{
         fdDao.update_ALL_bias5(fdDao.get_ma5_begin_date());
         fdDao.update_ALL_before_5_days_average(fdDao.get_ma5_begin_date());
 
-
         java.util.Date today = new java.util.Date(System.currentTimeMillis());
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         String day = format.format(today);
         fdDao.Delete_after_day(day);
+//        WangGooFragment.mUI_Handler.sendEmptyMessage(WangGooFragment.MSG_LoadingDialog_Finish);
+        WangGooFragment.loadingdialog.dismiss();
+    }
+    public void update_all_history(){
+        Thread thread = new Thread(new Runnable(){
+            @Override
+            public void run() {
+                Context appContext = WangGooFragment.strategyutil_context;
+                FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
+                fdDao =fdb.FeatureDatabaseDao();
+                InputStream inputStream = WangGooFragment.strategyutil_context.getResources().openRawResource(R.raw.all_data);
+                HashMap<String, HashMap<String,String>> hashmap_time_data_all = new HashMap<String, HashMap<String,String>>();
+
+                try {
+                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "gbk");
+                    BufferedReader reader = new BufferedReader(inputStreamReader);
+                    StringBuffer sb = new StringBuffer("");
+                    String result;
+                    while ((result = reader.readLine()) != null) {
+//              資料轉換
+                        result = result.replace("[","").replace("]","").replace(" ","");
+                        result = result.replace("'","");
+                        String[] temp_list = result.split(",");
+
+                        HashMap<String, String> temp_map = new HashMap<String, String>();
+                        String temp_time = "";
+                        for (String bb : temp_list){
+                            String[] final_list = bb.split(":");
+                            if(final_list[0].equals("time")){
+                                long millisecond = Long.parseLong(final_list[1]);
+                                Date date = new Date(millisecond);
+                                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+                                temp_time = format.format(date);
+                            }else{
+                                temp_map.put(final_list[0],final_list[1]);
+                            }
+                        }
+                        hashmap_time_data_all.put(temp_time,temp_map);
+                    }
+                    System.out.println(hashmap_time_data_all);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+
+                update_db(hashmap_time_data_all);
+                fdb.close();
+
+            }
+        });
+        thread.start();
     }
 
 }

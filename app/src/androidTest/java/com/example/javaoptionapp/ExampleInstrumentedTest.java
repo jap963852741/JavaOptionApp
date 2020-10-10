@@ -11,6 +11,7 @@ import com.example.javaoptionapp.room.Table_Option;
 import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
 import com.example.javaoptionapp.room.FeatureDatabase;
 import com.example.javaoptionapp.room.FeatureDatabaseDao;
+import com.example.javaoptionapp.ui.dashboard.OptionUtil;
 import com.example.javaoptionapp.ui.wanggoo.WangGooHistoryUtil;
 
 import org.junit.Test;
@@ -563,6 +564,13 @@ public class ExampleInstrumentedTest {
         classDate = calendar.getTime();//获取加减以后的Date类型日期
         SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
         String formatted = format1.format(classDate.getTime());
+    }
+
+
+    @Test
+    public void get_now_option_data(){
+        OptionUtil OPU = new OptionUtil();
+        OPU.post();
     }
 
 }
