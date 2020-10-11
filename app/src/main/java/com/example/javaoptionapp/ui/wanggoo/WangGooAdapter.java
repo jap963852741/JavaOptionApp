@@ -103,17 +103,8 @@ public class WangGooAdapter extends RecyclerView.Adapter<VH> {
 
 class VH extends RecyclerView.ViewHolder {
     TextView tv1;
-    //TextView tv2;
     public VH(@NonNull View itemView,View parent) {
         super(itemView);
         tv1 = itemView.findViewById(R.id.tv1);
-//
-//        //parent 由 container傳來計算高度
-//        //item 的適應高度調整
-//        int parentHeight = parent.getHeight();
-//        ViewGroup.LayoutParams layoutParams = itemView.getLayoutParams();
-//        layoutParams.height =  parentHeight/12;
-        //item 的適應高度調整
-
     }
 }

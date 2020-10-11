@@ -1,7 +1,6 @@
 package com.example.javaoptionapp;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.room.Room;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -11,7 +10,7 @@ import com.example.javaoptionapp.room.Table_Option;
 import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
 import com.example.javaoptionapp.room.FeatureDatabase;
 import com.example.javaoptionapp.room.FeatureDatabaseDao;
-import com.example.javaoptionapp.ui.dashboard.OptionUtil;
+import com.example.javaoptionapp.ui.Option.OptionUtil;
 import com.example.javaoptionapp.ui.wanggoo.WangGooHistoryUtil;
 
 import org.junit.Test;
@@ -30,7 +29,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -570,7 +568,68 @@ public class ExampleInstrumentedTest {
     @Test
     public void get_now_option_data(){
         OptionUtil OPU = new OptionUtil();
-        OPU.post();
+        OPU.get_all_month();
+//        HashMap<String,String> option_strike_price = OPU.option_strike_price;
+//
+//        for (String key : option_strike_price.keySet()) {
+//            System.out.println("Key = " + key + "Value = " + option_strike_price.get(key));
+//        }
+
+
+//        Context appContext = OptionFragment.option_context;
+//        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+//        builder.connectTimeout(15000, TimeUnit.MILLISECONDS)
+//                .readTimeout(15000, TimeUnit.MILLISECONDS);
+//        OkHttpClient okHttpClient = builder.build();
+//        Request request = new Request.Builder()
+//                .addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+//                .url("https://tw.screener.finance.yahoo.net/future/aa03?fumr=futurepart&opmr=optionpart&opcm=WTXO&opym=202011")
+//                .get()
+//                .build();
+//        Response response = null;
+//        try {
+//            response = okHttpClient.newCall(request).execute();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        if (response.code() == 200) {
+//            String result = null;
+//            try {
+//                result = response.body().string();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+////            result = result.replace("{","").replace("}","").replace("\"","");
+//            Log.i("option","result"+result);
+//        }
+//
+//        try {
+//            Document doc = Jsoup.connect("https://tw.screener.finance.yahoo.net/future/aa03?fumr=futurepart&opmr=optionpart&opcm=WTXO&opym=202011").get();
+//            Elements Strike_prices = doc.getElementsByClass("ext-big-tb-center");
+//            Elements links = doc.select("a");
+//
+//            for (Element element : Strike_prices) {
+//                String sp = element.text();
+//                sp = "B"+sp+"C";
+//                Log.i("履約價",sp);
+//                for (Element link : links){
+//                    String relHref = link.attr("href");
+//                    String text = link.text();
+//                    if (relHref.contains(sp)) {
+//                        Log.i("relHref", relHref);
+//                        Log.i("text", text);
+//                    }
+//                }
+//            }
+//
+//
+//
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+
     }
 
 }

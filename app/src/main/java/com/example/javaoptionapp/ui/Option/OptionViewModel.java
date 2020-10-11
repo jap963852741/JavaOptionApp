@@ -1,4 +1,4 @@
-package com.example.javaoptionapp.ui.dashboard;
+package com.example.javaoptionapp.ui.Option;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -10,7 +10,8 @@ public class OptionViewModel extends ViewModel {
 
     public OptionViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is dashboard fragment");
+        OptionUtil otu = new OptionUtil(mText);
+        otu.post();
     }
 
     public LiveData<String> getText() {

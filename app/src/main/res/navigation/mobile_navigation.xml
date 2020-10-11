@@ -13,9 +13,9 @@
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.example.javaoptionapp.ui.dashboard.OptionFragment"
+        android:name="com.example.javaoptionapp.ui.Option.OptionFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_option" />
 
     <fragment
         android:id="@+id/navigation_mystrategy"

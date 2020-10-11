@@ -77,13 +77,12 @@ public class WangGooFragment extends Fragment {
             public void onChanged(@Nullable String s) {
 //                textView.setText(s);
                 Log.i("WangGoo_data",s);
-                if (s != "This is wanggoo fragment") {
-                    List<String> WangGoo_data = new ArrayList<String>(Arrays.asList(s
-                            .split(",")));
-                    wanggooAdapter = new WangGooAdapter(WangGoo_data, container);
-                    recyclerView.setAdapter(wanggooAdapter);
-                    recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
-                }
+
+                List<String> WangGoo_data = new ArrayList<String>(Arrays.asList(s.split(",")));
+                wanggooAdapter = new WangGooAdapter(WangGoo_data, container);
+                recyclerView.setAdapter(wanggooAdapter);
+                recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
+
             }
         });
         return root;
