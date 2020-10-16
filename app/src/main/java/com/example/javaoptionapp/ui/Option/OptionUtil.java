@@ -25,7 +25,7 @@ public class OptionUtil {
         seturl();
     }
     public void seturl() {
-        url = "https://tw.screener.finance.yahoo.net/future/aa03?fumr=futurepart&opmr=optionpart&opcm=WTXO&opym=202011";
+        url = "https://tw.screener.finance.yahoo.net/future/aa03?fumr=futurepart&opmr=optionpart&opcm=WTXO&opym=202010";
     }
 
     public void post(){
@@ -64,7 +64,7 @@ public class OptionUtil {
             for (String key : option_strike_price.keySet()){
                 String target = " ";
                 if (!option_strike_price.get(key).equals("--")){
-                    target = String.valueOf(Integer.parseInt(key)+Integer.parseInt(option_strike_price.get(key).replace(".00","")));
+                    target = String.valueOf(Integer.parseInt(key)+Float.parseFloat(option_strike_price.get(key).replace(".00","")));
                 }
                 Text += key +
                         "  " + option_strike_price.get(key)+

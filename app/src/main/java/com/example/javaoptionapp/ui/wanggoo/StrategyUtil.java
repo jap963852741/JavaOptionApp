@@ -99,7 +99,9 @@ public class StrategyUtil {
                     }
                     Calendar calendar = Calendar.getInstance(); //使用Calendar日历类对日期进行加减
                     calendar.setTime(classDate);
-                    calendar.add(Calendar.DATE, +2);
+                    System.out.println(calendar.get(calendar.DAY_OF_WEEK));
+                    calendar.add(Calendar.DATE, +Day_To_Stop_Loss);
+                    System.out.println(calendar.get(calendar.DAY_OF_WEEK));
                     classDate = calendar.getTime();//获取加减以后的Date类型日期
                     SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
                     String formatted = format1.format(classDate.getTime());
