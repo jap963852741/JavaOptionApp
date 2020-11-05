@@ -1,6 +1,11 @@
 package com.example.javaoptionapp.ui.wanggoo;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -29,6 +34,7 @@ import com.example.javaoptionapp.dialog.LoadingDialog;
 import com.example.javaoptionapp.dialog.LoadingDialogFragment;
 import com.example.javaoptionapp.ui.home.HomeAdapter;
 import com.example.javaoptionapp.ui.home.HomeFragment;
+import com.example.taiwanworkdaylib.APIUtil;
 import com.hdl.calendardialog.CalendarView;
 import com.hdl.calendardialog.CalendarViewDialog;
 import com.wang.avi.AVLoadingIndicatorView;
@@ -46,10 +52,13 @@ public class WangGooFragment extends Fragment {
     private WangGooAdapter wanggooAdapter;
     public static final int MSG_UPLOAD_Begin =  1;
     public static final int MSG_UPLOAD_Finish = 2;
+    public static final int CHECK_PERMISSION = 3;
+
     private static AVLoadingIndicatorView avi;
     public static Context strategyutil_context;
     public static LoadingDialog loadingdialog;
     public WangGooHistoryUtil wghu;
+    public static Activity activity;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +67,8 @@ public class WangGooFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         strategyutil_context = getActivity().getApplicationContext();
+        activity = ((AppCompatActivity) getActivity());
+
         wangGooViewModel = new ViewModelProvider(this).get(WangGooViewModel.class);
         View root = inflater.inflate(R.layout.fragment_wanggoo, container, false);
         final RecyclerView recyclerView =  root.findViewById(R.id.re_view_wanggoo);
@@ -92,14 +103,16 @@ public class WangGooFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-
         menu.add(Menu.NONE, WangGooFragment.ActionBar_Menu_Num.update_two_year_data, Menu.NONE, R.string.update_two_year_data);
         menu.add(Menu.NONE, WangGooFragment.ActionBar_Menu_Num.update_all_year_data, Menu.NONE, R.string.update_all_year_data);
+        menu.add(Menu.NONE, WangGooFragment.ActionBar_Menu_Num.update_date_data, Menu.NONE, R.string.update_date_data);
     }
 
     public interface ActionBar_Menu_Num{
         final Integer update_two_year_data = 1;
         final Integer update_all_year_data = 2;
+        final Integer update_date_data = 3;
+
     }
 
 
@@ -114,6 +127,9 @@ public class WangGooFragment extends Fragment {
                 wghu.update_all_history();
                 loadingdialog.show();
                 break;
+            case 3:
+                new APIUtil().update();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -122,6 +138,7 @@ public class WangGooFragment extends Fragment {
 
 
     public static Handler mUI_Handler = new Handler() {
+        @SuppressLint("HandlerLeak")
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -130,6 +147,19 @@ public class WangGooFragment extends Fragment {
                     break;
                 case MSG_UPLOAD_Finish:
                     stopAnim();
+                    break;
+                case CHECK_PERMISSION:
+                    if (Build.VERSION.SDK_INT >= 23){
+                        int REQUEST_CODE_CONTACT = 101;
+                        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                        //验证是否许可权限
+                        for (String str : permissions) {
+                            if (activity.checkSelfPermission(str) != PackageManager.PERMISSION_GRANTED) {
+                                //申请权限
+                                activity.requestPermissions(permissions, REQUEST_CODE_CONTACT);
+                            }
+                        }
+                    }
                     break;
             }
         }

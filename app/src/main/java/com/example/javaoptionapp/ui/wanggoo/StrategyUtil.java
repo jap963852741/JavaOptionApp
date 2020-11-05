@@ -1,6 +1,7 @@
 package com.example.javaoptionapp.ui.wanggoo;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
 import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
@@ -18,7 +19,11 @@ import java.util.List;
 import androidx.lifecycle.MutableLiveData;
 import androidx.room.Room;
 
+import com.example.taiwanworkdaylib.APIUtil;
+import com.example.taiwanworkdaylib.HolidayUtil;
 import com.wang.avi.AVLoadingIndicatorView;
+
+import static com.example.javaoptionapp.ui.wanggoo.WangGooFragment.CHECK_PERMISSION;
 
 public class StrategyUtil {
     public MutableLiveData<String> mText;
@@ -45,6 +50,7 @@ public class StrategyUtil {
                 Context appContext = WangGooFragment.strategyutil_context;
                 FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
                 FeatureDatabaseDao fdDao =fdb.FeatureDatabaseDao();
+                HolidayUtil holidayutil = new HolidayUtil();
                 WangGooFragment.mUI_Handler.sendEmptyMessage(WangGooFragment.MSG_UPLOAD_Begin);
 //                update_db(fdDao);
                 WangGooFragment.mUI_Handler.sendEmptyMessage(WangGooFragment.MSG_UPLOAD_Finish);
@@ -100,8 +106,25 @@ public class StrategyUtil {
                     Calendar calendar = Calendar.getInstance(); //使用Calendar日历类对日期进行加减
                     calendar.setTime(classDate);
                     System.out.println(calendar.get(calendar.DAY_OF_WEEK));
-                    calendar.add(Calendar.DATE, +Day_To_Stop_Loss);
-                    System.out.println(calendar.get(calendar.DAY_OF_WEEK));
+
+//                    calendar.add(Calendar.DATE, +Day_To_Stop_Loss);
+                    int add_day = 0;
+
+
+
+
+
+                    Log.i("calculate", Environment.getDataDirectory().getPath());
+                    while (add_day < Day_To_Stop_Loss) {
+                        classDate = calendar.getTime();
+                        SimpleDateFormat fm = new SimpleDateFormat("yyyyMMdd");
+                        holidayutil.set_date(String.valueOf(fm.format(classDate.getTime())));
+                        calendar.add(Calendar.DATE, +1);
+                        if (!holidayutil.isHoliday()){
+                            add_day += 1;
+                        }
+                    }
+
                     classDate = calendar.getTime();//获取加减以后的Date类型日期
                     SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
                     String formatted = format1.format(classDate.getTime());

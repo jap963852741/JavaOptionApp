@@ -31,6 +31,17 @@
 
     </androidx.appcompat.widget.Toolbar>
 
+    <Button
+        android:id="@+id/choose_option_month_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/re_view_option"
+        app:layout_constraintHorizontal_weight="0.5"
+        app:layout_constraintRight_toRightOf="@id/re_view_option"
+        android:text="@string/maket_data"
+        android:textSize="20sp"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/re_view_option"
         android:layout_width="match_parent"

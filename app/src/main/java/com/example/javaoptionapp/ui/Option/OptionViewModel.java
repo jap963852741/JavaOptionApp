@@ -6,13 +6,19 @@ import androidx.lifecycle.ViewModel;
 
 public class OptionViewModel extends ViewModel {
 
-    private MutableLiveData<String> mText;
+    public static MutableLiveData<String> mText;
 
     public OptionViewModel() {
         mText = new MutableLiveData<>();
         OptionUtil otu = new OptionUtil(mText);
-        otu.post();
     }
+
+//    public OptionViewModel(String Month) {
+//        mText = new MutableLiveData<>();
+//        OptionUtil otu = new OptionUtil(mText);
+//    }
+
+
 
     public LiveData<String> getText() {
         return mText;
