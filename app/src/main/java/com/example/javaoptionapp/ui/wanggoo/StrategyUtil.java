@@ -19,11 +19,9 @@ import java.util.List;
 import androidx.lifecycle.MutableLiveData;
 import androidx.room.Room;
 
-import com.example.taiwanworkdaylib.APIUtil;
 import com.example.taiwanworkdaylib.HolidayUtil;
-import com.wang.avi.AVLoadingIndicatorView;
+import static com.example.javaoptionapp.ui.wanggoo.WangGooFragment.mUI_Handler;
 
-import static com.example.javaoptionapp.ui.wanggoo.WangGooFragment.CHECK_PERMISSION;
 
 public class StrategyUtil {
     public MutableLiveData<String> mText;
@@ -33,7 +31,7 @@ public class StrategyUtil {
     public int Day_To_Stop_Loss;
     public String ApproachDate = "";
     public boolean Day_to_Stop;
-
+    public static List<Table_Small_Taiwan_Feature> Hundred_Data;
 
     public StrategyUtil(MutableLiveData<String> mText){
         get_strategy();
@@ -56,7 +54,7 @@ public class StrategyUtil {
                 WangGooFragment.mUI_Handler.sendEmptyMessage(WangGooFragment.MSG_UPLOAD_Finish);
 
                 Day_To_Stop_Loss = 4;//幾天內沒到停利點 就平倉
-                List<Table_Small_Taiwan_Feature> Hundred_Data = fdDao.get_10_data_fromnow();
+                Hundred_Data = fdDao.get_10_data_fromnow();
                 Approach = false;
                 for(Table_Small_Taiwan_Feature Day_Data : Hundred_Data){
                     Day_to_Stop = false;
@@ -144,7 +142,9 @@ public class StrategyUtil {
                     }
                 }
                 mText.postValue(mText.getValue() + need_to_add + ",,");
+                WangGooFragment.mUI_Handler.sendEmptyMessage(WangGooFragment.UPDATE_IMAGE);
             }
+
         });
 
         thread.start();

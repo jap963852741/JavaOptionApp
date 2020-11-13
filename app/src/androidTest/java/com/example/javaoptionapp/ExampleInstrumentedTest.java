@@ -571,4 +571,11 @@ public class ExampleInstrumentedTest {
         OPU.get_all_month();
     }
 
+
+    @Test
+    public void canvas_test(){
+        OptionUtil OPU = new OptionUtil();
+        OPU.get_all_month();
+    }
+
 }
