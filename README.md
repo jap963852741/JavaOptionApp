@@ -16,6 +16,7 @@
     可回測台指期及選擇權歷史20年資料並顯示勝率與績效
     先使用測試內的 update 方法準備好測試資料，option_long_test()開始進行測試
     績效及勝率會打印在log console內
+    且會印出每日動作明細
  ![image](https://github.com/jap963852741/JavaOptionApp/blob/master/win.png)
 
 
