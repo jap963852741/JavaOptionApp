@@ -269,37 +269,37 @@ public class ExampleInstrumentedTest {
         * 寫入及更新 DateIndexTable 的方法
         * [time:1600963200000, tradeDate:1600963200000, open:12168.00000, high:12234.00000, low:12157.00000, close:12206.00000, volume:9865, millionAmount:0.00]
         * */
-        long year_time = TimeUnit.SECONDS.toMillis((long) (365.25*24*60*60));
-        String time = String.valueOf(System.currentTimeMillis());//- 2*year_time
-        WangGooHistoryUtil wghu = new WangGooHistoryUtil(time);
-        HashMap<String, HashMap<String,String>> hashmap_time_data = wghu.hashmap_time_data;
-        ArrayList need_to_update_list = new ArrayList();
-        ArrayList need_to_insert_list = new ArrayList();
-        for (String key : hashmap_time_data.keySet()) {
-            HashMap<String,String> temp_data = hashmap_time_data.get(key);
-            String date = key;
-            System.out.println(date +" " +temp_data.toString());
-            Table_Small_Taiwan_Feature dstf = new Table_Small_Taiwan_Feature(date,
-                    Float.parseFloat(temp_data.get("open")),
-                    Float.parseFloat(temp_data.get("high")),
-                    Float.parseFloat(temp_data.get("low")),
-                    Float.parseFloat(temp_data.get("close")),
-                    Float.parseFloat(temp_data.get("volume")));
-            Table_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
-//           沒有的才 insert
-            if (the_date_information != null){
-                need_to_update_list.add(dstf);
-            }else {
-                need_to_insert_list.add(dstf);
-            }
-        }
-
-        if (need_to_update_list != null) {
-            fdDao.updateAllTable_Small_Taiwan_Feature(need_to_update_list);
-        }
-        if (need_to_insert_list != null) {
-            fdDao.insertAllTable_Small_Taiwan_Feature(need_to_insert_list);
-        }
+//        long year_time = TimeUnit.SECONDS.toMillis((long) (365.25*24*60*60));
+//        String time = String.valueOf(System.currentTimeMillis());//- 2*year_time
+//        WangGooHistoryUtil wghu = new WangGooHistoryUtil(time);
+//        HashMap<String, HashMap<String,String>> hashmap_time_data = wghu.hashmap_time_data;
+//        ArrayList need_to_update_list = new ArrayList();
+//        ArrayList need_to_insert_list = new ArrayList();
+//        for (String key : hashmap_time_data.keySet()) {
+//            HashMap<String,String> temp_data = hashmap_time_data.get(key);
+//            String date = key;
+//            System.out.println(date +" " +temp_data.toString());
+//            Table_Small_Taiwan_Feature dstf = new Table_Small_Taiwan_Feature(date,
+//                    Float.parseFloat(temp_data.get("open")),
+//                    Float.parseFloat(temp_data.get("high")),
+//                    Float.parseFloat(temp_data.get("low")),
+//                    Float.parseFloat(temp_data.get("close")),
+//                    Float.parseFloat(temp_data.get("volume")));
+//            Table_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
+////           沒有的才 insert
+//            if (the_date_information != null){
+//                need_to_update_list.add(dstf);
+//            }else {
+//                need_to_insert_list.add(dstf);
+//            }
+//        }
+//
+//        if (need_to_update_list != null) {
+//            fdDao.updateAllTable_Small_Taiwan_Feature(need_to_update_list);
+//        }
+//        if (need_to_insert_list != null) {
+//            fdDao.insertAllTable_Small_Taiwan_Feature(need_to_insert_list);
+//        }
 
         /**
          * MA 5 日線計算 單元測試
@@ -367,7 +367,6 @@ public class ExampleInstrumentedTest {
                 if(Day_Data.MA_5!=null&&Day_Data.MA_10!=null&&Day_Data.MA_15!=null&&Day_Data.MA_30!=null&&
                         Day_Data.close < Day_Data.MA_5
                         && Day_Data.high > Day_Data.MA_5
-                        && Day_Data.volume > Day_Data.before_5_days_average*.865
                 ){ //收上引線不進場
                     Entry_Point = Day_Data.close; //進場點數
                     Exit_Benifit_Point =  Entry_Point * 1.2f; //停利點數
