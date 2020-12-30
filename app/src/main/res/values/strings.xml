@@ -14,5 +14,9 @@
     <string name="BA123690a">大盤籌碼日報</string>
     <string name="BA123695a">大盤漲跌家數</string>
     <string name="BA123691a">大盤外資</string>
+    
+    <string name="BA123692a">大盤主力</string>
+    <string name="BA123693a">大盤官股</string>
+    <string name="BA123694a">大盤資券</string>
 
 </resources>

@@ -110,6 +110,8 @@ public class WangGooFragment extends Fragment {
         //点击返回键和外部都不可取消
         loadingdialog.setCancelable(false);
         wghu = new WangGooHistoryUtil();
+        wghu.post();
+        loadingdialog.show();
         wangGooViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
@@ -158,7 +160,9 @@ public class WangGooFragment extends Fragment {
                 loadingdialog.show();
                 break;
             case 3:
+                loadingdialog.show();
                 new APIUtil().update();
+                loadingdialog.hide();
                 break;
         }
         return super.onOptionsItemSelected(item);

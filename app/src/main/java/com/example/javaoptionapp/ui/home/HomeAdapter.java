@@ -29,7 +29,7 @@ public class HomeAdapter extends RecyclerView.Adapter<VH> {
     public void onBindViewHolder(@NonNull VH holder, int position) {
         String c = dataList.get(position);
         holder.tv1.setText(c);
-
+        
     }
 
     @Override

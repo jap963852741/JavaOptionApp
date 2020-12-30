@@ -9,4 +9,13 @@
     <item android:id="@+id/BA123691a"
         android:title="@string/BA123691a"/>
 
+    <item android:id="@+id/BA123692a"
+        android:title="@string/BA123692a"/>
+    <item android:id="@+id/BA123693a"
+        android:title="@string/BA123693a"/>
+    <item android:id="@+id/BA123694a"
+        android:title="@string/BA123694a"/>
+
+
+
 </menu>

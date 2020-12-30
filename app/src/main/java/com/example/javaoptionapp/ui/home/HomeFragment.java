@@ -231,6 +231,19 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
                 homeViewModel.item_schma = "BA1-23691a";
                 homeViewModel.post_tolken();
                 break;
+            case R.id.BA123692a://大盤主力
+                homeViewModel.item_schma = "BA1-23692a";
+                homeViewModel.post_tolken();
+                break;
+            case R.id.BA123693a://大盤官股
+                homeViewModel.item_schma = "BA1-23693a";
+                homeViewModel.post_tolken();
+                break;
+            case R.id.BA123694a://大盤資券
+                homeViewModel.item_schma = "BA1-23694a";
+                homeViewModel.post_tolken();
+                break;
+
             default:
                 break;
         }
