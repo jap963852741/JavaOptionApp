@@ -136,11 +136,6 @@ public class HomeViewModel extends ViewModel implements CmoneyUtil {
 
         okHttpClient.newCall(request).enqueue(callback_token);
 
-
-
-
-
-
     }
     private Callback callback_token = new Callback() {
         @Override
