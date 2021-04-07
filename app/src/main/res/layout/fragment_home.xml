@@ -1,74 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment"
-    app:layout_constraintBottom_toTopOf="@id/nav_view"
     android:clickable="true"
     android:focusable="true"
     >
-<!--    android:paddingBottom="100dp"-->
-<!--    android:paddingTop="?attr/actionBarSize"-->
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolBar"
-        android:minHeight="?attr/actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorWhite"
         app:popupTheme="@style/toolbarstyletest"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="16dp"
         app:titleTextColor="@color/colorWhite"
         app:navigationIcon="@drawable/calendar"
         android:navigationIcon="@drawable/calendar"
+        app:layout_constraintTop_toTopOf="@id/toolBar"
         >
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        <TextView
-            android:id="@+id/toolbar_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:singleLine="true"
-            android:text="@string/app_name"
-            android:layout_centerInParent="true"
-            android:textSize="20sp"
-            android:textColor="@color/colorBlack"
-            android:fontFamily="@font/ozcaramel"/>
-
-        </RelativeLayout>
-
     </androidx.appcompat.widget.Toolbar>
+    <TextView
+        android:id="@+id/toolbar_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textSize="20sp"
+        android:textColor="@color/colorBlack"
+        android:fontFamily="@font/ozcaramel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/toolBar"
+        />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/re_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/toolBar"
+        app:layout_constraintBottom_toTopOf="@id/choose_button"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textSize="80sp"
+        />
 
     <Button
         android:id="@+id/choose_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="296dp"
-        android:layout_marginEnd="27dp"
         android:text="@string/maket_data"
         android:textSize="20sp"
-        android:layout_below="@id/toolBar"
-        />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/re_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="80sp"
-        app:layout_constraintTop_toBottomOf="@id/toolBar"
-        app:layout_constraintEnd_toEndOf="@+id/nav_view"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_below="@id/toolBar"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
 
 
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

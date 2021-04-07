@@ -1,16 +1,13 @@
 package com.example.javaoptionapp.ui.wanggoo;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -23,12 +20,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -38,21 +32,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.javaoptionapp.R;
-import com.example.javaoptionapp.dialog.LoadingDialog;
-import com.example.javaoptionapp.dialog.LoadingDialogFragment;
+import com.example.javaoptionapp.util.dialog.LoadingDialog;
 import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
-import com.example.javaoptionapp.ui.home.HomeAdapter;
-import com.example.javaoptionapp.ui.home.HomeFragment;
 import com.example.taiwanworkdaylib.APIUtil;
-import com.hdl.calendardialog.CalendarView;
-import com.hdl.calendardialog.CalendarViewDialog;
 import com.wang.avi.AVLoadingIndicatorView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import static java.util.Collections.max;
@@ -97,27 +84,21 @@ public class WangGooFragment extends Fragment {
         displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int screenHeight = displayMetrics.heightPixels;
-//        int screenWidth = displayMetrics.widthPixels;
         image.getLayoutParams().height = screenHeight/4;
-//        image.getLayoutParams().width = screenWidth/3;
 
         Toolbar toolbar = root.findViewById(R.id.toolBar_wanggoo);
         toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_history));//把三個小點換掉
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         loadingdialog = new LoadingDialog(getContext());
-        //仅点击外部不可取消
         loadingdialog.setCanceledOnTouchOutside(false);
-        //点击返回键和外部都不可取消
         loadingdialog.setCancelable(false);
+
         wghu = new WangGooHistoryUtil();
         wghu.post();
         loadingdialog.show();
         wangGooViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
-//                textView.setText(s);
-                Log.i("WangGoo_data",s);
-
                 List<String> WangGoo_data = new ArrayList<String>(Arrays.asList(s.split(",")));
                 wanggooAdapter = new WangGooAdapter(WangGoo_data, container);
                 recyclerView.setAdapter(wanggooAdapter);
@@ -125,7 +106,6 @@ public class WangGooFragment extends Fragment {
 
             }
         });
-        Log.i("status","onCreateView");
 
         return root;
     }

@@ -1,4 +1,4 @@
-package com.example.javaoptionapp.dialog;
+package com.example.javaoptionapp.util.dialog;
 
 import android.app.Dialog;
 import android.content.Context;

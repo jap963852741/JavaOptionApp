@@ -24,6 +24,7 @@ import static com.example.javaoptionapp.ui.wanggoo.WangGooFragment.mUI_Handler;
 
 
 public class StrategyUtil {
+    private final String TAG = "StrategyUtil";
     public MutableLiveData<String> mText;
     public boolean Approach;
     public Float Entry_Point = null , Exit_Point = null, Exit_Benifit_Point = null ,Exit_Damage_Point = null;
@@ -55,6 +56,7 @@ public class StrategyUtil {
 
                 Day_To_Stop_Loss = 4;//幾天內沒到停利點 就平倉
                 Hundred_Data = fdDao.get_10_data_fromnow();
+                Log.e(TAG,"Hundred_Data = "+ Hundred_Data.toString());
                 Approach = false;
                 for(Table_Small_Taiwan_Feature Day_Data : Hundred_Data){
                     Day_to_Stop = false;

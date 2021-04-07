@@ -1,7 +1,5 @@
 package com.example.javaoptionapp;
 
-import com.example.javaoptionapp.database.FeedReaderDbHelper;
-import com.example.javaoptionapp.ui.wanggoo.WangGooHistoryUtil;
 
 import org.junit.Test;
 

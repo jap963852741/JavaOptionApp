@@ -13,11 +13,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 public class WangGooUtil {
+    private final String TAG = "WangGooUtil";
     private  String url;
     private OkHttpClient okHttpClient;
     public HashMap<String, HashMap<String,String>> hashmap_time_data = new HashMap<String, HashMap<String,String>>();
@@ -75,8 +77,17 @@ public class WangGooUtil {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    Log.e(TAG,"Hundred_Data = "+ result);
                     result = result.replace("{","").replace("}","").replace("\"","");
                     mld.postValue(mld.getValue()+result);
+
+                    /**
+                     * 下面這兩行會有 BUG
+                     * 如果資料庫為空
+                     * 先跑 StrategyUtil 的話
+                     * DB 尚未更新完成
+                     * Hundred_Data 會為空 >> 繪畫不出圖
+                     */
                     update_today_db(fdDao);
                     StrategyUtil stu = new StrategyUtil(mld);
                 }
@@ -88,13 +99,14 @@ public class WangGooUtil {
         for (String key : hashmap_time_data.keySet()) {
             HashMap<String,String> temp_data = hashmap_time_data.get(key);
             String date = key;
-            System.out.println(date +" " +temp_data.toString());
+//            System.out.println(date +" " +temp_data.toString());
+            Log.e(TAG,"update_today_db = "+date +" " +temp_data.toString());
             Table_Small_Taiwan_Feature dstf = new Table_Small_Taiwan_Feature(date,
-                    Float.parseFloat(temp_data.get("open")),
-                    Float.parseFloat(temp_data.get("high")),
-                    Float.parseFloat(temp_data.get("low")),
-                    Float.parseFloat(temp_data.get("close")),
-                    Float.parseFloat(temp_data.get("volume")));
+                    Float.parseFloat(Objects.requireNonNull(temp_data.get("open"))),
+                    Float.parseFloat(Objects.requireNonNull(temp_data.get("high"))),
+                    Float.parseFloat(Objects.requireNonNull(temp_data.get("low"))),
+                    Float.parseFloat(Objects.requireNonNull(temp_data.get("close"))),
+                    Float.parseFloat(Objects.requireNonNull(temp_data.get("volume"))));
             Table_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
 //           沒有的才 insert
             if (the_date_information != null){
