@@ -51,7 +51,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+//        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        homeViewModel = new ViewModelProvider(this, new HomeViewModelFactory()).get(HomeViewModel.class);
 
         final View root = inflater.inflate(R.layout.fragment_home, container, false);
         final RecyclerView recyclerView =  root.findViewById(R.id.re_view);

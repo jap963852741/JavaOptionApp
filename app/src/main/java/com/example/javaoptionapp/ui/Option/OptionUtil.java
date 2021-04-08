@@ -41,6 +41,14 @@ public class OptionUtil {
         seturl(0);
     }
 
+    public interface Href_Num{
+        final Integer Buy_price = 1;
+        final Integer Sell_price = 2;
+        final Integer Deal_price = 3;
+        final Integer Up_Down = 4;
+        final Integer Open_position = 5;
+    }
+
     public void seturl(int month) {
         if (OptionFragment.Option_Month != null) {
             option_month_text = OptionFragment.Option_Month[month];
@@ -101,13 +109,6 @@ public class OptionUtil {
             }
             mText.postValue(Text);
         }
-    }
-    public interface Href_Num{
-        final Integer Buy_price = 1;
-        final Integer Sell_price = 2;
-        final Integer Deal_price = 3;
-        final Integer Up_Down = 4;
-        final Integer Open_position = 5;
     }
 
     class get_month_thread extends Thread{
