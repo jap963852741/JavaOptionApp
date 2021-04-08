@@ -1,4 +1,4 @@
-package com.example.javaoptionapp.Repository.network.api;
+package com.example.javaoptionapp.Repository.network.api.home;
 
 import com.example.javaoptionapp.Repository.bean.CMoneyBean;
 import com.example.javaoptionapp.Repository.bean.CMoneyTokenResponse;

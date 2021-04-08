@@ -1,24 +1,16 @@
 package com.example.javaoptionapp.ui.home;
 
 import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
 import com.example.javaoptionapp.Repository.bean.CMoneyBean;
 import com.example.javaoptionapp.Repository.bean.CMoneyTokenResponse;
-import com.example.javaoptionapp.Repository.network.CMoneyRepository;
-import com.example.javaoptionapp.Repository.network.api.CMoneyService;
-
+import com.example.javaoptionapp.Repository.CMoneyRepository;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
-
 import java.util.ArrayList;
 
 

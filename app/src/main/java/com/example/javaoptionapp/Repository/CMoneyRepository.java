@@ -1,4 +1,4 @@
-package com.example.javaoptionapp.Repository.network;
+package com.example.javaoptionapp.Repository;
 
 import com.example.javaoptionapp.Repository.network.DataSource.CMoneyDataSource;
 

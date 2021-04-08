@@ -6,7 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.example.javaoptionapp.Repository.bean.CMoneyBean;
 import com.example.javaoptionapp.Repository.bean.CMoneyTokenResponse;
-import com.example.javaoptionapp.Repository.network.api.*;
+import com.example.javaoptionapp.Repository.network.api.home.CMoneyService;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,10 +1,7 @@
 package com.example.javaoptionapp.ui.Option;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -27,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.javaoptionapp.R;
+import com.example.javaoptionapp.Repository.bean.option.YahooOptionBean;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +36,7 @@ public class OptionFragment extends Fragment implements View.OnClickListener, Po
 
     private OptionViewModel optionViewModel;
     private OptionAdapter OptionAdapter;
+    private OptionAdapterNew OptionAdapterNew;
     public static String[] Option_Month;
     public static Context option_context;
     public static Button choose_option_month_button;
@@ -45,22 +44,41 @@ public class OptionFragment extends Fragment implements View.OnClickListener, Po
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        optionViewModel =new ViewModelProvider(this).get(OptionViewModel.class);
+//        optionViewModel =new ViewModelProvider(this).get(OptionViewModel.class);
+        optionViewModel =new ViewModelProvider(this,new OptionViewModelFactory()).get(OptionViewModel.class);
+
+
         View root = inflater.inflate(R.layout.fragment_option, container, false);
         final RecyclerView recyclerView =  root.findViewById(R.id.re_view_option);
         option_context = getActivity().getApplicationContext();
         choose_option_month_button = (Button) root.findViewById(R.id.choose_option_month_button);
         choose_option_month_button.setOnClickListener(this);
-        optionViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+
+        optionViewModel.getlistYahooOptionBean().observe(getViewLifecycleOwner(), new Observer<ArrayList<YahooOptionBean>>() {
             @Override
-            public void onChanged(@Nullable String s) {
-                List<String> Option_data = new ArrayList<String>(Arrays.asList(s.split(",")));
-                Log.i("Option_data",Option_data.toString());
-                OptionAdapter = new OptionAdapter(Option_data, container);
-                recyclerView.setAdapter(OptionAdapter);
+            public void onChanged(@Nullable ArrayList<YahooOptionBean> listYahooOptionBean) {
+
+                OptionAdapterNew = new OptionAdapterNew(listYahooOptionBean, container);
+                recyclerView.setAdapter(OptionAdapterNew);
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
             }
         });
+
+
+
+
+//        optionViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+//            @Override
+//            public void onChanged(@Nullable String s) {
+//                List<String> Option_data = new ArrayList<String>(Arrays.asList(s.split(",")));
+//                Log.i("Option_data",Option_data.toString());
+//                OptionAdapter = new OptionAdapter(Option_data, container);
+//                recyclerView.setAdapter(OptionAdapter);
+//                recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
+//            }
+//        });
+
+
         return root;
     }
 

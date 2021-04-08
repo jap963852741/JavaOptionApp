@@ -20,7 +20,7 @@ import static com.example.javaoptionapp.ui.Option.OptionFragment.choose_option_m
 import static com.example.javaoptionapp.ui.Option.OptionFragment.mUI_Handler;
 
 public class OptionUtil {
-    private  int month_index;
+    private int month_index;
     public static String option_month_text;
     private  String url;
     public static LinkedHashMap<String,String> option_strike_price  = new LinkedHashMap<String,String>();;
