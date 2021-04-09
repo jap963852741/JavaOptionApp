@@ -59,7 +59,7 @@ public class WangGooFragment extends Fragment {
     public static LoadingDialog loadingdialog;
     public WangGooHistoryUtil wghu;
     public static Activity activity;
-    public static ImageView image;
+    private static ImageView image;
     public static Bitmap bitmap;
     public static Canvas canvas;
     public static DisplayMetrics displayMetrics;
@@ -157,10 +157,12 @@ public class WangGooFragment extends Fragment {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_UPLOAD_Begin:
-                    startAnim();
+//                    startAnim();
+                    avi.show();
                     break;
                 case MSG_UPLOAD_Finish:
-                    stopAnim();
+//                    stopAnim();
+                    avi.hide();
                     break;
                 case UPDATE_IMAGE:
                     bitmap();
@@ -169,15 +171,15 @@ public class WangGooFragment extends Fragment {
         }
     };
 
-    static void startAnim(){
-        avi.show();
-        // or avi.smoothToShow();
-    }
-
-    static void stopAnim(){
-        avi.hide();
-        // or avi.smoothToHide();
-    }
+//    static void startAnim(){
+//        avi.show();
+//        // or avi.smoothToShow();
+//    }
+//
+//    static void stopAnim(){
+//        avi.hide();
+//        // or avi.smoothToHide();
+//    }
 
     private static float upsite_y(float y,float max_y,float min_y){
         return max_y-(y-min_y);
@@ -260,4 +262,10 @@ public class WangGooFragment extends Fragment {
         image.setImageBitmap(bitmap);
     }
 
+    @Override
+    public void onPause() { //solve leak problem
+        super.onPause();
+        avi = null;
+        image = null;
+    }
 }

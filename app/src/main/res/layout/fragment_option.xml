@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.Option.OptionFragment">
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolBar_option"
         android:layout_width="match_parent"
@@ -17,27 +18,26 @@
         tools:layout_editor_absoluteX="16dp"
         tools:layout_editor_absoluteY="16dp"
         app:titleTextColor="@color/colorWhite"
-        >
-        <TextView
-            android:autoSizeTextType="uniform"
-            android:id="@+id/toolbar_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/app_name"
-            android:textSize="20sp"
-            android:textColor="@color/colorBlack"
-            android:fontFamily="@font/ozcaramel"/>
-
-    </androidx.appcompat.widget.Toolbar>
+        />
+    <TextView
+        android:id="@+id/toolbar_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textSize="20sp"
+        android:textColor="@color/colorBlack"
+        android:fontFamily="@font/ozcaramel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/toolBar_option" />
 
     <Button
         android:id="@+id/choose_option_month_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/re_view_option"
-        app:layout_constraintHorizontal_weight="0.5"
-        app:layout_constraintRight_toRightOf="@id/re_view_option"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         android:text="@string/maket_data"
         android:textSize="20sp"
         />
@@ -45,9 +45,10 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/re_view_option"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:textSize="80sp"
         app:layout_constraintTop_toBottomOf="@id/toolBar_option"
+        app:layout_constraintBottom_toTopOf="@id/choose_option_month_button"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_below="@id/toolBar_option"
         />

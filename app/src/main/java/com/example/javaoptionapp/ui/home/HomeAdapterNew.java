@@ -34,7 +34,7 @@ public class HomeAdapterNew extends RecyclerView.Adapter<VH1> {
     public void setData_index(int data_index){
         Log.e(TAG,"setData_index : " + data_index);
         this.data_index = data_index;
-        this.notifyDataSetChanged();
+//        this.notifyDataSetChanged();
     }
 
     @NonNull

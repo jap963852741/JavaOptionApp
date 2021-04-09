@@ -26,7 +26,6 @@ public class WangGooViewModel extends ViewModel {
     public WangGooViewModel() throws InterruptedException {
         mText = new MutableLiveData<>();
         WangGooUtil wgt = new WangGooUtil(mText);
-
     }
 
     public LiveData<String> getText() {

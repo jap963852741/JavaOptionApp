@@ -41,7 +41,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
 
     private HomeViewModel homeViewModel;
     private HomeAdapterNew homeAdapterNew;
-    private Button choose_button;
     private ArrayList Market_Date;
 
     @Override
@@ -56,7 +55,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
 
         final View root = inflater.inflate(R.layout.fragment_home, container, false);
         final RecyclerView recyclerView =  root.findViewById(R.id.re_view);
-        choose_button = (Button) root.findViewById(R.id.choose_button);
+        Button choose_button = (Button) root.findViewById(R.id.choose_button);
         choose_button.setOnClickListener(this);
         Toolbar toolbar = root.findViewById(R.id.toolBar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -231,9 +230,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
         }
         return false;
     }
-    ///選彈式菜單
 
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        homeAdapterNew = null;
+    }
 
 
     private void init(){

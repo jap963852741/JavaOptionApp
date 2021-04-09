@@ -30,27 +30,22 @@ public class OptionViewModel extends ViewModel {
 
     private String TAG = "OptionViewModel";
     private YahooOptionRepository yahooOptionRepository;
-    public static MutableLiveData<String> mText;
     public static MutableLiveData<ArrayList<YahooOptionBean>> mlistYahooOptionBean;
-
-    public OptionViewModel() {
-        mText = new MutableLiveData<>();
-        OptionUtil otu = new OptionUtil(mText);
-    }
+    public static MutableLiveData<String[]> mOption_Month;
 
     public OptionViewModel(YahooOptionRepository yahooOptionRepository) {
         this.yahooOptionRepository = yahooOptionRepository;
         mlistYahooOptionBean = new MutableLiveData<>();
-        yahooOptionApi();
+        mOption_Month = new MutableLiveData<>();
     }
 
-    public LiveData<String> getText() {
-        return mText;
-    }
     public LiveData<ArrayList<YahooOptionBean>> getlistYahooOptionBean() {
         return mlistYahooOptionBean;
     }
-    public void yahooOptionApi(){
+    public LiveData<String[]> getOption_Month() {
+        return mOption_Month;
+    }
+    public void yahooOptionApi(String month){
         Observer<ResponseBody> observer = new Observer<ResponseBody>(){
             @Override
             public void onSubscribe(@NonNull Disposable d) {
@@ -74,7 +69,7 @@ public class OptionViewModel extends ViewModel {
             }
         };
         yahooOptionRepository.getyahooOptionDataSource().getService()
-                .YahooOptionHtml()
+                .YahooOptionHtml(month)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.io())
                 .subscribe(observer);
@@ -89,10 +84,13 @@ public class OptionViewModel extends ViewModel {
 
         LinkedHashMap<String,String> option_strike_price  = new LinkedHashMap<String,String>();
         ArrayList<YahooOptionBean> listYahooOptionBean = new ArrayList<YahooOptionBean>();
+        listYahooOptionBean.add(new YahooOptionBean("履約價","成交價","目標"));
 
         Document doc = Jsoup.parse(response);
         Elements Strike_prices = doc.getElementsByClass("ext-big-tb-center");
         Elements links = doc.select("a");
+        Element month_value = doc.getElementById("itemselect");
+        mOption_Month.postValue(month_value.text().split(" "));
 
         for (Element element : Strike_prices) {
             String sp = element.text();

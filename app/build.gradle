@@ -67,6 +67,32 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
+
+
+    /** Monkey Test
+     * cd /d C:\Users\frank\AppData\Local\Android\Sdk\platform-tools
+     * adb shell monkey -p com.example.javaoptionapp --throttle 100 -v -v 100 > test.log
+     *
+     * -p com.example.javaoptionapp：测试包名为com.example.javaoptionapp
+     * –throttle 100：每100ms发送一次事件
+     * -v -v：指定日志级别
+     * > test.log：输出日志到文件
+     *
+     *
+     * adb shell monkey -p com.example.javaoptionapp -v --pct-touch 100 50 > test.log
+     * 参数percent为此事件的百分比，比如要求monkey完成50次点击事件  (100ms)
+     * –pct-motion （动作事件）
+     * –pct-trackball （轨迹球事件）
+     * –pct-nav （基本导航事件，输入设备的上、下、左、右）
+     * –pct-majornav （主要导航事件，兼容中间键，返回键，菜单按键）
+     * –pct-syskeys （系统导航事件，HOME、BACK及拨号音量键）
+     * –pct-appswitch （启动App事件）
+     * –pct-anyevent (不常用事件)
+    */
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7' //減少 OOM ，可以提高程式的穩定性
+    debugImplementation 'com.github.markzhai:blockcanary-android:1.5.0' //減少卡頓，提高應用流暢性
+
+
     def room_version = "2.2.5"
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"

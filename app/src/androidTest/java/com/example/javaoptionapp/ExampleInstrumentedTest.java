@@ -10,8 +10,6 @@ import com.example.javaoptionapp.room.Table_Option;
 import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
 import com.example.javaoptionapp.room.FeatureDatabase;
 import com.example.javaoptionapp.room.FeatureDatabaseDao;
-import com.example.javaoptionapp.ui.Option.OptionUtil;
-import com.example.javaoptionapp.ui.wanggoo.WangGooHistoryUtil;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +27,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
