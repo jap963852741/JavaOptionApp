@@ -25,14 +25,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.javaoptionapp.R;
-import com.example.javaoptionapp.Repository.bean.CMoneyBean;
+import com.example.javaoptionapp.Repository.bean.CMoney.CMoneyBean;
 import com.hdl.calendardialog.CalendarView;
 import com.hdl.calendardialog.CalendarViewDialog;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -232,8 +231,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onPause() {
+        super.onPause();
         homeAdapterNew = null;
     }
 

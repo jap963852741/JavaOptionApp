@@ -1,4 +1,4 @@
-package com.example.javaoptionapp.Repository.bean;
+package com.example.javaoptionapp.Repository.bean.CMoney;
 
 import java.util.ArrayList;
 

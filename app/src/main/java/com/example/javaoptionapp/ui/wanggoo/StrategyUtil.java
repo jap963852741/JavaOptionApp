@@ -24,6 +24,7 @@ import static com.example.javaoptionapp.ui.wanggoo.WangGooFragment.mUI_Handler;
 
 
 public class StrategyUtil {
+
     private final String TAG = "StrategyUtil";
     public MutableLiveData<String> mText;
     public boolean Approach;

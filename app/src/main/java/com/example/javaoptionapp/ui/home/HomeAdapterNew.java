@@ -11,16 +11,29 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.javaoptionapp.R;
-import com.example.javaoptionapp.Repository.bean.CMoneyBean;
+import com.example.javaoptionapp.Repository.bean.CMoney.CMoneyBean;
 
-import java.util.List;
-
-public class HomeAdapterNew extends RecyclerView.Adapter<VH1> {
+public class HomeAdapterNew extends RecyclerView.Adapter<HomeAdapterNew.VH> {
     private final String TAG = "HomeAdapterNew";
     private final CMoneyBean cMoneyBean;
     private final ViewGroup parentview;
     private int data_index = 0;
 
+    static class VH extends RecyclerView.ViewHolder {
+        TextView tv1;
+
+        public VH(@NonNull View itemView,View parent) {
+            super(itemView);
+            tv1 = itemView.findViewById(R.id.tv1);
+            //parent 由 container傳來計算高度
+            //item 的適應高度調整
+            int parentHeight = parent.getHeight();
+            ViewGroup.LayoutParams layoutParams = itemView.getLayoutParams();
+            layoutParams.height =  parentHeight/12;
+            //item 的適應高度調整
+        }
+
+    }
     public HomeAdapterNew(CMoneyBean cMoneyBean,ViewGroup container) {
         this.cMoneyBean = cMoneyBean;
         this.parentview = container;
@@ -39,14 +52,14 @@ public class HomeAdapterNew extends RecyclerView.Adapter<VH1> {
 
     @NonNull
     @Override
-    public VH1 onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        return new VH1(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_home, parent, false),parentview);
+        return new VH(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_home, parent, false), parentview);
     }
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull VH1 holder, int position) {
+    public void onBindViewHolder(@NonNull VH holder, int position) {
         String title = cMoneyBean.getTitle().get(position);
         String data = cMoneyBean.getData().get(data_index).get(position);
 
@@ -61,18 +74,3 @@ public class HomeAdapterNew extends RecyclerView.Adapter<VH1> {
 }
 
 
-class VH1 extends RecyclerView.ViewHolder {
-    TextView tv1;
-
-    public VH1(@NonNull View itemView,View parent) {
-        super(itemView);
-        tv1 = itemView.findViewById(R.id.tv1);
-        //parent 由 container傳來計算高度
-        //item 的適應高度調整
-        int parentHeight = parent.getHeight();
-        ViewGroup.LayoutParams layoutParams = itemView.getLayoutParams();
-        layoutParams.height =  parentHeight/12;
-        //item 的適應高度調整
-    }
-
-}

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -20,23 +20,19 @@
         tools:layout_editor_absoluteX="16dp"
         tools:layout_editor_absoluteY="16dp"
         app:titleTextColor="@color/colorWhite"
-        >
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <TextView
-                android:id="@+id/toolbar_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center"
-                android:text="@string/app_name"
-                android:textSize="20sp"
-                android:textColor="@color/colorBlack"
-                android:fontFamily="@font/ozcaramel"/>
-        </RelativeLayout>
-
-    </androidx.appcompat.widget.Toolbar>
+        />
+    <TextView
+        android:id="@+id/toolbar_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textSize="20sp"
+        android:textColor="@color/colorBlack"
+        android:fontFamily="@font/ozcaramel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/toolBar_wanggoo" />
 
     <ImageView
         android:id="@+id/image_wanggoo"
@@ -70,4 +66,4 @@
 
 
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,8 +4,8 @@ import android.util.Log;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.example.javaoptionapp.Repository.bean.CMoneyBean;
-import com.example.javaoptionapp.Repository.bean.CMoneyTokenResponse;
+import com.example.javaoptionapp.Repository.bean.CMoney.CMoneyBean;
+import com.example.javaoptionapp.Repository.bean.CMoney.CMoneyTokenResponse;
 import com.example.javaoptionapp.Repository.network.api.home.CMoneyService;
 
 import org.junit.Test;

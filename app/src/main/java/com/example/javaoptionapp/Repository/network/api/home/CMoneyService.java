@@ -1,10 +1,9 @@
 package com.example.javaoptionapp.Repository.network.api.home;
 
-import com.example.javaoptionapp.Repository.bean.CMoneyBean;
-import com.example.javaoptionapp.Repository.bean.CMoneyTokenResponse;
+import com.example.javaoptionapp.Repository.bean.CMoney.CMoneyBean;
+import com.example.javaoptionapp.Repository.bean.CMoney.CMoneyTokenResponse;
 
 import io.reactivex.rxjava3.core.Observable;
-import okhttp3.RequestBody;
 import retrofit2.http.*;
 
 public interface CMoneyService {

@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.javaoptionapp.util.AppBlockCanaryContext;
-import com.github.moduth.blockcanary.BlockCanary;
+//import com.example.javaoptionapp.util.AppBlockCanaryContext;
+//import com.github.moduth.blockcanary.BlockCanary;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,11 +34,14 @@ public class MainActivity extends AppCompatActivity {
                 R.id.navigation_mystrategy,R.id.navigation_home,  R.id.navigation_dashboard).build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupWithNavController(navView, navController);
-        BlockCanary.install(this, new AppBlockCanaryContext()).start();
-
+//        BlockCanary.install(this, new AppBlockCanaryContext()).start();
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
 
+    }
 }

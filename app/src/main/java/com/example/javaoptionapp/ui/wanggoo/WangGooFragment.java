@@ -1,6 +1,5 @@
 package com.example.javaoptionapp.ui.wanggoo;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -20,7 +20,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -64,6 +63,29 @@ public class WangGooFragment extends Fragment {
     public static Canvas canvas;
     public static DisplayMetrics displayMetrics;
 
+    static class aviHandler extends Handler{
+
+        public aviHandler(Looper looper){
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_UPLOAD_Begin:
+                    avi.show();
+                    break;
+                case MSG_UPLOAD_Finish:
+                    avi.hide();
+                    break;
+                case UPDATE_IMAGE:
+                    bitmap();
+                    break;
+            }
+        }
+    }
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,9 +95,9 @@ public class WangGooFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         Log.i("status","onCreateView");
 
-        strategyutil_context = getActivity().getApplicationContext();
+//        strategyutil_context = getActivity().getApplicationContext();
         activity = ((AppCompatActivity) getActivity());
-
+        strategyutil_context = activity.getApplicationContext();
         wangGooViewModel = new ViewModelProvider(this).get(WangGooViewModel.class);
         View root = inflater.inflate(R.layout.fragment_wanggoo, container, false);
         final RecyclerView recyclerView =  root.findViewById(R.id.re_view_wanggoo);
@@ -96,6 +118,7 @@ public class WangGooFragment extends Fragment {
         wghu = new WangGooHistoryUtil();
         wghu.post();
         loadingdialog.show();
+
         wangGooViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
@@ -149,37 +172,8 @@ public class WangGooFragment extends Fragment {
     }
 
 
+    public static Handler mUI_Handler = new aviHandler(Looper.getMainLooper());
 
-
-    public static Handler mUI_Handler = new Handler() {
-        @SuppressLint("HandlerLeak")
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_UPLOAD_Begin:
-//                    startAnim();
-                    avi.show();
-                    break;
-                case MSG_UPLOAD_Finish:
-//                    stopAnim();
-                    avi.hide();
-                    break;
-                case UPDATE_IMAGE:
-                    bitmap();
-                    break;
-            }
-        }
-    };
-
-//    static void startAnim(){
-//        avi.show();
-//        // or avi.smoothToShow();
-//    }
-//
-//    static void stopAnim(){
-//        avi.hide();
-//        // or avi.smoothToHide();
-//    }
 
     private static float upsite_y(float y,float max_y,float min_y){
         return max_y-(y-min_y);
@@ -199,7 +193,6 @@ public class WangGooFragment extends Fragment {
         Paint paintRedWidth = new Paint();
         paintRedWidth.setColor(Color.RED);
         paintRedWidth.setStrokeWidth(x_width);
-//        paintRed.setStyle(Paint.Style.STROKE);
         Paint paintGreen = new Paint();
         paintGreen.setColor(Color.GREEN);
         Paint paintGreenWidth = new Paint();
@@ -213,6 +206,7 @@ public class WangGooFragment extends Fragment {
         paintMA10.setColor(Color.rgb(255,97,0));
         paintMA10.setStyle(Paint.Style.STROKE);
         canvas = new Canvas(bitmap);
+        if (StrategyUtil.Hundred_Data.size() > 0) {
 
         for(Table_Small_Taiwan_Feature Day_Data : StrategyUtil.Hundred_Data) {
             min_y_list.add(Day_Data.low);
@@ -225,41 +219,42 @@ public class WangGooFragment extends Fragment {
         Path ma5_path = new Path();
         Path ma10_path = new Path();
         float before_close = 0f;
-        for(Table_Small_Taiwan_Feature Day_Data : StrategyUtil.Hundred_Data) {
-            Log.i("Hundred_Data", Day_Data.date + " 開盤: " +
-                    Day_Data.open + " 最高: " + Day_Data.high +
-                    " 最低 : " + Day_Data.low + " 收盤 : " + Day_Data.close + " " + Day_Data.MA_5 + " " + Day_Data.BIAS_5);
+            for (Table_Small_Taiwan_Feature Day_Data : StrategyUtil.Hundred_Data) {
+                Log.i("Hundred_Data", Day_Data.date + " 開盤: " +
+                        Day_Data.open + " 最高: " + Day_Data.high +
+                        " 最低 : " + Day_Data.low + " 收盤 : " + Day_Data.close + " " + Day_Data.MA_5 + " " + Day_Data.BIAS_5);
 
 
-            float startY = (upsite_y(Day_Data.low,max_y,min_y) - min_y) * image.getHeight()/(max_y-min_y);
-            float stopY = (upsite_y(Day_Data.high,max_y,min_y) - min_y) * image.getHeight()/(max_y-min_y);
-            float startY_width = (upsite_y(Day_Data.open,max_y,min_y) - min_y) * image.getHeight()/(max_y-min_y);
-            float stopY_width = (upsite_y(Day_Data.close,max_y,min_y) - min_y) * image.getHeight()/(max_y-min_y);
-            float ma5_Y = (upsite_y(Day_Data.MA_5,max_y,min_y) - min_y) * image.getHeight()/(max_y-min_y);
-            float ma10_Y = (upsite_y(Day_Data.MA_10,max_y,min_y) - min_y) * image.getHeight()/(max_y-min_y);
+                float startY = (upsite_y(Day_Data.low, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+                float stopY = (upsite_y(Day_Data.high, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+                float startY_width = (upsite_y(Day_Data.open, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+                float stopY_width = (upsite_y(Day_Data.close, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+                float ma5_Y = (upsite_y(Day_Data.MA_5, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+                float ma10_Y = (upsite_y(Day_Data.MA_10, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
 
-            if(before_close < Day_Data.close){
-                canvas.drawLine(x_init, startY, x_init, stopY, paintRed);
-                canvas.drawLine(x_init, startY_width, x_init, stopY_width, paintRedWidth);
-            }else {
-                canvas.drawLine(x_init, startY, x_init, stopY, paintGreen);
-                canvas.drawLine(x_init, startY_width, x_init, stopY_width, paintGreenWidth);
+                if (before_close < Day_Data.close) {
+                    canvas.drawLine(x_init, startY, x_init, stopY, paintRed);
+                    canvas.drawLine(x_init, startY_width, x_init, stopY_width, paintRedWidth);
+                } else {
+                    canvas.drawLine(x_init, startY, x_init, stopY, paintGreen);
+                    canvas.drawLine(x_init, startY_width, x_init, stopY_width, paintGreenWidth);
+                }
+                if (before_close == 0f) {
+                    ma5_path.moveTo(x_init, ma5_Y);
+                    ma10_path.moveTo(x_init, ma10_Y);
+                } else {
+                    ma5_path.lineTo(x_init, ma5_Y);
+                    ma10_path.lineTo(x_init, ma10_Y);
+                }
+
+
+                x_init += x_size;
+                before_close = Day_Data.close;
             }
-            if (before_close == 0f){
-                ma5_path.moveTo(x_init,ma5_Y);
-                ma10_path.moveTo(x_init,ma10_Y);
-            }else {
-                ma5_path.lineTo(x_init,ma5_Y);
-                ma10_path.lineTo(x_init,ma10_Y);
-            }
-
-
-            x_init += x_size;
-            before_close = Day_Data.close;
+            canvas.drawPath(ma5_path, paintMA5);
+            canvas.drawPath(ma10_path, paintMA10);
+            image.setImageBitmap(bitmap);
         }
-        canvas.drawPath(ma5_path, paintMA5);
-        canvas.drawPath(ma10_path, paintMA10);
-        image.setImageBitmap(bitmap);
     }
 
     @Override

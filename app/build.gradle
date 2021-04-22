@@ -89,8 +89,8 @@ dependencies {
      * –pct-appswitch （启动App事件）
      * –pct-anyevent (不常用事件)
     */
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7' //減少 OOM ，可以提高程式的穩定性
-    debugImplementation 'com.github.markzhai:blockcanary-android:1.5.0' //減少卡頓，提高應用流暢性
+//    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7' //減少 OOM ，可以提高程式的穩定性
+//    debugImplementation 'com.github.markzhai:blockcanary-android:1.5.0' //減少卡頓，提高應用流暢性
 
 
     def room_version = "2.2.5"

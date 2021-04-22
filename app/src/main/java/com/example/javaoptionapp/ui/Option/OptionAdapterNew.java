@@ -28,7 +28,7 @@ public class OptionAdapterNew extends RecyclerView.Adapter<OptionAdapterNew.opti
      * OptionAdapterNew OptionAdapterNew = new OptionAdapterNew();
      * OptionAdapterNew.optionViewHolder vh = OptionAdapterNew.new StartAndEndTime();
      */
-    class optionViewHolder extends RecyclerView.ViewHolder {
+    static class optionViewHolder extends RecyclerView.ViewHolder {
         TextView strikePrice;
         TextView dealPrice;
         TextView goalPrice;

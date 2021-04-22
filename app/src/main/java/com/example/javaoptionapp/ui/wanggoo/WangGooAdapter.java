@@ -24,11 +24,18 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class WangGooAdapter extends RecyclerView.Adapter<VH> {
+public class WangGooAdapter extends RecyclerView.Adapter<WangGooAdapter.VH> {
 
     public List<String> dataList;
     private ViewGroup parentview;
 
+    static class VH extends RecyclerView.ViewHolder {
+        TextView tv1;
+        public VH(@NonNull View itemView,View parent) {
+            super(itemView);
+            tv1 = itemView.findViewById(R.id.tv1);
+        }
+    }
     public WangGooAdapter(List<String> dataList,ViewGroup container) {
         Log.i("WangGooAdapter",dataList.toString());
 
@@ -74,7 +81,7 @@ public class WangGooAdapter extends RecyclerView.Adapter<VH> {
     @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        return new VH(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_home, parent, false),parentview);
+        return new VH(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_home, parent, false), parentview);
     }
 
     @Override
@@ -101,10 +108,3 @@ public class WangGooAdapter extends RecyclerView.Adapter<VH> {
 }
 
 
-class VH extends RecyclerView.ViewHolder {
-    TextView tv1;
-    public VH(@NonNull View itemView,View parent) {
-        super(itemView);
-        tv1 = itemView.findViewById(R.id.tv1);
-    }
-}

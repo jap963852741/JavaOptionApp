@@ -10,6 +10,7 @@ import com.example.javaoptionapp.room.Table_Option;
 import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
 import com.example.javaoptionapp.room.FeatureDatabase;
 import com.example.javaoptionapp.room.FeatureDatabaseDao;
+import com.example.taiwanworkdaylib.APIUtil;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Instrumented test, which will execute on an Android device.
  *
@@ -36,92 +39,6 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
-//    @Before
-//    public void create_test(){
-//        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-//        FeedReaderDbHelper dbHelper = new FeedReaderDbHelper(appContext);
-//        SQLiteDatabase db = dbHelper.getWritableDatabase();
-//        // Create a new map of values, where column names are the keys
-//        ContentValues values = new ContentValues();
-//        values.put(FeedReaderContract.FeedEntry.COLUMN_NAME_TITLE, "My Title");
-//        values.put(FeedReaderContract.FeedEntry.COLUMN_NAME_SUBTITLE, "子標題");
-//        // Insert the new row, returning the primary key value of the new row
-//        long newRowId = db.insert(FeedReaderContract.FeedEntry.TABLE_NAME, null, values);
-//        db.insert(FeedReaderContract.FeedEntry.TABLE_NAME, null, values);
-//        db.insert(FeedReaderContract.FeedEntry.TABLE_NAME, null, values);
-//    }
-//    @Test
-//    public void read_test(){
-//        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-//        FeedReaderDbHelper dbHelper = new FeedReaderDbHelper(appContext);
-//        Log.i("Now","read_test");
-//        //Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-//        SQLiteDatabase db = dbHelper.getReadableDatabase();
-//        // Define a projection that specifies which columns from the database
-//        // you will actually use after this query.
-//        String[] projection = {
-//                BaseColumns._ID,
-//                FeedReaderContract.FeedEntry.COLUMN_NAME_TITLE,
-//                FeedReaderContract.FeedEntry.COLUMN_NAME_SUBTITLE
-//        };
-//
-//        // Filter results WHERE "title" = 'My Title'
-//        String selection = FeedReaderContract.FeedEntry.COLUMN_NAME_TITLE + " = ?";
-//        String[] selectionArgs = { "My Title" };
-//
-//        // How you want the results sorted in the resulting Cursor
-//        String sortOrder = FeedReaderContract.FeedEntry.COLUMN_NAME_SUBTITLE + " DESC";
-//
-//        Cursor cursor = db.query(
-//                FeedReaderContract.FeedEntry.TABLE_NAME,   // The table to query
-//                projection,             // The array of columns to return (pass null to get all)
-//                selection,              // The columns for the WHERE clause
-//                selectionArgs,          // The values for the WHERE clause
-//                null,                   // don't group the rows
-//                null,                   // don't filter by row groups
-//                sortOrder               // The sort order
-//        );
-//
-//        List itemIds = new ArrayList<>();
-//        List subtitlearrays = new ArrayList<>();
-//
-//        while(cursor.moveToNext()) {
-//            long itemId = cursor.getLong(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntry._ID));
-//            String subtitlearray = cursor.getString(cursor.getColumnIndexOrThrow(FeedReaderContract.FeedEntry.COLUMN_NAME_SUBTITLE));
-//            subtitlearrays.add(subtitlearray);
-//            itemIds.add(itemId);
-//        }
-//        cursor.close();
-//
-//        System.out.println(itemIds);
-//        System.out.println(subtitlearrays);
-//
-//
-//        Cursor cursor_a = db.rawQuery("select * from entry",
-//                null);
-//        while (cursor_a.moveToNext()) {    //获取游标下移，作为循环，从而获得所有数据
-//            String id = cursor_a.getString(0);
-//            String name = cursor_a.getString(1);
-//            String credit = cursor_a.getString(2);//获取credit学分
-//            System.out.println("query--->" + id + "," + name + "," + credit);//输出数据
-//        }
-//
-//        cursor_a.close();
-//
-//    }
-//    @Test
-//    public void delete_test(){
-//        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-//        FeedReaderDbHelper dbHelper = new FeedReaderDbHelper(appContext);
-//        Log.i("Now","create_test");
-////        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-////        FeedReaderDbHelper dbHelper = new FeedReaderDbHelper(appContext);
-//        // Gets the data repository in write mode
-//        SQLiteDatabase db = dbHelper.getWritableDatabase();
-//        // Define 'where' part of query.
-//        dbHelper.onUpgrade(db,0,1);
-//
-//    }
 
     @Test
     public void update_before_2014_feature() {
@@ -561,17 +478,31 @@ public class ExampleInstrumentedTest {
     }
 
 
+//    @Test
+//    public void get_now_option_data(){
+//        OptionUtil OPU = new OptionUtil();
+//        OPU.get_all_month();
+//    }
+//
+//
+//    @Test
+//    public void canvas_test(){
+//        OptionUtil OPU = new OptionUtil();
+//        OPU.get_all_month();
+//    }
     @Test
-    public void get_now_option_data(){
-        OptionUtil OPU = new OptionUtil();
-        OPU.get_all_month();
+    public void useAppContext() {
+        // Context of the app under test.
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+//        assertEquals("com.example.taiwanworkday", appContext.getPackageName());
+        new APIUtil().update();
+
+        //等callback
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
-
-
-    @Test
-    public void canvas_test(){
-        OptionUtil OPU = new OptionUtil();
-        OPU.get_all_month();
-    }
-
 }

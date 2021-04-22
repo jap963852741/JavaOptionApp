@@ -1,4 +1,4 @@
-package com.example.javaoptionapp.Repository.bean;
+package com.example.javaoptionapp.Repository.bean.CMoney;
 
 public class CMoneyTokenResponse {
     private String token;

@@ -37,6 +37,7 @@ public class WangGooHistoryUtil extends WangGooUtil{
     private String[] value;
     public HashMap<String, HashMap<String,String>> hashmap_time_data = new HashMap<String, HashMap<String,String>>();
     private FeatureDatabaseDao fdDao;
+
     public WangGooHistoryUtil(){
         super();
         this.seturl();
