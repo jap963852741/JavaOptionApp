@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/item_option"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <TextView
+        android:id="@+id/nowPriceText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="#000000"
+        android:text="@string/nowPrice"
+        android:textSize="20sp"/>
+    <TextView
+        android:id="@+id/nowPrice"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/nowPriceText"
+        android:text=""
+        android:textSize="20sp"/>
+
+
+    <TextView
+        android:id="@+id/tradeDateText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/nowPriceText"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="#000000"
+        android:text="@string/tradeDateText"
+        android:textSize="20sp"/>
+    <TextView
+        android:id="@+id/tradeDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/tradeDateText"
+        app:layout_constraintLeft_toRightOf="@+id/tradeDateText"
+        android:text=""
+        android:textSize="20sp"/>
+
+    <TextView
+        android:id="@+id/openText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/tradeDateText"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="#000000"
+        android:text="@string/openText"
+        android:textSize="20sp"/>
+    <TextView
+        android:id="@+id/open"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/openText"
+        app:layout_constraintLeft_toRightOf="@+id/openText"
+        android:text=""
+        android:textSize="20sp"/>
+
+
+    <TextView
+        android:id="@+id/highestPriceText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/open"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="#000000"
+        android:text="@string/highestPriceText"
+        android:textSize="20sp"/>
+    <TextView
+        android:id="@+id/highestPrice"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/highestPriceText"
+        app:layout_constraintLeft_toRightOf="@+id/highestPriceText"
+        android:text=""
+        android:textSize="20sp"/>
+
+    <TextView
+        android:id="@+id/lowestPriceText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/highestPriceText"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="#000000"
+        android:text="@string/lowestPriceText"
+        android:textSize="20sp"/>
+    <TextView
+        android:id="@+id/lowestPrice"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/lowestPriceText"
+        app:layout_constraintLeft_toRightOf="@+id/lowestPriceText"
+        android:text=""
+        android:textSize="20sp"/>
+
+    <TextView
+        android:id="@+id/closePriceText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/lowestPrice"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="#000000"
+        android:text="@string/closePriceText"
+        android:textSize="20sp"/>
+    <TextView
+        android:id="@+id/closePrice"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/closePriceText"
+        app:layout_constraintLeft_toRightOf="@+id/closePriceText"
+        android:text=""
+        android:textSize="20sp"/>
+
+    <TextView
+        android:id="@+id/tradeVolumeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/closePrice"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="#000000"
+        android:text="@string/tradeVolumeText"
+        android:textSize="20sp"/>
+    <TextView
+        android:id="@+id/tradeVolume"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/tradeVolumeText"
+        app:layout_constraintLeft_toRightOf="@+id/tradeVolumeText"
+        android:text=""
+        android:textSize="20sp"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

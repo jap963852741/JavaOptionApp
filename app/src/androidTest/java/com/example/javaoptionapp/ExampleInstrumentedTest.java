@@ -1,6 +1,7 @@
 package com.example.javaoptionapp;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.room.Room;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -221,6 +222,7 @@ public class ExampleInstrumentedTest {
          * MA 15 日線計算 單元測試
          *當天收盤價也會計算在內
          * */
+        Log.e("213",fdDao.get_10_data_fromnow().toString());
         fdDao.update_ALL_ma5(fdDao.get_ma5_begin_date());
         fdDao.update_ALL_ma10(fdDao.get_ma10_begin_date());
         fdDao.update_ALL_ma15(fdDao.get_ma15_begin_date());
@@ -435,8 +437,7 @@ public class ExampleInstrumentedTest {
         FeatureDatabaseDao fdDao;
         FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
         fdDao = fdb.FeatureDatabaseDao();
-        fdDao.Delete_after_day(day);
-
+        fdDao.Delete_after_day("20201223");
 
     }
 

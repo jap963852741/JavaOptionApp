@@ -38,6 +38,17 @@ public class WangGooBean {
     }
 
     public String getTime() {
+        return time;
+    }
+
+    public String getTimeYYYYMMDD() {
+        long millisecond = Long.parseLong(time);
+        Date date = new Date(millisecond);
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        return format.format(date);
+    }
+
+    public String getTimeYYYYMMDDChinese() {
         long millisecond = Long.parseLong(time);
         Date date = new Date(millisecond);
         SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日");
@@ -45,6 +56,17 @@ public class WangGooBean {
     }
 
     public String getTradeDate() {
+        return tradeDate;
+    }
+
+    public String getTradeDateYYYYMMDD() {
+        long millisecond = Long.parseLong(tradeDate);
+        Date date = new Date(millisecond);
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        return format.format(date);
+    }
+
+    public String getTradeDateYYYYMMDDChinese() {
         long millisecond = Long.parseLong(tradeDate);
         Date date = new Date(millisecond);
         SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日");
@@ -54,4 +76,9 @@ public class WangGooBean {
     public String getVolume() {
         return volume;
     }
+
+    public int size() {
+        return 8;
+    }
+
 }

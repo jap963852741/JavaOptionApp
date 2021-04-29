@@ -8,7 +8,13 @@
     <string name="update_two_year_data">更新近兩年資料</string>
     <string name="update_all_year_data">更新全部資料</string>
     <string name="update_date_data">更新台灣放假日資料</string>
-
+    <string name="nowPrice">目前&#160;:&#160;</string>
+    <string name="tradeDateText">交易日期&#160;:&#160;</string>
+    <string name="openText">開盤&#160;:&#160;</string>
+    <string name="highestPriceText">最高價&#160;:&#160;</string>
+    <string name="lowestPriceText">最低價&#160;:&#160;</string>
+    <string name="closePriceText">收盤價&#160;:&#160;</string>
+    <string name="tradeVolumeText">交易量&#160;:&#160;</string>
 
     <string name="maket_data">市場資料</string>
     <string name="BA123690a">大盤籌碼日報</string>
@@ -18,5 +24,13 @@
     <string name="BA123692a">大盤主力</string>
     <string name="BA123693a">大盤官股</string>
     <string name="BA123694a">大盤資券</string>
+    <string name="now_strategy">目前交易策略&#160;:&#160;</string>
+    <string name="nothing">空手看盤</string>
+    <string name="ApproachDateText">入場日期&#160;:&#160;</string>
+    <string name="ablock" />
+    <string name="EntryPointText">入場點數&#160;:&#160;</string>
+    <string name="ExitPointText">平倉點數&#160;:&#160;</string>
+    <string name="thisTimePerformanceText">此次平倉績效&#160;:&#160;</string>
+
 
 </resources>
