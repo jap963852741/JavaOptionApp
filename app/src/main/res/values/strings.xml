@@ -25,12 +25,15 @@
     <string name="BA123693a">大盤官股</string>
     <string name="BA123694a">大盤資券</string>
     <string name="now_strategy">目前交易策略&#160;:&#160;</string>
-    <string name="nothing">空手看盤</string>
+    <string name="nothing">\n\n空手看盤</string>
     <string name="ApproachDateText">入場日期&#160;:&#160;</string>
     <string name="ablock" />
     <string name="EntryPointText">入場點數&#160;:&#160;</string>
     <string name="ExitPointText">平倉點數&#160;:&#160;</string>
     <string name="thisTimePerformanceText">此次平倉績效&#160;:&#160;</string>
+    <string name="ExitBenefitPointText">停利點數&#160;:&#160;</string>
+    <string name="LastTicketDayText">最後平倉日&#160;:&#160;</string>
+    <string name="warningText">\n高點超過停利點&#160;收盤平倉</string>
 
 
 </resources>

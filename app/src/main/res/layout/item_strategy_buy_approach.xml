@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
@@ -23,13 +23,13 @@
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintTop_toBottomOf="@id/now_strategy"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/noApproachDate"
+        app:layout_constraintRight_toLeftOf="@id/ApproachDate"
         android:text="@string/ApproachDateText"
         android:textColor="@color/colorRed"
         android:textSize="25sp"
         />
     <TextView
-        android:id="@+id/noApproachDate"
+        android:id="@+id/ApproachDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/now_strategy"
@@ -45,15 +45,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintTop_toBottomOf="@id/noApproachDate"
+        app:layout_constraintTop_toBottomOf="@id/ApproachDate"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/noApproachEntryPoint"
+        app:layout_constraintRight_toLeftOf="@id/EntryPoint"
         android:text="@string/EntryPointText"
         android:textColor="@color/colorRed"
         android:textSize="25sp"
         />
     <TextView
-        android:id="@+id/noApproachEntryPoint"
+        android:id="@+id/EntryPoint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@id/EntryPointText"
@@ -65,23 +65,23 @@
         />
 
     <TextView
-        android:id="@+id/ExitPointText"
+        android:id="@+id/ExitBenefitPointText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintTop_toBottomOf="@id/noApproachEntryPoint"
+        app:layout_constraintTop_toBottomOf="@id/EntryPoint"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/noApproachExitPoint"
-        android:text="@string/ExitPointText"
+        app:layout_constraintRight_toLeftOf="@id/ExitBenefitPoint"
+        android:text="@string/ExitBenefitPointText"
         android:textColor="@color/colorRed"
         android:textSize="25sp"
         />
     <TextView
-        android:id="@+id/noApproachExitPoint"
+        android:id="@+id/ExitBenefitPoint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/ExitPointText"
-        app:layout_constraintLeft_toRightOf="@id/ExitPointText"
+        app:layout_constraintTop_toTopOf="@id/ExitBenefitPointText"
+        app:layout_constraintLeft_toRightOf="@id/ExitBenefitPointText"
         app:layout_constraintRight_toRightOf="parent"
         android:textColor="@color/colorRed"
         android:textSize="25sp"
@@ -89,27 +89,39 @@
         />
 
     <TextView
-        android:id="@+id/thisTimePerformanceText"
+        android:id="@+id/LastTicketDayText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintTop_toBottomOf="@id/noApproachExitPoint"
+        app:layout_constraintTop_toBottomOf="@id/ExitBenefitPoint"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/thisTimePerformance"
-        android:text="@string/thisTimePerformanceText"
+        app:layout_constraintRight_toLeftOf="@id/LastTicketDay"
+        android:text="@string/LastTicketDayText"
         android:textColor="@color/colorRed"
         android:textSize="25sp"
         />
     <TextView
-        android:id="@+id/thisTimePerformance"
+        android:id="@+id/LastTicketDay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/thisTimePerformanceText"
-        app:layout_constraintLeft_toRightOf="@id/thisTimePerformanceText"
+        app:layout_constraintTop_toTopOf="@id/LastTicketDayText"
+        app:layout_constraintLeft_toRightOf="@id/LastTicketDayText"
         app:layout_constraintRight_toRightOf="parent"
         android:textColor="@color/colorRed"
         android:textSize="25sp"
         android:text="@string/ablock"
+        />
+
+    <TextView
+        android:id="@+id/warningText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/LastTicketDay"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textColor="@color/colorRed"
+        android:textSize="25sp"
+        android:text="@string/warningText"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

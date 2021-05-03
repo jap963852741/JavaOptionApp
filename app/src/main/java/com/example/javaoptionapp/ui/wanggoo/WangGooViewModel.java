@@ -40,9 +40,7 @@ public class WangGooViewModel extends ViewModel {
     private MutableLiveData<String> mText;
     private MutableLiveData<WangGooBean> wangGooBeanMutableLiveData;
     private MutableLiveData<StrategyResultBean> strategyResultBeanMutableLiveData;
-    private WangGooRepository wangGooRepository;
     private FeatureDatabaseDao fdDao;
-    private Context applicationContext;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public WangGooViewModel() {
@@ -50,14 +48,12 @@ public class WangGooViewModel extends ViewModel {
         WangGooUtil wgt = new WangGooUtil(mText);
     }
 
-    public WangGooViewModel(WangGooRepository wangGooRepository, Context context){
-        this.wangGooRepository = wangGooRepository;
-        this.applicationContext = context;
+    public WangGooViewModel(Context context){
         wangGooBeanMutableLiveData = new MutableLiveData<>();
         strategyResultBeanMutableLiveData = new MutableLiveData<>();
         fdDao = FeatureDatabase.getInstance(context).FeatureDatabaseDao();
-//        wangGooApi();
-//        wangGooHistoryApiUpdateDb();
+        wangGooApi();
+        wangGooHistoryApiUpdateDb();
         getStrategy();
     }
 

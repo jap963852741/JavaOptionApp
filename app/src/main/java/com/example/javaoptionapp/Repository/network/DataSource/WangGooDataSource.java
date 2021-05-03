@@ -99,6 +99,7 @@ public class WangGooDataSource implements FeatureDatabaseDao {
 
             Day_To_Stop_Loss = 4;//幾天內沒到停利點 就平倉
             Hundred_Data = get_10_data_fromnow();
+            strategyResultBean.setHundred_Data(Hundred_Data);
             Log.e(TAG,"Hundred_Data = "+ Hundred_Data.toString());
             Approach = false;
             for(Table_Small_Taiwan_Feature Day_Data : Hundred_Data){
@@ -171,6 +172,18 @@ public class WangGooDataSource implements FeatureDatabaseDao {
                 need_to_add +=  ","+"              最後平倉日 : "+ formatted
                         + ","
                         + ","+"高點超過停利點 收盤平倉";
+                Log.e(TAG,"Exit_Benifit_Point = " + Exit_Benifit_Point.toString());
+                strategyResultBean.setBuyOrNot(true);
+                strategyResultBean.setStrategyDataBean(
+                        new StrategyDataBean(
+                                true,
+                                ApproachDate,
+                                Entry_Point,
+                                Exit_Benifit_Point,
+                                formatted
+                        )
+                );
+
             }else {
                 if(Day_to_Stop){
 //                    need_to_add +=  ","+"              入場日期 : "+ ApproachDate

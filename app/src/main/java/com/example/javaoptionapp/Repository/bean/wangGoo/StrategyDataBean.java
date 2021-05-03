@@ -9,7 +9,7 @@ public class StrategyDataBean {
 
     // 持有中
     private Float ExitBenefitPoint;
-    private Float ExpectedSellDate;
+    private String ExpectedSellDate;
 
 
     // 賣出日當日
@@ -17,7 +17,8 @@ public class StrategyDataBean {
     private Float thisTimePerformance;
 
     //持有中
-    public StrategyDataBean(Boolean Approach,String ApproachDate,Float EntryPoint,Float ExitBenefitPoint,Float ExpectedSellDate){
+    public StrategyDataBean(Boolean Approach,String ApproachDate,Float EntryPoint,Float ExitBenefitPoint,String ExpectedSellDate){
+        this.Approach = Approach;
         this.ApproachDate = ApproachDate;
         this.EntryPoint = EntryPoint;
         this.ExitBenefitPoint = ExitBenefitPoint;
@@ -27,6 +28,7 @@ public class StrategyDataBean {
 
     //賣出日當日
     public StrategyDataBean(Boolean Approach,String ApproachDate,Float EntryPoint,Float ExitPoint){
+        this.Approach = Approach;
         this.ApproachDate = ApproachDate;
         this.EntryPoint = EntryPoint;
         this.ExitPoint = ExitPoint;
@@ -42,15 +44,13 @@ public class StrategyDataBean {
         return EntryPoint;
     }
 
-    public Float getExitBenefitPoint() {
-        return ExitBenefitPoint;
-    }
+    public Float getExitBenefitPoint() {return ExitBenefitPoint;}
 
     public Float getExitPoint() {
         return ExitPoint;
     }
 
-    public Float getExpectedSellDate() {
+    public String getExpectedSellDate() {
         return ExpectedSellDate;
     }
 

@@ -437,7 +437,7 @@ public class ExampleInstrumentedTest {
         FeatureDatabaseDao fdDao;
         FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
         fdDao = fdb.FeatureDatabaseDao();
-        fdDao.Delete_after_day("20201223");
+        fdDao.Delete_after_day("20201222");
 
     }
 

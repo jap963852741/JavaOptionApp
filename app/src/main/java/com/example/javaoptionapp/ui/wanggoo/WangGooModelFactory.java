@@ -24,7 +24,7 @@ public class WangGooModelFactory implements ViewModelProvider.Factory {
     @SuppressWarnings("unchecked")
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(WangGooViewModel.class)) {
-            return (T) new WangGooViewModel(new WangGooRepository(new WangGooDataSource()), context);
+            return (T) new WangGooViewModel(context);
         }
 
         throw new IllegalArgumentException("Unknown ViewModel class");

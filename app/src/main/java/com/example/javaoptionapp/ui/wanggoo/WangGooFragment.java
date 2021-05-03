@@ -89,7 +89,7 @@ public class WangGooFragment extends Fragment {
                     avi.hide();
                     break;
                 case UPDATE_IMAGE:
-                    bitmap();
+//                    bitmap();
                     break;
             }
         }
@@ -111,7 +111,7 @@ public class WangGooFragment extends Fragment {
         wangGooViewModel =new ViewModelProvider(this,new WangGooModelFactory(activity.getApplicationContext())).get(WangGooViewModel.class);
 
         View root = inflater.inflate(R.layout.fragment_wanggoo, container, false);
-        avi = root.findViewById(R.id.avi);
+//        avi = root.findViewById(R.id.avi);
         image = root.findViewById(R.id.image_wanggoo);
         wangGooBean = root.findViewById(R.id.wangGooBean);
         strategyView = root.findViewById(R.id.strategy);
@@ -153,26 +153,34 @@ public class WangGooFragment extends Fragment {
         });
 
         wangGooViewModel.getStrategyResultBean().observe(getViewLifecycleOwner(), responseStrategyResultBean -> {
+            bitmap(responseStrategyResultBean.getHundred_Data());
+            Log.e(TAG,responseStrategyResultBean.getHundred_Data().toString());
             if(responseStrategyResultBean.isBuyOrNot()) { //買進
                 StrategyDataBean strategyDataBean = responseStrategyResultBean.getStrategyDataBean();
-                if(!strategyDataBean.isApproach()) {//平倉日
-                    Log.e(TAG,strategyDataBean.getApproachDate());
-                    strategyView.setLayoutResource(R.layout.item_strategy_buy_no_approach);
+                if(strategyDataBean.isApproach()) { //持有日
+                    strategyView.setLayoutResource(R.layout.item_strategy_buy_approach);
                     View inflated = strategyView.inflate();
                     TextView ApproachDate = (TextView) inflated.findViewById(R.id.ApproachDate);
                     TextView EntryPoint = (TextView) inflated.findViewById(R.id.EntryPoint);
-                    TextView ExitPoint = (TextView) inflated.findViewById(R.id.ExitPoint);
+                    TextView ExitBenefitPoint = (TextView) inflated.findViewById(R.id.ExitBenefitPoint);
+                    TextView LastTicketDay = (TextView) inflated.findViewById(R.id.LastTicketDay);
+                    ApproachDate.setText(strategyDataBean.getApproachDate());
+                    EntryPoint.setText(String.valueOf(strategyDataBean.getEntryPoint()));
+                    ExitBenefitPoint.setText(String.valueOf(strategyDataBean.getExitBenefitPoint()));
+                    LastTicketDay.setText(String.valueOf(strategyDataBean.getExpectedSellDate()));
+                }else { //平倉日
+                    strategyView.setLayoutResource(R.layout.item_strategy_buy_no_approach);
+                    View inflated = strategyView.inflate();
+                    TextView ApproachDate = (TextView) inflated.findViewById(R.id.noApproachDate);
+                    TextView EntryPoint = (TextView) inflated.findViewById(R.id.noApproachEntryPoint);
+                    TextView ExitPoint = (TextView) inflated.findViewById(R.id.noApproachExitPoint);
                     TextView thisTimePerformance = (TextView) inflated.findViewById(R.id.thisTimePerformance);
-
                     ApproachDate.setText(strategyDataBean.getApproachDate());
                     EntryPoint.setText(String.valueOf(strategyDataBean.getEntryPoint()));
                     ExitPoint.setText(String.valueOf(strategyDataBean.getExitPoint()));
                     thisTimePerformance.setText(String.valueOf(strategyDataBean.getThisTimePerformance()));
-
-                }else {
-
                 }
-            }else {
+            }else {//觀察
                 strategyView.setLayoutResource(R.layout.item_strategy_nothing);
                 strategyView.inflate();
             }
@@ -205,7 +213,7 @@ public class WangGooFragment extends Fragment {
             case 1:
                 wghu.post();
                 loadingdialog.show();
-                bitmap();
+//                bitmap();
                 break;
             case 2:
                 wghu.update_all_history();
@@ -228,9 +236,9 @@ public class WangGooFragment extends Fragment {
         return max_y-(y-min_y);
     }
 
-    static void bitmap(){
-        float x_size = (float) image.getWidth() / StrategyUtil.Hundred_Data.size();
-        float x_init = (float) image.getWidth() / (StrategyUtil.Hundred_Data.size()*2);
+    static void bitmap(List<Table_Small_Taiwan_Feature> Hundred_Data){
+        float x_size = (float) image.getWidth() / Hundred_Data.size();
+        float x_init = (float) image.getWidth() / (Hundred_Data.size()*2);
         float min_y ;
         float max_y ;
         float x_width = x_init/2;
@@ -256,54 +264,54 @@ public class WangGooFragment extends Fragment {
         paintMA10.setColor(Color.rgb(255,97,0));
         paintMA10.setStyle(Paint.Style.STROKE);
         canvas = new Canvas(bitmap);
-        if (StrategyUtil.Hundred_Data.size() > 0) {
+        if (Hundred_Data.size() > 0) {
 
-        for(Table_Small_Taiwan_Feature Day_Data : StrategyUtil.Hundred_Data) {
-            min_y_list.add(Day_Data.low);
-            max_y_list.add(Day_Data.high);
-        }
-        min_y = min(min_y_list);
-        max_y = max(max_y_list);
-
-
-        Path ma5_path = new Path();
-        Path ma10_path = new Path();
-        float before_close = 0f;
-            for (Table_Small_Taiwan_Feature Day_Data : StrategyUtil.Hundred_Data) {
-                Log.i("Hundred_Data", Day_Data.date + " 開盤: " +
-                        Day_Data.open + " 最高: " + Day_Data.high +
-                        " 最低 : " + Day_Data.low + " 收盤 : " + Day_Data.close + " " + Day_Data.MA_5 + " " + Day_Data.BIAS_5);
-
-
-                float startY = (upsite_y(Day_Data.low, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
-                float stopY = (upsite_y(Day_Data.high, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
-                float startY_width = (upsite_y(Day_Data.open, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
-                float stopY_width = (upsite_y(Day_Data.close, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
-                float ma5_Y = (upsite_y(Day_Data.MA_5, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
-                float ma10_Y = (upsite_y(Day_Data.MA_10, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
-
-                if (before_close < Day_Data.close) {
-                    canvas.drawLine(x_init, startY, x_init, stopY, paintRed);
-                    canvas.drawLine(x_init, startY_width, x_init, stopY_width, paintRedWidth);
-                } else {
-                    canvas.drawLine(x_init, startY, x_init, stopY, paintGreen);
-                    canvas.drawLine(x_init, startY_width, x_init, stopY_width, paintGreenWidth);
-                }
-                if (before_close == 0f) {
-                    ma5_path.moveTo(x_init, ma5_Y);
-                    ma10_path.moveTo(x_init, ma10_Y);
-                } else {
-                    ma5_path.lineTo(x_init, ma5_Y);
-                    ma10_path.lineTo(x_init, ma10_Y);
-                }
-
-
-                x_init += x_size;
-                before_close = Day_Data.close;
+            for(Table_Small_Taiwan_Feature Day_Data : Hundred_Data) {
+                min_y_list.add(Day_Data.low);
+                max_y_list.add(Day_Data.high);
             }
-            canvas.drawPath(ma5_path, paintMA5);
-            canvas.drawPath(ma10_path, paintMA10);
-            image.setImageBitmap(bitmap);
+            min_y = min(min_y_list);
+            max_y = max(max_y_list);
+
+
+            Path ma5_path = new Path();
+            Path ma10_path = new Path();
+            float before_close = 0f;
+                for (Table_Small_Taiwan_Feature Day_Data : Hundred_Data) {
+                    Log.i("Hundred_Data", Day_Data.date + " 開盤: " +
+                            Day_Data.open + " 最高: " + Day_Data.high +
+                            " 最低 : " + Day_Data.low + " 收盤 : " + Day_Data.close + " " + Day_Data.MA_5 + " " + Day_Data.BIAS_5);
+
+
+                    float startY = (upsite_y(Day_Data.low, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+                    float stopY = (upsite_y(Day_Data.high, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+                    float startY_width = (upsite_y(Day_Data.open, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+                    float stopY_width = (upsite_y(Day_Data.close, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+                    float ma5_Y = (upsite_y(Day_Data.MA_5, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+                    float ma10_Y = (upsite_y(Day_Data.MA_10, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+
+                    if (before_close < Day_Data.close) {
+                        canvas.drawLine(x_init, startY, x_init, stopY, paintRed);
+                        canvas.drawLine(x_init, startY_width, x_init, stopY_width, paintRedWidth);
+                    } else {
+                        canvas.drawLine(x_init, startY, x_init, stopY, paintGreen);
+                        canvas.drawLine(x_init, startY_width, x_init, stopY_width, paintGreenWidth);
+                    }
+                    if (before_close == 0f) {
+                        ma5_path.moveTo(x_init, ma5_Y);
+                        ma10_path.moveTo(x_init, ma10_Y);
+                    } else {
+                        ma5_path.lineTo(x_init, ma5_Y);
+                        ma10_path.lineTo(x_init, ma10_Y);
+                    }
+
+
+                    x_init += x_size;
+                    before_close = Day_Data.close;
+                }
+                canvas.drawPath(ma5_path, paintMA5);
+                canvas.drawPath(ma10_path, paintMA10);
+                image.setImageBitmap(bitmap);
         }
     }
 
