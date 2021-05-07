@@ -211,12 +211,13 @@ public class WangGooFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case 1:
-                wghu.post();
+                wangGooViewModel.wangGooHistoryApiUpdateDb();
+//                wghu.post();
                 loadingdialog.show();
-//                bitmap();
                 break;
             case 2:
-                wghu.update_all_history();
+                wangGooViewModel.update_all_history();
+//                wghu.update_all_history();
                 loadingdialog.show();
                 break;
             case 3:
