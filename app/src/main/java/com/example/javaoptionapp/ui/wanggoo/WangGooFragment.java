@@ -55,7 +55,6 @@ public class WangGooFragment extends Fragment {
 
     private String TAG = "WangGooFragment";
     private WangGooViewModel wangGooViewModel;
-    private WangGooAdapter wanggooAdapter;
     public static final int MSG_UPLOAD_Begin =  1;
     public static final int MSG_UPLOAD_Finish = 2;
     public static final int UPDATE_IMAGE = 3;
@@ -66,7 +65,6 @@ public class WangGooFragment extends Fragment {
     private ViewStub strategyView;
     public static Context strategyutil_context;
     public static LoadingDialog loadingdialog;
-    public WangGooHistoryUtil wghu;
     public Activity activity;
     private static ImageView image;
     public static Bitmap bitmap;
@@ -108,7 +106,7 @@ public class WangGooFragment extends Fragment {
         activity = ((AppCompatActivity) getActivity());
         strategyutil_context = activity.getApplicationContext();
 //        wangGooViewModel = new ViewModelProvider(this).get(WangGooViewModel.class);
-        wangGooViewModel =new ViewModelProvider(this,new WangGooModelFactory(activity.getApplicationContext())).get(WangGooViewModel.class);
+        wangGooViewModel =new ViewModelProvider(this,new WangGooModelFactory(activity)).get(WangGooViewModel.class);
 
         View root = inflater.inflate(R.layout.fragment_wanggoo, container, false);
 //        avi = root.findViewById(R.id.avi);
@@ -134,11 +132,8 @@ public class WangGooFragment extends Fragment {
         Toolbar toolbar = root.findViewById(R.id.toolBar_wanggoo);
         toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_history));//把三個小點換掉
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        loadingdialog = new LoadingDialog(getContext());
-        loadingdialog.setCanceledOnTouchOutside(false);
-        loadingdialog.setCancelable(false);
 
-        wghu = new WangGooHistoryUtil();
+//        wghu = new WangGooHistoryUtil();
 
         wangGooViewModel.getWangGooBean().observe(getViewLifecycleOwner(), responseWangGooBean -> {
             if(responseWangGooBean != null) {
@@ -213,17 +208,15 @@ public class WangGooFragment extends Fragment {
             case 1:
                 wangGooViewModel.wangGooHistoryApiUpdateDb();
 //                wghu.post();
-                loadingdialog.show();
                 break;
             case 2:
                 wangGooViewModel.update_all_history();
 //                wghu.update_all_history();
-                loadingdialog.show();
                 break;
             case 3:
-                loadingdialog.show();
+                LoadingDialog.getInstance(activity).show();
                 new APIUtil().update();
-                loadingdialog.hide();
+                LoadingDialog.getInstance(activity).hide();
                 break;
         }
         return super.onOptionsItemSelected(item);

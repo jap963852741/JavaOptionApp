@@ -19,6 +19,7 @@ import com.example.javaoptionapp.Repository.network.DataSource.WangGooDataSource
 import com.example.javaoptionapp.room.FeatureDatabase;
 import com.example.javaoptionapp.room.FeatureDatabaseDao;
 import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
+import com.example.javaoptionapp.util.dialog.LoadingDialog;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,17 +48,15 @@ public class WangGooViewModel extends ViewModel {
     private MutableLiveData<StrategyResultBean> strategyResultBeanMutableLiveData;
     private FeatureDatabaseDao fdDao;
     private Context myContext;
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public WangGooViewModel() {
-        mText = new MutableLiveData<>();
-        WangGooUtil wgt = new WangGooUtil(mText);
-    }
+    private LoadingDialog loadingdialog;
+
 
     public WangGooViewModel(Context context){
         wangGooBeanMutableLiveData = new MutableLiveData<>();
         strategyResultBeanMutableLiveData = new MutableLiveData<>();
         fdDao = FeatureDatabase.getInstance(context).FeatureDatabaseDao();
         myContext = context;
+        loadingdialog = LoadingDialog.getInstance(context);
         wangGooApi();
         wangGooHistoryApiUpdateDb();
         getStrategy();
@@ -98,6 +97,7 @@ public class WangGooViewModel extends ViewModel {
     }
 
     public void wangGooHistoryApiUpdateDb(){
+        loadingdialog.show();
         Observer<List<WangGooBean>> observer = new Observer<List<WangGooBean>>(){
             @Override
             public void onSubscribe(@NonNull Disposable d) {
@@ -146,12 +146,13 @@ public class WangGooViewModel extends ViewModel {
             }
             @Override
             public void onError(@NonNull Throwable e) {
+                loadingdialog.dismiss();
                 Log.e(TAG,e.getMessage());
             }
 
             @Override
             public void onComplete() {
-                WangGooFragment.loadingdialog.dismiss();
+                loadingdialog.dismiss();
             }
         };
         new WangGooRepository(new WangGooDataSource()).getWangGooDataSource().getHistoryService()
@@ -187,6 +188,7 @@ public class WangGooViewModel extends ViewModel {
     }
 
     public void update_all_history(){
+        loadingdialog.show();
         Thread thread = new Thread(new Runnable(){
             @Override
             public void run() {
@@ -269,7 +271,7 @@ public class WangGooViewModel extends ViewModel {
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         String day = format.format(today);
         fdDao.Delete_after_day(day);
-        WangGooFragment.loadingdialog.dismiss();
+        loadingdialog.dismiss();
 
     }
 
