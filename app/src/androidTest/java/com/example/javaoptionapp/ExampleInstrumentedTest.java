@@ -1,6 +1,7 @@
 package com.example.javaoptionapp;
 
 import android.content.Context;
+import android.util.ArrayMap;
 import android.util.Log;
 
 import androidx.room.Room;
@@ -119,41 +120,42 @@ public class ExampleInstrumentedTest {
         FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
         fdDao = fdb.FeatureDatabaseDao();
         InputStream inputStream = appContext.getResources().openRawResource(R.raw.option_data);
-        HashMap<Integer, HashMap<String,String>> hashmap_time_data = new HashMap<Integer, HashMap<String,String>>();
+        ArrayMap<Integer, ArrayMap<String,String>> hashmap_time_data = new ArrayMap<Integer, ArrayMap<String,String>>();
 
         try {
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "gbk");
             BufferedReader reader = new BufferedReader(inputStreamReader);
-            StringBuffer sb = new StringBuffer("");
-            String result = null;
+            String result;
+
             int i = 0;
 
             while ((result = reader.readLine()) != null) {
-//              資料轉換
-                if (i>10000 && i % 1000 == 0){
+                if (i>10000 && i % 1000 == 0){   //大於一萬時 一千筆print 一次
                     System.out.println(result);
                 }
-                result = result.replace("[","").replace("]","").replace(" ","");
-                result = result.replace("'","");
+                result = result.replace("[","").replace("]","")
+                        .replace(" ","").replace("'","")
+                        .replace("'","");
                 String[] temp_list = result.split(",");
-
-                HashMap<String, String> temp_map = new HashMap<String, String>();
-                String temp_time = "";
+                ArrayMap<String, String> temp_map = new ArrayMap<String, String>();
                 for (String bb : temp_list){
                     String[] final_list = bb.split(":");
-                    if(final_list[0].equals("Date")){
-                        temp_time = final_list[1];
-                    }
                     temp_map.put(final_list[0],final_list[1]);
                 }
+
                 hashmap_time_data.put(i,temp_map);
+
+                temp_map = null;
                 i+=1;
             }
         } catch (Exception e1) {
             e1.printStackTrace();
+            System.out.println(e1.toString());
         }
-        for (Integer key : hashmap_time_data.keySet()) {
-            HashMap<String,String> temp_data = hashmap_time_data.get(key);
+        System.out.println("------進入迴圈------");
+
+        for (int key : hashmap_time_data.keySet()) {
+            ArrayMap<String,String> temp_data = hashmap_time_data.get(key);
             Table_Option table_option = new Table_Option(
                     temp_data.get("Date"),
                     temp_data.get("Maturity"),
@@ -163,14 +165,11 @@ public class ExampleInstrumentedTest {
                     Integer.parseInt(temp_data.get("Day_To_Finish")));
             Table_Option the_date_information = fdDao.get_option_data(temp_data.get("Date"),temp_data.get("Maturity"),temp_data.get("Strike_price"),temp_data.get("CallPut"));
 //           沒有的才 insert
-            if (the_date_information != null){
-//                fdDao.update_option(table_option);
-                continue;
-            }else {
+            if (the_date_information == null) {
                 fdDao.insert_option(table_option);
             }
         }
-        System.out.println("離開迴圈");
+        System.out.println("------離開迴圈------");
         fdb.close();
     }
     @Test
@@ -179,42 +178,10 @@ public class ExampleInstrumentedTest {
         FeatureDatabaseDao fdDao;
         FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
         fdDao = fdb.FeatureDatabaseDao();
-//        //[time:1600963200000, tradeDate:1600963200000, open:12168.00000, high:12234.00000, low:12157.00000, close:12206.00000, volume:9865, millionAmount:0.00]
         /**
         * 寫入及更新 DateIndexTable 的方法
         * [time:1600963200000, tradeDate:1600963200000, open:12168.00000, high:12234.00000, low:12157.00000, close:12206.00000, volume:9865, millionAmount:0.00]
         * */
-//        long year_time = TimeUnit.SECONDS.toMillis((long) (365.25*24*60*60));
-//        String time = String.valueOf(System.currentTimeMillis());//- 2*year_time
-//        WangGooHistoryUtil wghu = new WangGooHistoryUtil(time);
-//        HashMap<String, HashMap<String,String>> hashmap_time_data = wghu.hashmap_time_data;
-//        ArrayList need_to_update_list = new ArrayList();
-//        ArrayList need_to_insert_list = new ArrayList();
-//        for (String key : hashmap_time_data.keySet()) {
-//            HashMap<String,String> temp_data = hashmap_time_data.get(key);
-//            String date = key;
-//            System.out.println(date +" " +temp_data.toString());
-//            Table_Small_Taiwan_Feature dstf = new Table_Small_Taiwan_Feature(date,
-//                    Float.parseFloat(temp_data.get("open")),
-//                    Float.parseFloat(temp_data.get("high")),
-//                    Float.parseFloat(temp_data.get("low")),
-//                    Float.parseFloat(temp_data.get("close")),
-//                    Float.parseFloat(temp_data.get("volume")));
-//            Table_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
-////           沒有的才 insert
-//            if (the_date_information != null){
-//                need_to_update_list.add(dstf);
-//            }else {
-//                need_to_insert_list.add(dstf);
-//            }
-//        }
-//
-//        if (need_to_update_list != null) {
-//            fdDao.updateAllTable_Small_Taiwan_Feature(need_to_update_list);
-//        }
-//        if (need_to_insert_list != null) {
-//            fdDao.insertAllTable_Small_Taiwan_Feature(need_to_insert_list);
-//        }
 
         /**
          * MA 5 日線計算 單元測試
@@ -291,6 +258,7 @@ public class ExampleInstrumentedTest {
                     Day = 1;//第0天
                     System.out.println(Day_Data.date + " 進場做多點數 : "+ Entry_Point +"停利點位:" + Exit_Benifit_Point);
 
+                    //選擇權是否進場
                     Table_Option Approch_option = fdDao.get_Option_Date_Close_Settlement_data(Day_Data.date,30,1000,4);
                     if (Approch_option == null){
                         have_option_information = false;
@@ -394,6 +362,9 @@ public class ExampleInstrumentedTest {
         System.out.println("Total_Session : "+ Total_Session);
 
         AtomicReference<Float> total_v = new AtomicReference<>(0f);
+
+        System.out.println("Total_Performance --> " + Total_Option_Performance.toString());
+
         Total_Performance.forEach((k, v) -> {
             System.out.println("年份: " + k + " 績效:" + v);
             total_v.updateAndGet(v1 -> v1 + v);
@@ -437,7 +408,7 @@ public class ExampleInstrumentedTest {
         FeatureDatabaseDao fdDao;
         FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
         fdDao = fdb.FeatureDatabaseDao();
-        fdDao.Delete_after_day("20201222");
+        fdDao.Delete_after_day("20210514");
 
     }
 
@@ -479,31 +450,4 @@ public class ExampleInstrumentedTest {
     }
 
 
-//    @Test
-//    public void get_now_option_data(){
-//        OptionUtil OPU = new OptionUtil();
-//        OPU.get_all_month();
-//    }
-//
-//
-//    @Test
-//    public void canvas_test(){
-//        OptionUtil OPU = new OptionUtil();
-//        OPU.get_all_month();
-//    }
-    @Test
-    public void useAppContext() {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-//        assertEquals("com.example.taiwanworkday", appContext.getPackageName());
-        new APIUtil().update();
-
-        //等callback
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }
 }

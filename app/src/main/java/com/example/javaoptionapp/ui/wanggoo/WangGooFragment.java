@@ -28,6 +28,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.javaoptionapp.R;
 import com.example.javaoptionapp.Repository.bean.wangGoo.StrategyDataBean;
+import com.example.javaoptionapp.databinding.FragmentWanggooBinding;
+import com.example.javaoptionapp.databinding.ItemStrategyBuyApproachBinding;
+import com.example.javaoptionapp.databinding.ItemWanggooBinding;
 import com.example.javaoptionapp.ui.common.ViewModelFactory;
 import com.example.javaoptionapp.util.dialog.LoadingDialog;
 import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
@@ -43,6 +46,7 @@ import static java.util.Collections.min;
 public class WangGooFragment extends Fragment {
 
     private String TAG = "WangGooFragment";
+    private FragmentWanggooBinding fragmentWanggooBinding;
     private WangGooViewModel wangGooViewModel;
     private View wangGooBean;
     private ImageView image;
@@ -59,41 +63,45 @@ public class WangGooFragment extends Fragment {
         Log.i("status","onCreateView");
 
         activity = ((AppCompatActivity) getActivity());
-//        wangGooViewModel = new ViewModelProvider(this).get(WangGooViewModel.class);
         wangGooViewModel =new ViewModelProvider(this,new ViewModelFactory(activity)).get(WangGooViewModel.class);
 
-        View root = inflater.inflate(R.layout.fragment_wanggoo, container, false);
-        image = root.findViewById(R.id.image_wanggoo);
-        wangGooBean = root.findViewById(R.id.wangGooBean);
-        strategyView = root.findViewById(R.id.strategy);
+//        View root = inflater.inflate(R.layout.fragment_wanggoo, container, false);
+        fragmentWanggooBinding = FragmentWanggooBinding.inflate(inflater, container, false);
+        ItemWanggooBinding wangGooBean =  ItemWanggooBinding.bind(fragmentWanggooBinding.getRoot());
+//        image = root.findViewById(R.id.image_wanggoo);
+//        wangGooBean = root.findViewById(R.id.wangGooBean);
+//        strategyView = root.findViewById(R.id.strategy);
+        image = fragmentWanggooBinding.imageWanggoo;
+        strategyView = fragmentWanggooBinding.strategy;
 
-        TextView nowPrice = (TextView) wangGooBean.findViewById(R.id.nowPrice);
-        TextView tradeDate = (TextView) wangGooBean.findViewById(R.id.tradeDate);
-        TextView open = (TextView) wangGooBean.findViewById(R.id.open);
-        TextView highestPrice = (TextView) wangGooBean.findViewById(R.id.highestPrice);
-        TextView lowestPrice = (TextView) wangGooBean.findViewById(R.id.lowestPrice);
-        TextView closePrice = (TextView) wangGooBean.findViewById(R.id.closePrice);
-        TextView tradeVolume = (TextView) wangGooBean.findViewById(R.id.tradeVolume);
-        TextView approachDate = (TextView) strategyView.findViewById(R.id.ApproachDate);
+//        TextView nowPrice = (TextView) wangGooBean.findViewById(R.id.nowPrice);
+//        TextView tradeDate = (TextView) wangGooBean.findViewById(R.id.tradeDate);
+//        TextView open = (TextView) wangGooBean.findViewById(R.id.open);
+//        TextView highestPrice = (TextView) wangGooBean.findViewById(R.id.highestPrice);
+//        TextView lowestPrice = (TextView) wangGooBean.findViewById(R.id.lowestPrice);
+//        TextView closePrice = (TextView) wangGooBean.findViewById(R.id.closePrice);
+//        TextView tradeVolume = (TextView) wangGooBean.findViewById(R.id.tradeVolume);
+//        TextView approachDate = (TextView) strategyView.findViewById(R.id.ApproachDate);
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int screenHeight = displayMetrics.heightPixels;
         image.getLayoutParams().height = screenHeight/4;
 
-        Toolbar toolbar = root.findViewById(R.id.toolBar_wanggoo);
+//        Toolbar toolbar = root.findViewById(R.id.toolBar_wanggoo);
+        Toolbar toolbar = fragmentWanggooBinding.toolBarWanggoo;
         toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_history));//把三個小點換掉
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
         wangGooViewModel.getWangGooBean().observe(getViewLifecycleOwner(), responseWangGooBean -> {
             if(responseWangGooBean != null) {
-                nowPrice.setText(responseWangGooBean.getClose());
-                tradeDate.setText(responseWangGooBean.getTradeDateYYYYMMDDChinese());
-                open.setText(responseWangGooBean.getOpen());
-                highestPrice.setText(responseWangGooBean.getHigh());
-                lowestPrice.setText(responseWangGooBean.getLow());
-                closePrice.setText(responseWangGooBean.getClose());
-                tradeVolume.setText(responseWangGooBean.getVolume());
+                wangGooBean.nowPrice.setText(responseWangGooBean.getClose());
+                wangGooBean.tradeDate.setText(responseWangGooBean.getTradeDateYYYYMMDDChinese());
+                wangGooBean.open.setText(responseWangGooBean.getOpen());
+                wangGooBean.highestPrice.setText(responseWangGooBean.getHigh());
+                wangGooBean.lowestPrice.setText(responseWangGooBean.getLow());
+                wangGooBean.closePrice.setText(responseWangGooBean.getClose());
+                wangGooBean.tradeVolume.setText(responseWangGooBean.getVolume());
             }
         });
 
@@ -104,15 +112,16 @@ public class WangGooFragment extends Fragment {
                 StrategyDataBean strategyDataBean = responseStrategyResultBean.getStrategyDataBean();
                 if(strategyDataBean.isApproach()) { //持有日
                     strategyView.setLayoutResource(R.layout.item_strategy_buy_approach);
-                    View inflated = strategyView.inflate();
-                    TextView ApproachDate = (TextView) inflated.findViewById(R.id.ApproachDate);
-                    TextView EntryPoint = (TextView) inflated.findViewById(R.id.EntryPoint);
-                    TextView ExitBenefitPoint = (TextView) inflated.findViewById(R.id.ExitBenefitPoint);
-                    TextView LastTicketDay = (TextView) inflated.findViewById(R.id.LastTicketDay);
-                    ApproachDate.setText(strategyDataBean.getApproachDate());
-                    EntryPoint.setText(String.valueOf(strategyDataBean.getEntryPoint()));
-                    ExitBenefitPoint.setText(String.valueOf(strategyDataBean.getExitBenefitPoint()));
-                    LastTicketDay.setText(String.valueOf(strategyDataBean.getExpectedSellDate()));
+                    ItemStrategyBuyApproachBinding itemBinding = ItemStrategyBuyApproachBinding.bind(fragmentWanggooBinding.getRoot());
+//                    TextView ApproachDate = (TextView) inflated.findViewById(R.id.ApproachDate);
+//                    TextView EntryPoint = (TextView) inflated.findViewById(R.id.EntryPoint);
+//                    TextView ExitBenefitPoint = (TextView) inflated.findViewById(R.id.ExitBenefitPoint);
+//                    TextView LastTicketDay = (TextView) inflated.findViewById(R.id.LastTicketDay);
+                    itemBinding.ApproachDate.setText(strategyDataBean.getApproachDate());
+                    itemBinding.EntryPoint.setText(String.valueOf(strategyDataBean.getEntryPoint()));
+                    itemBinding.ExitBenefitPoint.setText(String.valueOf(strategyDataBean.getExitBenefitPoint()));
+                    itemBinding.LastTicketDay.setText(String.valueOf(strategyDataBean.getExpectedSellDate()));
+                    strategyView.inflate();
                 }else { //平倉日
                     strategyView.setLayoutResource(R.layout.item_strategy_buy_no_approach);
                     View inflated = strategyView.inflate();
@@ -141,7 +150,7 @@ public class WangGooFragment extends Fragment {
 
         init();
 
-        return root;
+        return fragmentWanggooBinding.getRoot();
     }
 
     private void init() {
