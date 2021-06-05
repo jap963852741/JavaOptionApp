@@ -45,7 +45,6 @@ import com.wang.avi.AVLoadingIndicatorView;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Collections.max;
@@ -55,44 +54,10 @@ public class WangGooFragment extends Fragment {
 
     private String TAG = "WangGooFragment";
     private WangGooViewModel wangGooViewModel;
-    public static final int MSG_UPLOAD_Begin =  1;
-    public static final int MSG_UPLOAD_Finish = 2;
-    public static final int UPDATE_IMAGE = 3;
-
-
-    private static AVLoadingIndicatorView avi;
     private View wangGooBean;
+    private ImageView image;
     private ViewStub strategyView;
-    public static Context strategyutil_context;
-    public static LoadingDialog loadingdialog;
-    public Activity activity;
-    private static ImageView image;
-    public static Bitmap bitmap;
-    public static Canvas canvas;
-    public static DisplayMetrics displayMetrics;
-
-    static class aviHandler extends Handler{
-
-        public aviHandler(Looper looper){
-            super(looper);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_UPLOAD_Begin:
-                    avi.show();
-                    break;
-                case MSG_UPLOAD_Finish:
-                    avi.hide();
-                    break;
-                case UPDATE_IMAGE:
-//                    bitmap();
-                    break;
-            }
-        }
-    }
-
+    private Activity activity;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -104,12 +69,10 @@ public class WangGooFragment extends Fragment {
         Log.i("status","onCreateView");
 
         activity = ((AppCompatActivity) getActivity());
-        strategyutil_context = activity.getApplicationContext();
 //        wangGooViewModel = new ViewModelProvider(this).get(WangGooViewModel.class);
         wangGooViewModel =new ViewModelProvider(this,new WangGooModelFactory(activity)).get(WangGooViewModel.class);
 
         View root = inflater.inflate(R.layout.fragment_wanggoo, container, false);
-//        avi = root.findViewById(R.id.avi);
         image = root.findViewById(R.id.image_wanggoo);
         wangGooBean = root.findViewById(R.id.wangGooBean);
         strategyView = root.findViewById(R.id.strategy);
@@ -121,10 +84,9 @@ public class WangGooFragment extends Fragment {
         TextView lowestPrice = (TextView) wangGooBean.findViewById(R.id.lowestPrice);
         TextView closePrice = (TextView) wangGooBean.findViewById(R.id.closePrice);
         TextView tradeVolume = (TextView) wangGooBean.findViewById(R.id.tradeVolume);
-
         TextView approachDate = (TextView) strategyView.findViewById(R.id.ApproachDate);
 
-        displayMetrics = new DisplayMetrics();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int screenHeight = displayMetrics.heightPixels;
         image.getLayoutParams().height = screenHeight/4;
@@ -132,8 +94,6 @@ public class WangGooFragment extends Fragment {
         Toolbar toolbar = root.findViewById(R.id.toolBar_wanggoo);
         toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_history));//把三個小點換掉
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-
-//        wghu = new WangGooHistoryUtil();
 
         wangGooViewModel.getWangGooBean().observe(getViewLifecycleOwner(), responseWangGooBean -> {
             if(responseWangGooBean != null) {
@@ -181,8 +141,21 @@ public class WangGooFragment extends Fragment {
             }
         });
 
+        wangGooViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            if(isLoading){
+                LoadingDialog.getInstance(getActivity()).show();
+            }else{
+                LoadingDialog.getInstance(getActivity()).hide();
+            }
+        });
+
+        init();
 
         return root;
+    }
+
+    private void init() {
+        wangGooViewModel.wangGooApiGetStrategy();
     }
 
 
@@ -195,9 +168,9 @@ public class WangGooFragment extends Fragment {
     }
 
     public interface ActionBar_Menu_Num{
-        final Integer update_two_year_data = 1;
-        final Integer update_all_year_data = 2;
-        final Integer update_date_data = 3;
+        Integer update_two_year_data = 1;
+        Integer update_all_year_data = 2;
+        Integer update_date_data = 3;
 
     }
 
@@ -207,11 +180,9 @@ public class WangGooFragment extends Fragment {
         switch (item.getItemId()) {
             case 1:
                 wangGooViewModel.wangGooHistoryApiUpdateDb();
-//                wghu.post();
                 break;
             case 2:
-                wangGooViewModel.update_all_history();
-//                wghu.update_all_history();
+                wangGooViewModel.update_all_history(activity);
                 break;
             case 3:
                 LoadingDialog.getInstance(activity).show();
@@ -223,14 +194,13 @@ public class WangGooFragment extends Fragment {
     }
 
 
-    public static Handler mUI_Handler = new aviHandler(Looper.getMainLooper());
 
 
     private static float upsite_y(float y,float max_y,float min_y){
         return max_y-(y-min_y);
     }
 
-    static void bitmap(List<Table_Small_Taiwan_Feature> Hundred_Data){
+    private void bitmap(List<Table_Small_Taiwan_Feature> Hundred_Data){
         float x_size = (float) image.getWidth() / Hundred_Data.size();
         float x_init = (float) image.getWidth() / (Hundred_Data.size()*2);
         float min_y ;
@@ -239,7 +209,7 @@ public class WangGooFragment extends Fragment {
         ArrayList<Float> min_y_list = new ArrayList<Float>();
         ArrayList<Float> max_y_list = new ArrayList<Float>();
 
-        bitmap = Bitmap.createBitmap(image.getWidth(),image.getHeight(),Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(image.getWidth(), image.getHeight(), Bitmap.Config.ARGB_8888);
         Paint paintRed = new Paint();
         paintRed.setColor(Color.RED);
         Paint paintRedWidth = new Paint();
@@ -257,7 +227,7 @@ public class WangGooFragment extends Fragment {
         Paint paintMA10 = new Paint();
         paintMA10.setColor(Color.rgb(255,97,0));
         paintMA10.setStyle(Paint.Style.STROKE);
-        canvas = new Canvas(bitmap);
+        Canvas canvas = new Canvas(bitmap);
         if (Hundred_Data.size() > 0) {
 
             for(Table_Small_Taiwan_Feature Day_Data : Hundred_Data) {
@@ -312,7 +282,6 @@ public class WangGooFragment extends Fragment {
     @Override
     public void onPause() { //solve leak problem
         super.onPause();
-        avi = null;
         image = null;
     }
 }

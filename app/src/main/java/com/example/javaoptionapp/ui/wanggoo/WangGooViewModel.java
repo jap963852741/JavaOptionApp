@@ -1,11 +1,13 @@
 package com.example.javaoptionapp.ui.wanggoo;
 
+import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 
 
 import androidx.annotation.RequiresApi;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -25,15 +27,21 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.BiFunction;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 
@@ -42,70 +50,68 @@ import static java.lang.Thread.sleep;
 
 public class WangGooViewModel extends ViewModel {
 
-    private String TAG = "WangGooViewModel";
-    private MutableLiveData<String> mText;
-    private MutableLiveData<WangGooBean> wangGooBeanMutableLiveData;
-    private MutableLiveData<StrategyResultBean> strategyResultBeanMutableLiveData;
-    private FeatureDatabaseDao fdDao;
-    private Context myContext;
-    private LoadingDialog loadingdialog;
-
-
     public WangGooViewModel(Context context){
         wangGooBeanMutableLiveData = new MutableLiveData<>();
         strategyResultBeanMutableLiveData = new MutableLiveData<>();
+        isLoadingLiveData = new MutableLiveData<>();
         fdDao = FeatureDatabase.getInstance(context).FeatureDatabaseDao();
-        myContext = context;
-        loadingdialog = LoadingDialog.getInstance(context);
-        wangGooApi();
-        wangGooHistoryApiUpdateDb();
-        getStrategy();
     }
 
-    public LiveData<String> getText() {
-        return mText;
-    }
+    private String TAG = "WangGooViewModel";
+    private MutableLiveData<WangGooBean> wangGooBeanMutableLiveData;
+    private MutableLiveData<StrategyResultBean> strategyResultBeanMutableLiveData;
+    private MutableLiveData<Boolean> isLoadingLiveData ;
+    private FeatureDatabaseDao fdDao;
 
     public LiveData<WangGooBean> getWangGooBean() {
         return wangGooBeanMutableLiveData;
     }
     public LiveData<StrategyResultBean> getStrategyResultBean() {return strategyResultBeanMutableLiveData;}
+    public LiveData<Boolean> getIsLoading() {return isLoadingLiveData;}
 
-    public void wangGooApi(){
-        Observer<WangGooBean> observer = new Observer<WangGooBean>(){
+    public void wangGooApiGetStrategy(){
+        isLoadingLiveData.postValue(true);
+        Observable.zip(
+                    new WangGooRepository(new WangGooDataSource()).getWangGooDataSource().getService()
+                                            .WangGooBean().subscribeOn(Schedulers.io()),
+                    new WangGooDataSource().getStrategy(fdDao).subscribeOn(Schedulers.io()),
+                    new BiFunction<WangGooBean,StrategyResultBean,initObject>(){
+                        @Override
+                        public initObject apply(WangGooBean wangGooBean, StrategyResultBean strategyResultBean) throws Throwable {
+                            return new initObject(wangGooBean, strategyResultBean);
+                        }
+                    }
+                ).observeOn(Schedulers.newThread()).subscribe(new Observer<initObject>() {
             @Override
-            public void onSubscribe(@NonNull Disposable d) {
+            public void onSubscribe(Disposable d) {
             }
             @Override
-            public void onNext(@NonNull WangGooBean wangGooBean) {
-                wangGooBeanMutableLiveData.postValue(wangGooBean);
+            public void onNext(initObject initobject) {
+                wangGooBeanMutableLiveData.postValue(initobject.getWangGooBean());
+                strategyResultBeanMutableLiveData.postValue(initobject.getStrategyResultBean());
             }
             @Override
-            public void onError(@NonNull Throwable e) {
-                Log.e(TAG,e.getMessage());
+            public void onError(Throwable e) {
+                isLoadingLiveData.postValue(false);
+                Log.e(TAG + "wangGooApiGetStrategy",e.toString());
             }
-
             @Override
             public void onComplete() {
+                isLoadingLiveData.postValue(false);
             }
-        };
-        new WangGooRepository(new WangGooDataSource()).getWangGooDataSource().getService()
-                .WangGooBean()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(Schedulers.io())
-                .subscribe(observer);
+        });
     }
 
     public void wangGooHistoryApiUpdateDb(){
-        loadingdialog.show();
+        isLoadingLiveData.postValue(true);
         Observer<List<WangGooBean>> observer = new Observer<List<WangGooBean>>(){
             @Override
             public void onSubscribe(@NonNull Disposable d) {
             }
             @Override
             public void onNext(@NonNull List<WangGooBean> wangGooBeanList) {
-                ArrayList need_to_update_list = new ArrayList();
-                ArrayList need_to_insert_list = new ArrayList();
+                ArrayList<Table_Small_Taiwan_Feature> need_to_update_list = new ArrayList<>();
+                ArrayList<Table_Small_Taiwan_Feature> need_to_insert_list = new ArrayList<>();
                 for (WangGooBean wangGooBean : wangGooBeanList) {
                     Table_Small_Taiwan_Feature dstf = new Table_Small_Taiwan_Feature(
                             wangGooBean.getTimeYYYYMMDD(),
@@ -124,10 +130,10 @@ public class WangGooViewModel extends ViewModel {
                     }
                 }
                 //如果資料太多 array 內存會爆  >>就要一筆一筆update
-                if (need_to_update_list != null) {
+                if (need_to_update_list.size() > 0) {
                     fdDao.updateAllTable_Small_Taiwan_Feature(need_to_update_list);
                 }
-                if (need_to_insert_list != null) {
+                if (need_to_insert_list.size() > 0) {
                     fdDao.insertAllTable_Small_Taiwan_Feature(need_to_insert_list);
                 }
 
@@ -139,20 +145,20 @@ public class WangGooViewModel extends ViewModel {
                 fdDao.update_ALL_before_5_days_average(fdDao.get_ma5_begin_date());
 
                 java.util.Date today = new java.util.Date(System.currentTimeMillis());
-                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
                 String day = format.format(today);
                 fdDao.Delete_after_day(day);
 
             }
             @Override
             public void onError(@NonNull Throwable e) {
-                loadingdialog.dismiss();
-                Log.e(TAG,e.getMessage());
+                isLoadingLiveData.postValue(false);
+                Log.e(TAG,e.toString());
             }
 
             @Override
             public void onComplete() {
-                loadingdialog.dismiss();
+                isLoadingLiveData.postValue(false);
             }
         };
         new WangGooRepository(new WangGooDataSource()).getWangGooDataSource().getHistoryService()
@@ -162,43 +168,17 @@ public class WangGooViewModel extends ViewModel {
                 .subscribe(observer);
     }
 
-    public void getStrategy(){
-        Observer<StrategyResultBean> observer = new Observer<StrategyResultBean>(){
-            @Override
-            public void onSubscribe(@NonNull Disposable d) {
-            }
-            @Override
-            public void onNext(@NonNull StrategyResultBean s) {
-                strategyResultBeanMutableLiveData.postValue(s);
-                Log.e(TAG,s.toString());
-            }
-            @Override
-            public void onError(@NonNull Throwable e) {
-                Log.e(TAG,e.getMessage());
-            }
-
-            @Override
-            public void onComplete() {
-            }
-        };
-        new WangGooDataSource().getStrategy(fdDao)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(Schedulers.io())
-                .subscribe(observer);
-    }
-
-    public void update_all_history(){
-        loadingdialog.show();
+    public void update_all_history(Context context){
+        isLoadingLiveData.postValue(true);
         Thread thread = new Thread(new Runnable(){
             @Override
             public void run() {
-                InputStream inputStream = myContext.getResources().openRawResource(R.raw.all_data);
+                InputStream inputStream = context.getResources().openRawResource(R.raw.all_data);
                 HashMap<String, HashMap<String,String>> hashmap_time_data_all = new HashMap<String, HashMap<String,String>>();
 
                 try {
                     InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "gbk");
                     BufferedReader reader = new BufferedReader(inputStreamReader);
-                    StringBuffer sb = new StringBuffer("");
                     String result;
                     while ((result = reader.readLine()) != null) {
 //              資料轉換
@@ -213,7 +193,7 @@ public class WangGooViewModel extends ViewModel {
                             if(final_list[0].equals("time")){
                                 long millisecond = Long.parseLong(final_list[1]);
                                 Date date = new Date(millisecond);
-                                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+                                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
                                 temp_time = format.format(date);
                             }else{
                                 temp_map.put(final_list[0],final_list[1]);
@@ -271,8 +251,26 @@ public class WangGooViewModel extends ViewModel {
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         String day = format.format(today);
         fdDao.Delete_after_day(day);
-        loadingdialog.dismiss();
+        isLoadingLiveData.postValue(false);
 
+    }
+
+    static class initObject{
+        private WangGooBean wangGooBean;
+        private StrategyResultBean strategyResultBean;
+
+        public initObject(WangGooBean wangGooBean, StrategyResultBean strategyResultBean) {
+            this.wangGooBean = wangGooBean;
+            this.strategyResultBean = strategyResultBean;
+        }
+
+        public WangGooBean getWangGooBean() {
+            return wangGooBean;
+        }
+
+        public StrategyResultBean getStrategyResultBean() {
+            return strategyResultBean;
+        }
     }
 
 }

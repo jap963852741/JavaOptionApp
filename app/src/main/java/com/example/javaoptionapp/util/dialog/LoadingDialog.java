@@ -1,5 +1,6 @@
 package com.example.javaoptionapp.util.dialog;
 
+import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -51,4 +52,13 @@ public class LoadingDialog extends Dialog {
         linearLayout.getBackground().setAlpha(210);
     }
 
+    @Override
+    public void hide() {
+        try {
+            Thread.sleep(100);//延遲0.1秒再關閉 (使用者體驗)
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        super.hide();
+    }
 }

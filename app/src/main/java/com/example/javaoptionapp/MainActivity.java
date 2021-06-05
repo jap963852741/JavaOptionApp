@@ -1,25 +1,15 @@
 package com.example.javaoptionapp;
 
-
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
-
-//import com.example.javaoptionapp.util.AppBlockCanaryContext;
-//import com.github.moduth.blockcanary.BlockCanary;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import java.lang.reflect.Field;
-
 public class MainActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,13 +25,10 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupWithNavController(navView, navController);
 //        BlockCanary.install(this, new AppBlockCanaryContext()).start();
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-
     }
 }
