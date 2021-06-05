@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.javaoptionapp.R;
 import com.example.javaoptionapp.Repository.bean.CMoney.CMoneyBean;
+import com.example.javaoptionapp.ui.common.ViewModelFactory;
 import com.hdl.calendardialog.CalendarView;
 import com.hdl.calendardialog.CalendarViewDialog;
 
@@ -50,7 +51,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
 
     public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
 //        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-        homeViewModel = new ViewModelProvider(this, new HomeViewModelFactory()).get(HomeViewModel.class);
+        homeViewModel = new ViewModelProvider(this, new ViewModelFactory()).get(HomeViewModel.class);
 
         final View root = inflater.inflate(R.layout.fragment_home, container, false);
         final RecyclerView recyclerView =  root.findViewById(R.id.re_view);

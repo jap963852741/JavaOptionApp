@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.javaoptionapp.R;
 import com.example.javaoptionapp.Repository.bean.option.YahooOptionBean;
+import com.example.javaoptionapp.ui.common.ViewModelFactory;
+
 import java.util.ArrayList;
 
 public class OptionFragment extends Fragment implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
@@ -30,7 +32,7 @@ public class OptionFragment extends Fragment implements View.OnClickListener, Po
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        optionViewModel =new ViewModelProvider(this,new OptionViewModelFactory()).get(OptionViewModel.class);
+        optionViewModel =new ViewModelProvider(this,new ViewModelFactory()).get(OptionViewModel.class);
 
 
         View root = inflater.inflate(R.layout.fragment_option, container, false);

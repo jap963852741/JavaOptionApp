@@ -1,16 +1,12 @@
 package com.example.javaoptionapp.ui.wanggoo;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,20 +24,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.javaoptionapp.R;
 import com.example.javaoptionapp.Repository.bean.wangGoo.StrategyDataBean;
-import com.example.javaoptionapp.Repository.bean.wangGoo.WangGooBean;
-import com.example.javaoptionapp.ui.Option.OptionViewModel;
-import com.example.javaoptionapp.ui.Option.OptionViewModelFactory;
+import com.example.javaoptionapp.ui.common.ViewModelFactory;
 import com.example.javaoptionapp.util.dialog.LoadingDialog;
 import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
 import com.example.taiwanworkdaylib.APIUtil;
-import com.wang.avi.AVLoadingIndicatorView;
 
 
 import java.util.ArrayList;
@@ -70,7 +60,7 @@ public class WangGooFragment extends Fragment {
 
         activity = ((AppCompatActivity) getActivity());
 //        wangGooViewModel = new ViewModelProvider(this).get(WangGooViewModel.class);
-        wangGooViewModel =new ViewModelProvider(this,new WangGooModelFactory(activity)).get(WangGooViewModel.class);
+        wangGooViewModel =new ViewModelProvider(this,new ViewModelFactory(activity)).get(WangGooViewModel.class);
 
         View root = inflater.inflate(R.layout.fragment_wanggoo, container, false);
         image = root.findViewById(R.id.image_wanggoo);
