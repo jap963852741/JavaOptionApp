@@ -84,10 +84,7 @@ public class WangGooDataSource implements FeatureDatabaseDao {
         Observable<StrategyResultBean> myObservable = Observable.create(subscriber -> {
             featureDatabaseDao = fdDao;
             StrategyResultBean strategyResultBean = new StrategyResultBean();
-//        WangGooFragment.mUI_Handler.sendEmptyMessage(WangGooFragment.MSG_UPLOAD_Begin);
-//        WangGooFragment.mUI_Handler.sendEmptyMessage(WangGooFragment.MSG_UPLOAD_Finish);
             HolidayUtil holidayutil = new HolidayUtil();
-
             String need_to_add = "";
             boolean Approach;
             Float Entry_Point = null , Exit_Point = null, Exit_Benifit_Point = null ,Exit_Damage_Point = null;

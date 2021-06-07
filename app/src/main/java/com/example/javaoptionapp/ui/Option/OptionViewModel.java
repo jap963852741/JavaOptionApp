@@ -46,6 +46,7 @@ public class OptionViewModel extends ViewModel {
         return mOption_Month;
     }
     public void yahooOptionApi(String month){
+        Log.e(TAG,"yahooOptionApi ---> " + month);
         Observer<ResponseBody> observer = new Observer<ResponseBody>(){
             @Override
             public void onSubscribe(@NonNull Disposable d) {
@@ -76,6 +77,7 @@ public class OptionViewModel extends ViewModel {
     }
 
     public void responseToListYahooOptionBean(String response){
+        Log.e(TAG,response);
         final Integer Buy_price = 1;
         final Integer Sell_price = 2;
         final Integer Deal_price = 3;

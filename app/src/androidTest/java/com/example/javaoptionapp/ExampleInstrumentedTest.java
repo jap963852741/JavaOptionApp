@@ -126,7 +126,7 @@ public class ExampleInstrumentedTest {
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "gbk");
             BufferedReader reader = new BufferedReader(inputStreamReader);
             String result;
-
+            ArrayMap<String, String> temp_map = new ArrayMap<>();
             int i = 0;
 
             while ((result = reader.readLine()) != null) {
@@ -137,66 +137,61 @@ public class ExampleInstrumentedTest {
                         .replace(" ","").replace("'","")
                         .replace("'","");
                 String[] temp_list = result.split(",");
-                ArrayMap<String, String> temp_map = new ArrayMap<String, String>();
+
+                if(!temp_map.isEmpty()) {
+                    temp_map.clear();
+                }
                 for (String bb : temp_list){
                     String[] final_list = bb.split(":");
                     temp_map.put(final_list[0],final_list[1]);
                 }
 
-                hashmap_time_data.put(i,temp_map);
-
-                temp_map = null;
+                Table_Option table_option = new Table_Option(
+                        temp_map.get("Date"),
+                        temp_map.get("Maturity"),
+                        temp_map.get("Strike_price"),
+                        temp_map.get("CallPut"),
+                        Float.parseFloat(temp_map.get("close")),
+                        Integer.parseInt(temp_map.get("Day_To_Finish")));
+                Table_Option the_date_information = fdDao.get_option_data(temp_map.get("Date"),
+                        temp_map.get("Maturity"),
+                        temp_map.get("Strike_price"),
+                        temp_map.get("CallPut"));
+//           沒有的才 insert
+                if (the_date_information == null) {
+                    fdDao.insert_option(table_option);
+                }
                 i+=1;
             }
         } catch (Exception e1) {
             e1.printStackTrace();
             System.out.println(e1.toString());
         }
-        System.out.println("------進入迴圈------");
-
-        for (int key : hashmap_time_data.keySet()) {
-            ArrayMap<String,String> temp_data = hashmap_time_data.get(key);
-            Table_Option table_option = new Table_Option(
-                    temp_data.get("Date"),
-                    temp_data.get("Maturity"),
-                    temp_data.get("Strike_price"),
-                    temp_data.get("CallPut"),
-                    Float.parseFloat(temp_data.get("close")),
-                    Integer.parseInt(temp_data.get("Day_To_Finish")));
-            Table_Option the_date_information = fdDao.get_option_data(temp_data.get("Date"),temp_data.get("Maturity"),temp_data.get("Strike_price"),temp_data.get("CallPut"));
-//           沒有的才 insert
-            if (the_date_information == null) {
-                fdDao.insert_option(table_option);
-            }
-        }
-        System.out.println("------離開迴圈------");
         fdb.close();
     }
+
+
+    /**
+     * MA 5 日線計算 單元測試
+     * MA 10 日線計算 單元測試
+     * MA 15 日線計算 單元測試
+     *當天收盤價也會計算在內
+     * */
     @Test
     public void room_test(){
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         FeatureDatabaseDao fdDao;
         FeatureDatabase fdb = Room.databaseBuilder(appContext, FeatureDatabase.class, "database-name").build();
         fdDao = fdb.FeatureDatabaseDao();
-        /**
-        * 寫入及更新 DateIndexTable 的方法
-        * [time:1600963200000, tradeDate:1600963200000, open:12168.00000, high:12234.00000, low:12157.00000, close:12206.00000, volume:9865, millionAmount:0.00]
-        * */
 
-        /**
-         * MA 5 日線計算 單元測試
-         * MA 10 日線計算 單元測試
-         * MA 15 日線計算 單元測試
-         *當天收盤價也會計算在內
-         * */
-        Log.e("213",fdDao.get_10_data_fromnow().toString());
+//        格式 : [time:1600963200000, tradeDate:1600963200000, open:12168.00000, high:12234.00000, low:12157.00000, close:12206.00000, volume:9865, millionAmount:0.00]
+
         fdDao.update_ALL_ma5(fdDao.get_ma5_begin_date());
         fdDao.update_ALL_ma10(fdDao.get_ma10_begin_date());
         fdDao.update_ALL_ma15(fdDao.get_ma15_begin_date());
         fdDao.update_ALL_ma30(fdDao.get_ma30_begin_date());
         fdDao.update_ALL_bias5(fdDao.get_ma5_begin_date());
         fdDao.update_ALL_before_5_days_average(fdDao.get_ma5_begin_date());
-
     }
 
 
