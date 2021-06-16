@@ -24,13 +24,14 @@ public class HomeViewModel extends ViewModel{
      * BA1-23693a 大盤官股
      * */
     public String item_schma = "BA1-23689a";
-    private static ArrayList Market_Date;//全域
-    private static int date_index;
-    private static CMoneyRepository cMoneyRepository;
+    private ArrayList<String> Market_Date;//全域
+    private int date_index;
+    private CMoneyRepository cMoneyRepository;
 
     public static MutableLiveData<String>  mText;
     public static MutableLiveData<CMoneyBean>  cMoneyBeanMutableLiveData;
-    public static MutableLiveData<ArrayList>  MarketDateMutableLiveData;
+    public static MutableLiveData<ArrayList<String>>  MarketDateMutableLiveData;
+    public static MutableLiveData<Boolean>  isLoadingLiveData;
 
 
 
@@ -38,12 +39,14 @@ public class HomeViewModel extends ViewModel{
         mText = new MutableLiveData<>();
         cMoneyBeanMutableLiveData = new MutableLiveData<>();
         MarketDateMutableLiveData = new MutableLiveData<>();
+        isLoadingLiveData = new MutableLiveData<>();
         cMoneyRepository = homeCMoneyRepository;
         Log.i("Now","HomeViewModel()");
     }
 
 
     public void CMoneyTokenApi(){
+        isLoadingLiveData.postValue(true);
         Observer<CMoneyTokenResponse> observer = new Observer<CMoneyTokenResponse>(){
             @Override
             public void onSubscribe(@NonNull Disposable d) {
@@ -57,11 +60,14 @@ public class HomeViewModel extends ViewModel{
 
             @Override
             public void onError(@NonNull Throwable e) {
-                Log.e(TAG,e.getMessage());
+                isLoadingLiveData.postValue(false);
+                Log.e(TAG,e.toString());
             }
 
             @Override
             public void onComplete() {
+                isLoadingLiveData.postValue(false);
+
             }
         };
         cMoneyRepository.getcMoneyDataSource().getService()
@@ -96,11 +102,13 @@ public class HomeViewModel extends ViewModel{
             }
             @Override
             public void onError(@NonNull Throwable e) {
-                Log.e(TAG,e.getMessage());
+                isLoadingLiveData.postValue(false);
+                Log.e(TAG,e.toString());
             }
 
             @Override
             public void onComplete() {
+                isLoadingLiveData.postValue(false);
             }
         };
         cMoneyRepository.getcMoneyDataSource().getService()
@@ -124,11 +132,15 @@ public class HomeViewModel extends ViewModel{
         return cMoneyBeanMutableLiveData;
     }
 
-    public LiveData<ArrayList> getMarket_Date(){
+    public LiveData<ArrayList<String>> getMarket_Date(){
         return MarketDateMutableLiveData;
     }
 
     public LiveData<String> getText() {
         return mText;
+    }
+
+    public static MutableLiveData<Boolean> getIsLoadingLiveData() {
+        return isLoadingLiveData;
     }
 }

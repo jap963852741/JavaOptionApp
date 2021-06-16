@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.javaoptionapp.R;
 import com.example.javaoptionapp.Repository.bean.CMoney.CMoneyBean;
 import com.example.javaoptionapp.ui.common.ViewModelFactory;
+import com.example.javaoptionapp.util.dialog.LoadingDialog;
 import com.hdl.calendardialog.CalendarView;
 import com.hdl.calendardialog.CalendarViewDialog;
 
@@ -67,6 +68,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
             homeAdapterNew = new HomeAdapterNew(cMoneyBean,container);
             recyclerView.setAdapter(homeAdapterNew);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
+        });
+
+        homeViewModel.getIsLoadingLiveData().observe(getViewLifecycleOwner(), isLoading -> {
+            if(isLoading){
+                LoadingDialog.getInstance(getActivity()).show();
+            }else{
+                LoadingDialog.getInstance(getActivity()).hide();
+            }
         });
 
 
