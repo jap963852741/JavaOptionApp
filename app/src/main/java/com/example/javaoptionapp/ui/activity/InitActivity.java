@@ -38,8 +38,9 @@ public class InitActivity extends AppCompatActivity {
 
         wangGooViewModel.getLoadingBarPercentLiveData().observe(this, loadingBarPercent -> {
             if(loadingBarPercent < 1f) {
+                String percent = String.format(Locale.getDefault() ,"%.0f",loadingBarPercent*100) + " %";
                 binding.loadingBar.setSmoothPercent(loadingBarPercent);
-                binding.tvLoadingBar.setText(String.format(Locale.getDefault() ,"%f",loadingBarPercent));
+                binding.tvLoadingBar.setText(percent);
             }else {
                 // 创建需要启动的Activity对应的Intent
                 Intent intent = new Intent(this,MainActivity.class);
