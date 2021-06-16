@@ -60,21 +60,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Popu
         Toolbar toolbar = root.findViewById(R.id.toolBar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
-        homeViewModel.getMarket_Date().observe(getViewLifecycleOwner(), new Observer<ArrayList>() {
-            @Override
-            public void onChanged(@Nullable ArrayList arrayList) {
-                Market_Date = arrayList;
-            }
-        });
+        homeViewModel.getMarket_Date().observe(getViewLifecycleOwner(), arrayList -> Market_Date = arrayList);
 
 
-        homeViewModel.getCMoneyBean().observe(getViewLifecycleOwner(), new Observer<CMoneyBean>() {
-            @Override
-            public void onChanged(@Nullable CMoneyBean cMoneyBean) {
-                homeAdapterNew = new HomeAdapterNew(cMoneyBean,container);
-                recyclerView.setAdapter(homeAdapterNew);
-                recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
-            }
+        homeViewModel.getCMoneyBean().observe(getViewLifecycleOwner(), cMoneyBean -> {
+            homeAdapterNew = new HomeAdapterNew(cMoneyBean,container);
+            recyclerView.setAdapter(homeAdapterNew);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
         });
 
 

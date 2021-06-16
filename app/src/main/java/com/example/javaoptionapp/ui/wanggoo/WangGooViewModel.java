@@ -3,7 +3,9 @@ package com.example.javaoptionapp.ui.wanggoo;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
+import android.util.ArrayMap;
 import android.util.Log;
+import android.widget.Toast;
 
 
 import androidx.annotation.RequiresApi;
@@ -50,17 +52,12 @@ import static java.lang.Thread.sleep;
 
 public class WangGooViewModel extends ViewModel {
 
-    public WangGooViewModel(Context context){
-        wangGooBeanMutableLiveData = new MutableLiveData<>();
-        strategyResultBeanMutableLiveData = new MutableLiveData<>();
-        isLoadingLiveData = new MutableLiveData<>();
-        fdDao = FeatureDatabase.getInstance(context).FeatureDatabaseDao();
-    }
-
+    private Toast errToast;
     private String TAG = "WangGooViewModel";
     private MutableLiveData<WangGooBean> wangGooBeanMutableLiveData;
     private MutableLiveData<StrategyResultBean> strategyResultBeanMutableLiveData;
     private MutableLiveData<Boolean> isLoadingLiveData ;
+    private MutableLiveData<Float> loadingBarPercentLiveData ;
     private FeatureDatabaseDao fdDao;
 
     public LiveData<WangGooBean> getWangGooBean() {
@@ -68,6 +65,18 @@ public class WangGooViewModel extends ViewModel {
     }
     public LiveData<StrategyResultBean> getStrategyResultBean() {return strategyResultBeanMutableLiveData;}
     public LiveData<Boolean> getIsLoading() {return isLoadingLiveData;}
+    public LiveData<Float> getLoadingBarPercentLiveData() {
+        return loadingBarPercentLiveData;
+    }
+
+    public WangGooViewModel(Context context){
+        errToast = Toast.makeText(context, "LOADING FAIL" , Toast.LENGTH_LONG);
+        wangGooBeanMutableLiveData = new MutableLiveData<>();
+        strategyResultBeanMutableLiveData = new MutableLiveData<>();
+        isLoadingLiveData = new MutableLiveData<>();
+        loadingBarPercentLiveData = new MutableLiveData<>();
+        fdDao = FeatureDatabase.getInstance(context).FeatureDatabaseDao();
+    }
 
     public void wangGooApiGetStrategy(){
         isLoadingLiveData.postValue(true);
@@ -75,12 +84,13 @@ public class WangGooViewModel extends ViewModel {
                     new WangGooRepository(new WangGooDataSource()).getWangGooDataSource().getService()
                                             .WangGooBean().subscribeOn(Schedulers.io()),
                     new WangGooDataSource().getStrategy(fdDao).subscribeOn(Schedulers.io()),
-                    new BiFunction<WangGooBean,StrategyResultBean,initObject>(){
-                        @Override
-                        public initObject apply(WangGooBean wangGooBean, StrategyResultBean strategyResultBean) throws Throwable {
-                            return new initObject(wangGooBean, strategyResultBean);
-                        }
-                    }
+                    initObject::new
+//                    new BiFunction<WangGooBean,StrategyResultBean,initObject>(){
+//                        @Override
+//                        public initObject apply(WangGooBean wangGooBean, StrategyResultBean strategyResultBean) throws Throwable {
+//                            return new initObject(wangGooBean, strategyResultBean);
+//                        }
+//                    }
                 ).observeOn(Schedulers.newThread()).subscribe(new Observer<initObject>() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -104,12 +114,14 @@ public class WangGooViewModel extends ViewModel {
 
     public void wangGooHistoryApiUpdateDb(){
         isLoadingLiveData.postValue(true);
+        loadingBarPercentLiveData.postValue(0.2f);
         Observer<List<WangGooBean>> observer = new Observer<List<WangGooBean>>(){
             @Override
             public void onSubscribe(@NonNull Disposable d) {
             }
             @Override
             public void onNext(@NonNull List<WangGooBean> wangGooBeanList) {
+                loadingBarPercentLiveData.postValue(0.3f);
                 ArrayList<Table_Small_Taiwan_Feature> need_to_update_list = new ArrayList<>();
                 ArrayList<Table_Small_Taiwan_Feature> need_to_insert_list = new ArrayList<>();
                 for (WangGooBean wangGooBean : wangGooBeanList) {
@@ -125,10 +137,11 @@ public class WangGooViewModel extends ViewModel {
 //           沒有的才 insert
                     if (the_date_information != null){
                         need_to_update_list.add(dstf);
-                    }else {
+                    }else{
                         need_to_insert_list.add(dstf);
                     }
                 }
+                loadingBarPercentLiveData.postValue(0.5f);
                 //如果資料太多 array 內存會爆  >>就要一筆一筆update
                 if (need_to_update_list.size() > 0) {
                     fdDao.updateAllTable_Small_Taiwan_Feature(need_to_update_list);
@@ -136,7 +149,7 @@ public class WangGooViewModel extends ViewModel {
                 if (need_to_insert_list.size() > 0) {
                     fdDao.insertAllTable_Small_Taiwan_Feature(need_to_insert_list);
                 }
-
+                loadingBarPercentLiveData.postValue(0.8f);
                 fdDao.update_ALL_ma5(fdDao.get_ma5_begin_date());
                 fdDao.update_ALL_ma10(fdDao.get_ma10_begin_date());
                 fdDao.update_ALL_ma15(fdDao.get_ma15_begin_date());
@@ -144,15 +157,17 @@ public class WangGooViewModel extends ViewModel {
                 fdDao.update_ALL_bias5(fdDao.get_ma5_begin_date());
                 fdDao.update_ALL_before_5_days_average(fdDao.get_ma5_begin_date());
 
+                loadingBarPercentLiveData.postValue(0.99f);
                 java.util.Date today = new java.util.Date(System.currentTimeMillis());
                 SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
                 String day = format.format(today);
                 fdDao.Delete_after_day(day);
-
+                loadingBarPercentLiveData.postValue(1f);
             }
             @Override
             public void onError(@NonNull Throwable e) {
                 isLoadingLiveData.postValue(false);
+                errToast.show();
                 Log.e(TAG,e.toString());
             }
 
@@ -170,52 +185,49 @@ public class WangGooViewModel extends ViewModel {
 
     public void update_all_history(Context context){
         isLoadingLiveData.postValue(true);
-        Thread thread = new Thread(new Runnable(){
-            @Override
-            public void run() {
-                InputStream inputStream = context.getResources().openRawResource(R.raw.all_data);
-                HashMap<String, HashMap<String,String>> hashmap_time_data_all = new HashMap<String, HashMap<String,String>>();
+        Thread thread = new Thread(() -> {
+            InputStream inputStream = context.getResources().openRawResource(R.raw.all_data);
+            ArrayMap<String, ArrayMap<String,String>> hashmap_time_data_all = new ArrayMap<String, ArrayMap<String,String>>();
 
-                try {
-                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "gbk");
-                    BufferedReader reader = new BufferedReader(inputStreamReader);
-                    String result;
-                    while ((result = reader.readLine()) != null) {
+            try {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "gbk");
+                BufferedReader reader = new BufferedReader(inputStreamReader);
+                String result;
+                while ((result = reader.readLine()) != null) {
 //              資料轉換
-                        result = result.replace("[","").replace("]","").replace(" ","");
-                        result = result.replace("'","");
-                        String[] temp_list = result.split(",");
+                    result = result.replace("[","").replace("]","").replace(" ","");
+                    result = result.replace("'","");
+                    String[] temp_list = result.split(",");
 
-                        HashMap<String, String> temp_map = new HashMap<String, String>();
-                        String temp_time = "";
-                        for (String bb : temp_list){
-                            String[] final_list = bb.split(":");
-                            if(final_list[0].equals("time")){
-                                long millisecond = Long.parseLong(final_list[1]);
-                                Date date = new Date(millisecond);
-                                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
-                                temp_time = format.format(date);
-                            }else{
-                                temp_map.put(final_list[0],final_list[1]);
-                            }
+                    ArrayMap<String, String> temp_map = new ArrayMap<String, String>();
+                    String temp_time = "";
+                    for (String bb : temp_list){
+                        String[] final_list = bb.split(":");
+                        if(final_list[0].equals("time")){
+                            long millisecond = Long.parseLong(final_list[1]);
+                            Date date = new Date(millisecond);
+                            SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+                            temp_time = format.format(date);
+                        }else{
+                            temp_map.put(final_list[0],final_list[1]);
                         }
-                        hashmap_time_data_all.put(temp_time,temp_map);
                     }
-                    System.out.println(hashmap_time_data_all);
-                } catch (Exception e1) {
-                    e1.printStackTrace();
+                    hashmap_time_data_all.put(temp_time,temp_map);
                 }
-                update_db(hashmap_time_data_all);
+                System.out.println(hashmap_time_data_all);
+            } catch (Exception e1) {
+                e1.printStackTrace();
             }
+            update_db(hashmap_time_data_all);
         });
         thread.start();
     }
 
-    public void update_db(HashMap<String, HashMap<String,String>> hashmap_time_data){
-        ArrayList need_to_update_list = new ArrayList();
-        ArrayList need_to_insert_list = new ArrayList();
+    public void update_db(ArrayMap<String, ArrayMap<String,String>> hashmap_time_data){
+        ArrayList<Table_Small_Taiwan_Feature> need_to_update_list = new ArrayList<>();
+        ArrayList<Table_Small_Taiwan_Feature> need_to_insert_list = new ArrayList<>();
         for (String key : hashmap_time_data.keySet()) {
-            HashMap<String,String> temp_data = hashmap_time_data.get(key);
+            ArrayMap<String,String> temp_data = hashmap_time_data.get(key);
             String date = key;
             System.out.println(date +" " +temp_data.toString());
             Table_Small_Taiwan_Feature dstf = new Table_Small_Taiwan_Feature(date,

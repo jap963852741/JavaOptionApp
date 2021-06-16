@@ -1,8 +1,9 @@
-package com.example.javaoptionapp;
+package com.example.javaoptionapp.ui.activity;
 
 import android.os.Bundle;
 import android.view.View;
 
+import com.example.javaoptionapp.R;
 import com.example.javaoptionapp.ui.common.ViewModelFactory;
 import com.example.javaoptionapp.ui.wanggoo.WangGooViewModel;
 import com.example.javaoptionapp.util.dialog.LoadingDialog;
@@ -32,14 +33,6 @@ public class MainActivity extends AppCompatActivity {
                 R.id.navigation_home,  R.id.navigation_dashboard).build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupWithNavController(navView, navController);
-
-        wangGooViewModel.getIsLoading().observe(this, isLoading -> {
-            if(isLoading){
-                LoadingDialog.getInstance(this).show();
-            }else{
-                LoadingDialog.getInstance(this).hide();
-            }
-        });
 
         init();
 //        BlockCanary.install(this, new AppBlockCanaryContext()).start();

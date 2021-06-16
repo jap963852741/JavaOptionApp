@@ -32,12 +32,7 @@ public class HomeViewModel extends ViewModel{
     public static MutableLiveData<CMoneyBean>  cMoneyBeanMutableLiveData;
     public static MutableLiveData<ArrayList>  MarketDateMutableLiveData;
 
-    public HomeViewModel() {
-        mText = new MutableLiveData<>();
-        cMoneyBeanMutableLiveData = new MutableLiveData<>();
-        MarketDateMutableLiveData = new MutableLiveData<>();
-        Log.i("Now","HomeViewModel()");
-    }
+
 
     public HomeViewModel(CMoneyRepository homeCMoneyRepository) {
         mText = new MutableLiveData<>();
