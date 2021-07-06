@@ -1,12 +1,16 @@
 package com.example.javaoptionapp.ui.wanggoo;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Application;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +41,7 @@ import com.example.javaoptionapp.ui.common.ViewModelFactory;
 import com.example.javaoptionapp.util.dialog.LoadingDialog;
 import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
 import com.example.taiwanworkdaylib.APIUtil;
+import com.example.taiwanworkdaylib.ApiResponse;
 
 
 import java.util.ArrayList;
@@ -52,6 +58,8 @@ public class WangGooFragment extends Fragment {
     private ImageView image;
     private ViewStub strategyView;
     private Activity activity;
+    private final int SHOW = 0;
+    private final int HIDE = 1;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,6 +98,7 @@ public class WangGooFragment extends Fragment {
         });
 
         wangGooViewModel.getStrategyResultBean().observe(getViewLifecycleOwner(), responseStrategyResultBean -> {
+            if(responseStrategyResultBean.getHundred_Data() == null) return;
             bitmap(responseStrategyResultBean.getHundred_Data());
             Log.e(TAG,responseStrategyResultBean.getHundred_Data().toString());
             if(responseStrategyResultBean.isBuyOrNot()) { //買進
@@ -119,10 +128,14 @@ public class WangGooFragment extends Fragment {
 
         wangGooViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
             if(isLoading){
-                LoadingDialog.getInstance(getActivity()).show();
+                LoadingDialog.getInstance(getActivity().getApplicationContext()).show();
             }else{
-                LoadingDialog.getInstance(getActivity()).hide();
+                LoadingDialog.getInstance(getActivity().getApplicationContext()).hide();
             }
+        });
+
+        wangGooViewModel.getShowToast().observe(getViewLifecycleOwner(),toastContent ->{
+            Toast.makeText(getContext(),toastContent,Toast.LENGTH_SHORT).show();
         });
 
         init();
@@ -143,6 +156,8 @@ public class WangGooFragment extends Fragment {
         menu.add(Menu.NONE, WangGooFragment.ActionBar_Menu_Num.update_date_data, Menu.NONE, R.string.update_date_data);
     }
 
+
+
     public interface ActionBar_Menu_Num{
         Integer update_two_year_data = 1;
         Integer update_all_year_data = 2;
@@ -161,9 +176,7 @@ public class WangGooFragment extends Fragment {
                 wangGooViewModel.update_all_history(activity);
                 break;
             case 3:
-                LoadingDialog.getInstance(activity).show();
-                new APIUtil().update();
-                LoadingDialog.getInstance(activity).hide();
+                wangGooViewModel.updateDate();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -260,4 +273,6 @@ public class WangGooFragment extends Fragment {
         super.onPause();
         image = null;
     }
+
+
 }

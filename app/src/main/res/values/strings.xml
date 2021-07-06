@@ -34,6 +34,7 @@
     <string name="ExitBenefitPointText">停利點數&#160;:&#160;</string>
     <string name="LastTicketDayText">最後平倉日&#160;:&#160;</string>
     <string name="warningText">\n高點超過停利點&#160;收盤平倉</string>
+    <string name="updateSuccess">更新成功</string>
 
 
 </resources>

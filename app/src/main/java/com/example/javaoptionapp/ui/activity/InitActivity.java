@@ -1,6 +1,8 @@
 package com.example.javaoptionapp.ui.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 
@@ -15,6 +17,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.Locale;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -62,6 +65,18 @@ public class InitActivity extends AppCompatActivity {
     }
 
     private void init(){
+        // Android6.0 就是API 23之后。APP需要动态获取权限。
+        //java.io.FileNotFoundException: ./sdcard/data/data.txt (Permission denied)
+        final int EXTERNAL_STORAGE_REQ_CODE = 10 ;
+
+        int permission = ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // 请求权限
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},EXTERNAL_STORAGE_REQ_CODE);
+        }
+
         wangGooViewModel.wangGooHistoryApiUpdateDb();
     }
 }

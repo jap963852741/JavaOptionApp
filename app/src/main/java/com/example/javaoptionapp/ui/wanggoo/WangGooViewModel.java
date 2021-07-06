@@ -3,6 +3,7 @@ package com.example.javaoptionapp.ui.wanggoo;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
+import android.os.Message;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.Toast;
@@ -24,6 +25,8 @@ import com.example.javaoptionapp.room.FeatureDatabase;
 import com.example.javaoptionapp.room.FeatureDatabaseDao;
 import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
 import com.example.javaoptionapp.util.dialog.LoadingDialog;
+import com.example.taiwanworkdaylib.APIUtil;
+import com.example.taiwanworkdaylib.ApiResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -52,12 +55,12 @@ import static java.lang.Thread.sleep;
 
 public class WangGooViewModel extends ViewModel {
 
-    private Toast errToast;
     private String TAG = "WangGooViewModel";
     private MutableLiveData<WangGooBean> wangGooBeanMutableLiveData;
     private MutableLiveData<StrategyResultBean> strategyResultBeanMutableLiveData;
     private MutableLiveData<Boolean> isLoadingLiveData ;
     private MutableLiveData<Float> loadingBarPercentLiveData ;
+    private MutableLiveData<String> toastStringLiveData ;
     private FeatureDatabaseDao fdDao;
 
     public LiveData<WangGooBean> getWangGooBean() {
@@ -68,13 +71,16 @@ public class WangGooViewModel extends ViewModel {
     public LiveData<Float> getLoadingBarPercentLiveData() {
         return loadingBarPercentLiveData;
     }
+    public MutableLiveData<String> getShowToast() {
+        return toastStringLiveData;
+    }
 
     public WangGooViewModel(Context context){
-        errToast = Toast.makeText(context, "LOADING FAIL" , Toast.LENGTH_LONG);
         wangGooBeanMutableLiveData = new MutableLiveData<>();
         strategyResultBeanMutableLiveData = new MutableLiveData<>();
         isLoadingLiveData = new MutableLiveData<>();
         loadingBarPercentLiveData = new MutableLiveData<>();
+        toastStringLiveData = new MutableLiveData<>();
         fdDao = FeatureDatabase.getInstance(context).FeatureDatabaseDao();
     }
 
@@ -103,11 +109,13 @@ public class WangGooViewModel extends ViewModel {
             @Override
             public void onError(Throwable e) {
                 isLoadingLiveData.postValue(false);
+                toastStringLiveData.postValue("更新失敗 : \n" + e.getMessage());
                 Log.e(TAG + "wangGooApiGetStrategy",e.toString());
             }
             @Override
             public void onComplete() {
                 isLoadingLiveData.postValue(false);
+                toastStringLiveData.postValue("更新成功" );
             }
         });
     }
@@ -167,13 +175,15 @@ public class WangGooViewModel extends ViewModel {
             @Override
             public void onError(@NonNull Throwable e) {
                 isLoadingLiveData.postValue(false);
-                errToast.show();
+                toastStringLiveData.postValue("更新失敗 : \n" + e.getMessage());
                 Log.e(TAG,e.toString());
             }
 
             @Override
             public void onComplete() {
                 isLoadingLiveData.postValue(false);
+                toastStringLiveData.postValue("更新成功");
+
             }
         };
         new WangGooRepository(new WangGooDataSource()).getWangGooDataSource().getHistoryService()
@@ -217,6 +227,8 @@ public class WangGooViewModel extends ViewModel {
                 System.out.println(hashmap_time_data_all);
             } catch (Exception e1) {
                 e1.printStackTrace();
+                isLoadingLiveData.postValue(false);
+                toastStringLiveData.postValue("更新失敗 : \n" + e1.getMessage());
             }
             update_db(hashmap_time_data_all);
         });
@@ -224,46 +236,54 @@ public class WangGooViewModel extends ViewModel {
     }
 
     public void update_db(ArrayMap<String, ArrayMap<String,String>> hashmap_time_data){
-        ArrayList<Table_Small_Taiwan_Feature> need_to_update_list = new ArrayList<>();
-        ArrayList<Table_Small_Taiwan_Feature> need_to_insert_list = new ArrayList<>();
-        for (String key : hashmap_time_data.keySet()) {
-            ArrayMap<String,String> temp_data = hashmap_time_data.get(key);
-            String date = key;
-            System.out.println(date +" " +temp_data.toString());
-            Table_Small_Taiwan_Feature dstf = new Table_Small_Taiwan_Feature(date,
-                    Float.parseFloat(temp_data.get("open")),
-                    Float.parseFloat(temp_data.get("high")),
-                    Float.parseFloat(temp_data.get("low")),
-                    Float.parseFloat(temp_data.get("close")),
-                    Float.parseFloat(temp_data.get("volume")));
-            Table_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
+        try {
+
+
+            ArrayList<Table_Small_Taiwan_Feature> need_to_update_list = new ArrayList<>();
+            ArrayList<Table_Small_Taiwan_Feature> need_to_insert_list = new ArrayList<>();
+            for (String key : hashmap_time_data.keySet()) {
+                ArrayMap<String, String> temp_data = hashmap_time_data.get(key);
+                String date = key;
+                System.out.println(date + " " + temp_data.toString());
+                Table_Small_Taiwan_Feature dstf = new Table_Small_Taiwan_Feature(date,
+                        Float.parseFloat(temp_data.get("open")),
+                        Float.parseFloat(temp_data.get("high")),
+                        Float.parseFloat(temp_data.get("low")),
+                        Float.parseFloat(temp_data.get("close")),
+                        Float.parseFloat(temp_data.get("volume")));
+                Table_Small_Taiwan_Feature the_date_information = fdDao.get_Date_data(date);
 //           沒有的才 insert
-            if (the_date_information != null){
-                need_to_update_list.add(dstf);
-            }else {
-                need_to_insert_list.add(dstf);
+                if (the_date_information != null) {
+                    need_to_update_list.add(dstf);
+                } else {
+                    need_to_insert_list.add(dstf);
+                }
             }
-        }
-        //如果資料太多 array 內存會爆  >>就要一筆一筆update
-        if (need_to_update_list != null) {
-            fdDao.updateAllTable_Small_Taiwan_Feature(need_to_update_list);
-        }
-        if (need_to_insert_list != null) {
-            fdDao.insertAllTable_Small_Taiwan_Feature(need_to_insert_list);
-        }
+            //如果資料太多 array 內存會爆  >>就要一筆一筆update
+            if (need_to_update_list != null) {
+                fdDao.updateAllTable_Small_Taiwan_Feature(need_to_update_list);
+            }
+            if (need_to_insert_list != null) {
+                fdDao.insertAllTable_Small_Taiwan_Feature(need_to_insert_list);
+            }
 
-        fdDao.update_ALL_ma5(fdDao.get_ma5_begin_date());
-        fdDao.update_ALL_ma10(fdDao.get_ma10_begin_date());
-        fdDao.update_ALL_ma15(fdDao.get_ma15_begin_date());
-        fdDao.update_ALL_ma30(fdDao.get_ma30_begin_date());
-        fdDao.update_ALL_bias5(fdDao.get_ma5_begin_date());
-        fdDao.update_ALL_before_5_days_average(fdDao.get_ma5_begin_date());
+            fdDao.update_ALL_ma5(fdDao.get_ma5_begin_date());
+            fdDao.update_ALL_ma10(fdDao.get_ma10_begin_date());
+            fdDao.update_ALL_ma15(fdDao.get_ma15_begin_date());
+            fdDao.update_ALL_ma30(fdDao.get_ma30_begin_date());
+            fdDao.update_ALL_bias5(fdDao.get_ma5_begin_date());
+            fdDao.update_ALL_before_5_days_average(fdDao.get_ma5_begin_date());
 
-        java.util.Date today = new java.util.Date(System.currentTimeMillis());
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-        String day = format.format(today);
-        fdDao.Delete_after_day(day);
-        isLoadingLiveData.postValue(false);
+            java.util.Date today = new java.util.Date(System.currentTimeMillis());
+            SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+            String day = format.format(today);
+            fdDao.Delete_after_day(day);
+            isLoadingLiveData.postValue(false);
+            toastStringLiveData.postValue("更新成功");
+        }catch (Exception e){
+            isLoadingLiveData.postValue(false);
+            toastStringLiveData.postValue("更新失敗 : \n" + e.getMessage());
+        }
 
     }
 
@@ -284,5 +304,23 @@ public class WangGooViewModel extends ViewModel {
             return strategyResultBean;
         }
     }
+
+    public void updateDate(){  //更新日曆
+        isLoadingLiveData.postValue(true);
+        new APIUtil().update(new ApiResponse() {
+            @Override
+            public void success() {
+                isLoadingLiveData.postValue(false);
+                toastStringLiveData.postValue("更新成功");
+            }
+
+            @Override
+            public void fail(Exception e) {
+                isLoadingLiveData.postValue(false);
+                toastStringLiveData.postValue("更新失敗 : \n" + e.getMessage());
+            }
+        });
+    }
+
 
 }
