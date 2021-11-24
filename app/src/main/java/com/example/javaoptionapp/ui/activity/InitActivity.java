@@ -1,10 +1,13 @@
 package com.example.javaoptionapp.ui.activity;
 
 import android.Manifest;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.javaoptionapp.R;
 import com.example.javaoptionapp.databinding.ActivityInitBinding;
@@ -16,6 +19,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.Locale;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
@@ -37,22 +41,32 @@ public class InitActivity extends AppCompatActivity {
 
         binding.loadingBar.setSmoothPercent(0.8f);
 
-        wangGooViewModel =new ViewModelProvider(this,new ViewModelFactory(this)).get(WangGooViewModel.class);
+        wangGooViewModel = new ViewModelProvider(this, new ViewModelFactory(this)).get(WangGooViewModel.class);
 
         wangGooViewModel.getLoadingBarPercentLiveData().observe(this, loadingBarPercent -> {
-            if(loadingBarPercent < 1f) {
-                String percent = String.format(Locale.getDefault() ,"%.0f",loadingBarPercent*100) + " %";
+            if (loadingBarPercent < 1f) {
+                String percent = String.format(Locale.getDefault(), "%.0f", loadingBarPercent * 100) + " %";
                 binding.loadingBar.setSmoothPercent(loadingBarPercent);
                 binding.tvLoadingBar.setText(percent);
-            }else {
+            } else {
                 // 创建需要启动的Activity对应的Intent
-                Intent intent = new Intent(this,MainActivity.class);
+                Intent intent = new Intent(this, MainActivity.class);
                 // 启动intent对应的Activity
                 startActivity(intent);
                 finish();
             }
         });
 
+        wangGooViewModel.getShowToast().observe(this, toastContent -> {
+            Toast.makeText(this, toastContent, Toast.LENGTH_SHORT).show();
+        });
+
+        wangGooViewModel.getReloadEventLiveData().observe(this, unit -> {
+            Dialog reloadDialog = new AlertDialog.Builder(this).setMessage("獲取資料失敗")
+                    .setPositiveButton("reload", (dialog, which) -> wangGooViewModel.wangGooHistoryApiUpdateDb())
+                    .setNegativeButton("close App", (dialog, which) -> finish()).create();
+            reloadDialog.show();
+        });
 
         View view = binding.getRoot();
         setContentView(view);
@@ -64,17 +78,17 @@ public class InitActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private void init(){
+    private void init() {
         // Android6.0 就是API 23之后。APP需要动态获取权限。
         //java.io.FileNotFoundException: ./sdcard/data/data.txt (Permission denied)
-        final int EXTERNAL_STORAGE_REQ_CODE = 10 ;
+        final int EXTERNAL_STORAGE_REQ_CODE = 10;
 
-        int permission = ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // 请求权限
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},EXTERNAL_STORAGE_REQ_CODE);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_REQ_CODE);
         }
 
         wangGooViewModel.wangGooHistoryApiUpdateDb();

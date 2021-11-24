@@ -23,12 +23,14 @@ public interface WangGooService {
     @GET("daily-candlestick")
     Observable<WangGooBean> WangGooBean();
 
-    @Headers({"User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)"})
-    @GET("historical-daily-candlesticks?")
+    @Headers({"User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)","Referer: https://www.wantgoo.com/futures/wmt&"})
+    @GET("historical-daily-candlesticks")
     Observable<ResponseBody> WangGooHistoryHtml(@Query("before") String before,@Query("top") String top);
+    //  有變動邏輯 before 改為上星期的 16:00
 //    "https://www.wantgoo.com/investrue/wmt&/historical-daily-candlesticks?before="+System.currentTimeMillis()+"&top=490"
 
     @Headers({"User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)"})
-    @GET("historical-daily-candlesticks?")
+    @GET("historical-daily-candlesticks")
     Observable<List<WangGooBean>> WangGooHistoryBeanArray(@Query("before") String before, @Query("top") String top);
+    //https://www.wantgoo.com/investrue/wmt&/historical-daily-candlesticks?before=1632758400000&top=490
 }

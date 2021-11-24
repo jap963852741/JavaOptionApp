@@ -26,7 +26,9 @@ import java.util.Date;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
+import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -49,9 +51,9 @@ public class WangGooDataSource implements FeatureDatabaseDao {
             IntTime = Integer.parseInt(simpleDateFormat.format(date));
         }
         if(IntTime > 830 && IntTime < 1455){
-            baseUrl = "https://www.wantgoo.com/investrue/wtx&/"; //早盤
+            baseUrl = "https://www.wantgoo.com/futures/wtx&/"; //早盤
         }else{
-            baseUrl = "https://www.wantgoo.com/investrue/wtxp&/"; //晚盤
+            baseUrl = "https://www.wantgoo.com/futures/wtxp&/"; //晚盤
         }
 
         Log.i(TAG, "baseUrl = " + baseUrl);
@@ -65,6 +67,20 @@ public class WangGooDataSource implements FeatureDatabaseDao {
         return retrofit.create(WangGooService.class);
     }
 
+    private OkHttpClient getLogIntercept(){
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        // set your desired log level
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        // add your other interceptors …
+
+        // add logging as last interceptor
+        httpClient.addInterceptor(logging);  // <-- this is the important line!
+
+        return httpClient.build();
+    }
+
     public WangGooService getHistoryService(){
         String baseUrl;
         baseUrl = "https://www.wantgoo.com/investrue/wmt&/";
@@ -74,6 +90,7 @@ public class WangGooDataSource implements FeatureDatabaseDao {
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+                .client(getLogIntercept())
                 .build();
 
         return retrofit.create(WangGooService.class);
