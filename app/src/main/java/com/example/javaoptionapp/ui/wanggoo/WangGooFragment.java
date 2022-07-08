@@ -1,16 +1,15 @@
 package com.example.javaoptionapp.ui.wanggoo;
 
-import android.annotation.SuppressLint;
+import static java.util.Collections.max;
+import static java.util.Collections.min;
+
 import android.app.Activity;
-import android.app.Application;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -37,18 +35,12 @@ import com.example.javaoptionapp.databinding.FragmentWanggooBinding;
 import com.example.javaoptionapp.databinding.ItemStrategyBuyApproachBinding;
 import com.example.javaoptionapp.databinding.ItemStrategyBuyNoApproachBinding;
 import com.example.javaoptionapp.databinding.ItemWanggooBinding;
+import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
 import com.example.javaoptionapp.ui.common.ViewModelFactory;
 import com.example.javaoptionapp.util.dialog.LoadingDialog;
-import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
-import com.example.taiwanworkdaylib.APIUtil;
-import com.example.taiwanworkdaylib.ApiResponse;
-
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.util.Collections.max;
-import static java.util.Collections.min;
 
 public class WangGooFragment extends Fragment {
 
@@ -57,7 +49,6 @@ public class WangGooFragment extends Fragment {
     private WangGooViewModel wangGooViewModel;
     private ImageView image;
     private ViewStub strategyView;
-    private Activity activity;
     private final int SHOW = 0;
     private final int HIDE = 1;
 
@@ -66,27 +57,27 @@ public class WangGooFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        activity = ((AppCompatActivity) getActivity());
-        wangGooViewModel =new ViewModelProvider(this,new ViewModelFactory(activity)).get(WangGooViewModel.class);
+        wangGooViewModel = new ViewModelProvider(this, new ViewModelFactory(getActivity())).get(WangGooViewModel.class);
         fragmentWanggooBinding = FragmentWanggooBinding.inflate(inflater, container, false);
-        ItemWanggooBinding itemWanggooBinding =  ItemWanggooBinding.bind(fragmentWanggooBinding.getRoot());
+        ItemWanggooBinding itemWanggooBinding = ItemWanggooBinding.bind(fragmentWanggooBinding.getRoot());
         image = fragmentWanggooBinding.imageWanggoo;
         strategyView = fragmentWanggooBinding.strategy;
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int screenHeight = displayMetrics.heightPixels;
-        image.getLayoutParams().height = screenHeight/4;
+        image.getLayoutParams().height = screenHeight / 4;
 
         Toolbar toolbar = fragmentWanggooBinding.toolBarWanggoo;
         toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_history));//把三個小點換掉
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
         wangGooViewModel.getWangGooBean().observe(getViewLifecycleOwner(), responseWangGooBean -> {
-            if(responseWangGooBean != null) {
+            if (responseWangGooBean != null) {
                 itemWanggooBinding.nowPrice.setText(responseWangGooBean.getClose());
                 itemWanggooBinding.tradeDate.setText(responseWangGooBean.getTradeDateYYYYMMDDChinese());
                 itemWanggooBinding.open.setText(responseWangGooBean.getOpen());
@@ -98,12 +89,12 @@ public class WangGooFragment extends Fragment {
         });
 
         wangGooViewModel.getStrategyResultBean().observe(getViewLifecycleOwner(), responseStrategyResultBean -> {
-            if(responseStrategyResultBean.getHundred_Data() == null) return;
+            if (responseStrategyResultBean.getHundred_Data() == null) return;
             bitmap(responseStrategyResultBean.getHundred_Data());
-            Log.e(TAG,responseStrategyResultBean.getHundred_Data().toString());
-            if(responseStrategyResultBean.isBuyOrNot()) { //買進
+            Log.e(TAG, responseStrategyResultBean.getHundred_Data().toString());
+            if (responseStrategyResultBean.isBuyOrNot()) { //買進
                 StrategyDataBean strategyDataBean = responseStrategyResultBean.getStrategyDataBean();
-                if(strategyDataBean.isApproach()) { //持有日
+                if (strategyDataBean.isApproach()) { //持有日
                     strategyView.setLayoutResource(R.layout.item_strategy_buy_approach);
                     strategyView.inflate();
                     ItemStrategyBuyApproachBinding itemBinding = ItemStrategyBuyApproachBinding.bind(fragmentWanggooBinding.getRoot());
@@ -111,7 +102,7 @@ public class WangGooFragment extends Fragment {
                     itemBinding.EntryPoint.setText(String.valueOf(strategyDataBean.getEntryPoint()));
                     itemBinding.ExitBenefitPoint.setText(String.valueOf(strategyDataBean.getExitBenefitPoint()));
                     itemBinding.LastTicketDay.setText(String.valueOf(strategyDataBean.getExpectedSellDate()));
-                }else { //平倉日
+                } else { //平倉日
                     strategyView.setLayoutResource(R.layout.item_strategy_buy_no_approach);
                     strategyView.inflate();
                     ItemStrategyBuyNoApproachBinding itemBinding = ItemStrategyBuyNoApproachBinding.bind(fragmentWanggooBinding.getRoot());
@@ -120,23 +111,22 @@ public class WangGooFragment extends Fragment {
                     itemBinding.noApproachExitPoint.setText(String.valueOf(strategyDataBean.getExitPoint()));
                     itemBinding.thisTimePerformance.setText(String.valueOf(strategyDataBean.getThisTimePerformance()));
                 }
-            }else {//觀察
+            } else {//觀察
                 strategyView.setLayoutResource(R.layout.item_strategy_nothing);
                 strategyView.inflate();
             }
         });
 
         wangGooViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
-            if(isLoading){
-                LoadingDialog.getInstance(getActivity().getApplicationContext()).show();
-            }else{
-                LoadingDialog.getInstance(getActivity().getApplicationContext()).hide();
+            if (isLoading) {
+                LoadingDialog.getInstance(getActivity()).show();
+            } else {
+                LoadingDialog.getInstance(getActivity()).hide();
             }
         });
 
-        wangGooViewModel.getShowToast().observe(getViewLifecycleOwner(),toastContent ->{
-            Toast.makeText(getContext(),toastContent,Toast.LENGTH_SHORT).show();
-        });
+        wangGooViewModel.getShowToast().observe(getViewLifecycleOwner(), toastContent ->
+                Toast.makeText(getContext(), toastContent, Toast.LENGTH_SHORT).show());
 
         init();
 
@@ -157,12 +147,10 @@ public class WangGooFragment extends Fragment {
     }
 
 
-
-    public interface ActionBar_Menu_Num{
+    public interface ActionBar_Menu_Num {
         Integer update_two_year_data = 1;
         Integer update_all_year_data = 2;
         Integer update_date_data = 3;
-
     }
 
 
@@ -173,7 +161,7 @@ public class WangGooFragment extends Fragment {
                 wangGooViewModel.wangGooHistoryApiUpdateDb();
                 break;
             case 2:
-                wangGooViewModel.update_all_history(activity);
+                wangGooViewModel.update_all_history(getActivity());
                 break;
             case 3:
                 wangGooViewModel.updateDate();
@@ -183,18 +171,16 @@ public class WangGooFragment extends Fragment {
     }
 
 
-
-
-    private static float upsite_y(float y,float max_y,float min_y){
-        return max_y-(y-min_y);
+    private static float upsite_y(float y, float max_y, float min_y) {
+        return max_y - (y - min_y);
     }
 
-    private void bitmap(List<Table_Small_Taiwan_Feature> Hundred_Data){
+    private void bitmap(List<Table_Small_Taiwan_Feature> Hundred_Data) {
         float x_size = (float) image.getWidth() / Hundred_Data.size();
-        float x_init = (float) image.getWidth() / (Hundred_Data.size()*2);
-        float min_y ;
-        float max_y ;
-        float x_width = x_init/2;
+        float x_init = (float) image.getWidth() / (Hundred_Data.size() * 2);
+        float min_y;
+        float max_y;
+        float x_width = x_init / 2;
         ArrayList<Float> min_y_list = new ArrayList<Float>();
         ArrayList<Float> max_y_list = new ArrayList<Float>();
 
@@ -214,12 +200,12 @@ public class WangGooFragment extends Fragment {
         paintMA5.setColor(Color.BLUE);
         paintMA5.setStyle(Paint.Style.STROKE);
         Paint paintMA10 = new Paint();
-        paintMA10.setColor(Color.rgb(255,97,0));
+        paintMA10.setColor(Color.rgb(255, 97, 0));
         paintMA10.setStyle(Paint.Style.STROKE);
         Canvas canvas = new Canvas(bitmap);
         if (Hundred_Data.size() > 0) {
 
-            for(Table_Small_Taiwan_Feature Day_Data : Hundred_Data) {
+            for (Table_Small_Taiwan_Feature Day_Data : Hundred_Data) {
                 min_y_list.add(Day_Data.low);
                 max_y_list.add(Day_Data.high);
             }
@@ -230,41 +216,41 @@ public class WangGooFragment extends Fragment {
             Path ma5_path = new Path();
             Path ma10_path = new Path();
             float before_close = 0f;
-                for (Table_Small_Taiwan_Feature Day_Data : Hundred_Data) {
-                    Log.i("Hundred_Data", Day_Data.date + " 開盤: " +
-                            Day_Data.open + " 最高: " + Day_Data.high +
-                            " 最低 : " + Day_Data.low + " 收盤 : " + Day_Data.close + " " + Day_Data.MA_5 + " " + Day_Data.BIAS_5);
+            for (Table_Small_Taiwan_Feature Day_Data : Hundred_Data) {
+                Log.i("Hundred_Data", Day_Data.date + " 開盤: " +
+                        Day_Data.open + " 最高: " + Day_Data.high +
+                        " 最低 : " + Day_Data.low + " 收盤 : " + Day_Data.close + " " + Day_Data.MA_5 + " " + Day_Data.BIAS_5);
 
 
-                    float startY = (upsite_y(Day_Data.low, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
-                    float stopY = (upsite_y(Day_Data.high, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
-                    float startY_width = (upsite_y(Day_Data.open, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
-                    float stopY_width = (upsite_y(Day_Data.close, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
-                    float ma5_Y = (upsite_y(Day_Data.MA_5, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
-                    float ma10_Y = (upsite_y(Day_Data.MA_10, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+                float startY = (upsite_y(Day_Data.low, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+                float stopY = (upsite_y(Day_Data.high, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+                float startY_width = (upsite_y(Day_Data.open, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+                float stopY_width = (upsite_y(Day_Data.close, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+                float ma5_Y = (upsite_y(Day_Data.MA_5, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
+                float ma10_Y = (upsite_y(Day_Data.MA_10, max_y, min_y) - min_y) * image.getHeight() / (max_y - min_y);
 
-                    if (before_close < Day_Data.close) {
-                        canvas.drawLine(x_init, startY, x_init, stopY, paintRed);
-                        canvas.drawLine(x_init, startY_width, x_init, stopY_width, paintRedWidth);
-                    } else {
-                        canvas.drawLine(x_init, startY, x_init, stopY, paintGreen);
-                        canvas.drawLine(x_init, startY_width, x_init, stopY_width, paintGreenWidth);
-                    }
-                    if (before_close == 0f) {
-                        ma5_path.moveTo(x_init, ma5_Y);
-                        ma10_path.moveTo(x_init, ma10_Y);
-                    } else {
-                        ma5_path.lineTo(x_init, ma5_Y);
-                        ma10_path.lineTo(x_init, ma10_Y);
-                    }
-
-
-                    x_init += x_size;
-                    before_close = Day_Data.close;
+                if (before_close < Day_Data.close) {
+                    canvas.drawLine(x_init, startY, x_init, stopY, paintRed);
+                    canvas.drawLine(x_init, startY_width, x_init, stopY_width, paintRedWidth);
+                } else {
+                    canvas.drawLine(x_init, startY, x_init, stopY, paintGreen);
+                    canvas.drawLine(x_init, startY_width, x_init, stopY_width, paintGreenWidth);
                 }
-                canvas.drawPath(ma5_path, paintMA5);
-                canvas.drawPath(ma10_path, paintMA10);
-                image.setImageBitmap(bitmap);
+                if (before_close == 0f) {
+                    ma5_path.moveTo(x_init, ma5_Y);
+                    ma10_path.moveTo(x_init, ma10_Y);
+                } else {
+                    ma5_path.lineTo(x_init, ma5_Y);
+                    ma10_path.lineTo(x_init, ma10_Y);
+                }
+
+
+                x_init += x_size;
+                before_close = Day_Data.close;
+            }
+            canvas.drawPath(ma5_path, paintMA5);
+            canvas.drawPath(ma10_path, paintMA10);
+            image.setImageBitmap(bitmap);
         }
     }
 

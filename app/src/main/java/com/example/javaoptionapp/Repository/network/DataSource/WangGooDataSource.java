@@ -3,17 +3,14 @@ package com.example.javaoptionapp.Repository.network.DataSource;
 import android.os.Environment;
 import android.util.Log;
 
-import androidx.room.Room;
-
 import com.example.javaoptionapp.Repository.bean.wangGoo.StrategyDataBean;
 import com.example.javaoptionapp.Repository.bean.wangGoo.StrategyResultBean;
-import com.example.javaoptionapp.Repository.network.api.option.YahooOptionService;
 import com.example.javaoptionapp.Repository.network.api.wanggoo.WangGooService;
-import com.example.javaoptionapp.room.FeatureDatabase;
 import com.example.javaoptionapp.room.FeatureDatabaseDao;
 import com.example.javaoptionapp.room.Table_Option;
 import com.example.javaoptionapp.room.Table_Small_Taiwan_Feature;
-import com.example.javaoptionapp.ui.wanggoo.WangGooFragment;
+import com.example.javaoptionapp.util.OkhttpClientUtilKt;
+import com.example.javaoptionapp.util.Singleton;
 import com.example.taiwanworkdaylib.HolidayUtil;
 
 import java.text.DateFormat;
@@ -27,8 +24,6 @@ import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
 import okhttp3.OkHttpClient;
-import okhttp3.ResponseBody;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -37,24 +32,25 @@ public class WangGooDataSource implements FeatureDatabaseDao {
 
     private String TAG = "WangGooDataSource";
     private FeatureDatabaseDao featureDatabaseDao;
+    private OkHttpClient.Builder httpClient = Singleton.INSTANCE.getOkHttpClientBuilder();
 
-    public WangGooService getService(){
-
+    public WangGooService getService() {
         String baseUrl;
-        int IntTime = 0;  //幾點幾分
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            IntTime = Integer.parseInt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HHmm")));
-        }else{
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HHmm");// HH:mm:ss
+//        int IntTime = 0;  //幾點幾分
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//            IntTime = Integer.parseInt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HHmm")));
+//        } else {
+//            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HHmm");// HH:mm:ss
             //获取当前时间
-            Date date = new Date(System.currentTimeMillis());
-            IntTime = Integer.parseInt(simpleDateFormat.format(date));
-        }
-        if(IntTime > 830 && IntTime < 1455){
-            baseUrl = "https://www.wantgoo.com/futures/wtx&/"; //早盤
-        }else{
-            baseUrl = "https://www.wantgoo.com/futures/wtxp&/"; //晚盤
-        }
+//            Date date = new Date(System.currentTimeMillis());
+//            IntTime = Integer.parseInt(simpleDateFormat.format(date));
+//        }
+        baseUrl = "https://www.wantgoo.com/investrue/wtx&/";
+//        if(IntTime > 830 && IntTime < 1455){
+//            baseUrl = "https://www.wantgoo.com/futures/wtx&/"; //早盤
+//        }else{
+//            baseUrl = "https://www.wantgoo.com/futures/wtxp&/"; //晚盤
+//        }
 
         Log.i(TAG, "baseUrl = " + baseUrl);
 
@@ -62,41 +58,29 @@ public class WangGooDataSource implements FeatureDatabaseDao {
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+                .client(httpClient.build())
                 .build();
 
         return retrofit.create(WangGooService.class);
     }
 
-    private OkHttpClient getLogIntercept(){
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        // set your desired log level
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+    public WangGooService getHistoryService() {
+        Log.i(TAG, "getHistoryService");
 
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        // add your other interceptors …
-
-        // add logging as last interceptor
-        httpClient.addInterceptor(logging);  // <-- this is the important line!
-
-        return httpClient.build();
-    }
-
-    public WangGooService getHistoryService(){
         String baseUrl;
-        baseUrl = "https://www.wantgoo.com/investrue/wmt&/";
-        Log.i(TAG, "baseUrl = " + baseUrl);
+        baseUrl = "https://www.wantgoo.com/investrue/wtxm&/";
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-                .client(getLogIntercept())
+                .client(httpClient.build())
                 .build();
 
         return retrofit.create(WangGooService.class);
     }
 
-    public Observable<StrategyResultBean> getStrategy(FeatureDatabaseDao fdDao){ //StrategyBean
+    public Observable<StrategyResultBean> getStrategy(FeatureDatabaseDao fdDao) { //StrategyBean
 
         Observable<StrategyResultBean> myObservable = Observable.create(subscriber -> {
             featureDatabaseDao = fdDao;
@@ -104,7 +88,7 @@ public class WangGooDataSource implements FeatureDatabaseDao {
             HolidayUtil holidayutil = new HolidayUtil();
             String need_to_add = "";
             boolean Approach;
-            Float Entry_Point = null , Exit_Point = null, Exit_Benifit_Point = null ,Exit_Damage_Point = null;
+            Float Entry_Point = null, Exit_Point = null, Exit_Benifit_Point = null, Exit_Damage_Point = null;
             int Day = 0;
             int Day_To_Stop_Loss;
             String ApproachDate = "";
@@ -114,31 +98,30 @@ public class WangGooDataSource implements FeatureDatabaseDao {
             Day_To_Stop_Loss = 4;//幾天內沒到停利點 就平倉
             Hundred_Data = get_10_data_fromnow();
             strategyResultBean.setHundred_Data(Hundred_Data);
-            Log.e(TAG,"Hundred_Data = "+ Hundred_Data.toString());
+            Log.e(TAG, "Hundred_Data = " + Hundred_Data.toString());
             Approach = false;
-            for(Table_Small_Taiwan_Feature Day_Data : Hundred_Data){
+            for (Table_Small_Taiwan_Feature Day_Data : Hundred_Data) {
                 Day_to_Stop = false;
-                Log.i("Hundred_Data", Day_Data.date + " 開盤: " + Day_Data.open + " 最高: "+Day_Data.high + " 最低 : "+Day_Data.low + " 收盤 : " +Day_Data.close + " "+ Day_Data.MA_5+ " "+ Day_Data.BIAS_5);
-                if(!Approach) {
-                    if(Day_Data.MA_5!=null&&Day_Data.MA_10!=null&&Day_Data.MA_15!=null&&Day_Data.MA_30!=null&&
+                Log.i("Hundred_Data", Day_Data.date + " 開盤: " + Day_Data.open + " 最高: " + Day_Data.high + " 最低 : " + Day_Data.low + " 收盤 : " + Day_Data.close + " " + Day_Data.MA_5 + " " + Day_Data.BIAS_5);
+                if (!Approach) {
+                    if (Day_Data.MA_5 != null && Day_Data.MA_10 != null && Day_Data.MA_15 != null && Day_Data.MA_30 != null &&
                             Day_Data.close < Day_Data.MA_5
                             && Day_Data.high > Day_Data.MA_5
-                            && Day_Data.volume > Day_Data.before_5_days_average*.86){
+                            && Day_Data.volume > Day_Data.before_5_days_average * .86) {
                         ApproachDate = Day_Data.date;
                         Entry_Point = Day_Data.close; //進場點數
-                        Exit_Benifit_Point =  Entry_Point * 1.2f; //停利點數
+                        Exit_Benifit_Point = Entry_Point * 1.2f; //停利點數
                         Approach = true;//進場
                         Day = 1;//第0天
 //                            Log.i("Hundred_Data", Day_Data.date + " 進場做多點數 : "+ Entry_Point +"停利點位:" + Exit_Benifit_Point);
                     }
-                }else if(Approach){//已進場做多 判斷停利停損
-                    if(Day_Data.high > Exit_Benifit_Point){  //Day_Data.close > Day_Data.MA_5 * 1.05 ||
+                } else if (Approach) {//已進場做多 判斷停利停損
+                    if (Day_Data.high > Exit_Benifit_Point) {  //Day_Data.close > Day_Data.MA_5 * 1.05 ||
                         Day_to_Stop = true;
-                        Exit_Point =  Day_Data.close; //停利點數
+                        Exit_Point = Day_Data.close; //停利點數
                         Approach = false;
 //                            System.out.println("停利點數 : "+ Exit_Point);
-                    }
-                    else if(Day == Day_To_Stop_Loss){  //第四天沒漲超過100就算輸
+                    } else if (Day == Day_To_Stop_Loss) {  //第四天沒漲超過100就算輸
                         Day_to_Stop = true;
                         Exit_Point = Day_Data.close; //停損點數
                         Approach = false;
@@ -149,10 +132,10 @@ public class WangGooDataSource implements FeatureDatabaseDao {
             }
 
             need_to_add += ",,目前交易策略,";
-            if(Approach){//進場
-                need_to_add +=  ","+"              入場日期 : "+ ApproachDate
-                        +","+"              入場點數 : "+ Entry_Point
-                        + ","+"              停利點數 : "+ Exit_Benifit_Point;
+            if (Approach) {//進場
+                need_to_add += "," + "              入場日期 : " + ApproachDate
+                        + "," + "              入場點數 : " + Entry_Point
+                        + "," + "              停利點數 : " + Exit_Benifit_Point;
                 DateFormat format = new SimpleDateFormat("yyyyMMdd"); //定义日期格式化的格式
                 String classDateString = ApproachDate;//需要加减的字符串型日期
                 Date classDate = null;//把字符串转化成指定格式的日期
@@ -174,7 +157,7 @@ public class WangGooDataSource implements FeatureDatabaseDao {
                     SimpleDateFormat fm = new SimpleDateFormat("yyyyMMdd");
                     holidayutil.set_date(String.valueOf(fm.format(classDate.getTime())));
                     calendar.add(Calendar.DATE, +1);
-                    if (!holidayutil.isHoliday()){
+                    if (!holidayutil.isHoliday()) {
                         add_day += 1;
                     }
                 }
@@ -183,10 +166,10 @@ public class WangGooDataSource implements FeatureDatabaseDao {
                 SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
                 String formatted = format1.format(classDate.getTime());
 
-                need_to_add +=  ","+"              最後平倉日 : "+ formatted
+                need_to_add += "," + "              最後平倉日 : " + formatted
                         + ","
-                        + ","+"高點超過停利點 收盤平倉";
-                Log.e(TAG,"Exit_Benifit_Point = " + Exit_Benifit_Point.toString());
+                        + "," + "高點超過停利點 收盤平倉";
+                Log.e(TAG, "Exit_Benifit_Point = " + Exit_Benifit_Point.toString());
                 strategyResultBean.setBuyOrNot(true);
                 strategyResultBean.setStrategyDataBean(
                         new StrategyDataBean(
@@ -198,8 +181,8 @@ public class WangGooDataSource implements FeatureDatabaseDao {
                         )
                 );
 
-            }else {
-                if(Day_to_Stop){
+            } else {
+                if (Day_to_Stop) {
 //                    need_to_add +=  ","+"              入場日期 : "+ ApproachDate
 //                            + ","+"              入場點數 : "+ Entry_Point
 //                            + ","+"              平倉點數 : "+ Exit_Point
@@ -215,7 +198,7 @@ public class WangGooDataSource implements FeatureDatabaseDao {
                             )
                     );
 
-                }else {
+                } else {
                     strategyResultBean.setBuyOrNot(false);
                 }
             }
@@ -223,8 +206,6 @@ public class WangGooDataSource implements FeatureDatabaseDao {
             subscriber.onNext(strategyResultBean);
             subscriber.onComplete();
         });
-
-
 
         return myObservable;
     }
@@ -246,12 +227,12 @@ public class WangGooDataSource implements FeatureDatabaseDao {
 
     @Override
     public Table_Option get_Option_Date_Close_Settlement_data(String one_date, Integer small, Integer big, Integer D) {
-        return featureDatabaseDao.get_Option_Date_Close_Settlement_data(one_date,small,big,D);
+        return featureDatabaseDao.get_Option_Date_Close_Settlement_data(one_date, small, big, D);
     }
 
     @Override
     public Table_Option get_option_data(String one_date, String m, String SP, String CP) {
-        return featureDatabaseDao.get_option_data(one_date,m,SP,CP);
+        return featureDatabaseDao.get_option_data(one_date, m, SP, CP);
     }
 
     @Override

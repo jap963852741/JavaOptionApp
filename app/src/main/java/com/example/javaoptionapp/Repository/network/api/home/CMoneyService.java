@@ -8,7 +8,7 @@ import retrofit2.http.*;
 
 public interface CMoneyService {
 
-    @POST("auth?appId=20200904152146367&appSecret=629ec0a0928c11eb9bbf000c29beef84")
+    @POST("auth?appId=20200904152146367&appSecret=26cbf7204e0f11ec9331000c29beef84")
     @Headers("X-Parse-Application-Id:vqYuKPOkLQLYHhk4QTGsGKFwATT4mBIGREI2m8eD")
     Observable<CMoneyTokenResponse> cMoneyToken();
 

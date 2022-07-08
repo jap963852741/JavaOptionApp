@@ -108,7 +108,7 @@ public class WangGooViewModel extends ViewModel {
                         .WangGooBean().subscribeOn(Schedulers.io()),
                 new WangGooDataSource().getStrategy(fdDao).subscribeOn(Schedulers.io()),
                 initObject::new
-        ).observeOn(Schedulers.newThread()).subscribe(new Observer<initObject>() {
+        ).observeOn(Schedulers.io()).subscribe(new Observer<initObject>() {
             @Override
             public void onSubscribe(Disposable d) {
             }
